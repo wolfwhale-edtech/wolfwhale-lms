@@ -131,7 +131,7 @@ class mod_forum_mod_form extends moodleform_mod {
         }
         $mform->setDefault('trackingtype', $default);
 
-        if ($CFG->enablerssfeeds && isset($CFG->forum_enablerssfeeds) && $CFG->forum_enablerssfeeds) {
+        if (!empty($CFG->enablerssfeeds) && !empty($CFG->forum_enablerssfeeds)) {
 //-------------------------------------------------------------------------------
             $mform->addElement('header', 'rssheader', get_string('rss'));
             $choices = array();

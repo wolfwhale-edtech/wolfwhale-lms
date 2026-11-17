@@ -5612,10 +5612,6 @@ EOT;
                 'modname' => 'assign',
                 'purpose' => MOD_PURPOSE_ASSESSMENT,
                 'otherpurpose' => null,
-            ],            'bigbluebuttonbn' => [
-                'modname' => 'bigbluebuttonbn',
-                'purpose' => MOD_PURPOSE_COMMUNICATION,
-                'otherpurpose' => null,
             ],            'book' => [
                 'modname' => 'book',
                 'purpose' => MOD_PURPOSE_CONTENT,

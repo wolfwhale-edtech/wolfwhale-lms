@@ -426,6 +426,7 @@ final class locallib_test extends \advanced_testcase {
         global $PAGE;
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
         $course = $this->getDataGenerator()->create_course();
         $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
 

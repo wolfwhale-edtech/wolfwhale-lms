@@ -40,6 +40,7 @@ final class taglib_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usetags', 1);
     }
 
     /**
@@ -698,18 +699,26 @@ final class taglib_test extends \advanced_testcase {
      * Prepares environment for test_move_tags_* tests
      */
     protected function prepare_move_tags() {
-        global $CFG;
-        require_once($CFG->dirroot.'/blog/locallib.php');
+        global $DB;
         $this->setUser($this->getDataGenerator()->create_user());
 
         $collid1 = core_tag_collection::get_default();
         $collid2 = core_tag_collection::create(array('name' => 'newcoll'))->id;
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
-        $blogpost = new \blog_entry(null, array('subject' => 'test'), null);
-        $states = \blog_entry::get_applicable_publish_states();
-        $blogpost->publishstate = reset($states);
-        $blogpost->add();
+        $blogpost = (object) ['id' => $DB->insert_record('post', (object) [
+            'module' => 'forum',
+            'userid' => $user1->id,
+            'courseid' => 1,
+            'groupid' => 0,
+            'moduleid' => 0,
+            'coursemoduleid' => 0,
+            'subject' => 'test',
+            'uniquehash' => sha1(random_string(20)),
+            'publishstate' => 'site',
+            'lastmodified' => time(),
+            'created' => time(),
+        ])];
 
         core_tag_tag::set_item_tags('core', 'user', $user1->id, \context_user::instance($user1->id),
                 array('Tag1', 'Tag2'));

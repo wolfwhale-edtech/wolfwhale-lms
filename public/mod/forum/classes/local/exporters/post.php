@@ -576,7 +576,7 @@ class post extends exporter {
         global $CFG;
 
         $urlfactory = $this->related['urlfactory'];
-        $enableplagiarism = $CFG->enableplagiarism;
+        $enableplagiarism = !empty($CFG->enableplagiarism);
         $forum = $this->related['forum'];
         $context = $this->related['context'];
 

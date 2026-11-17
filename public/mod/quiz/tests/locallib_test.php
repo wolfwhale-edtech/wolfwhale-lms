@@ -124,6 +124,7 @@ final class locallib_test extends \advanced_testcase {
      */
     public function test_quiz_question_tostring_with_tags(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $context = \context_coursecat::instance($this->getDataGenerator()->create_category()->id);
         $questiongenerator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $questioncat = $questiongenerator->create_question_category(['contextid' => $context->id]);

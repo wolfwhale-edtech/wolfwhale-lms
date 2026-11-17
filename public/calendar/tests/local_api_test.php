@@ -52,7 +52,7 @@ final class local_api_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $mapper = container::get_event_mapper();
-        $feedbackgenerator = $generator->get_plugin_generator('mod_feedback');
+        $feedbackgenerator = $generator->get_plugin_generator('mod_page');
         $feedback = $feedbackgenerator->create_instance(array_merge(
             ['course' => $course->id],
             $feedbackproperties
@@ -796,7 +796,7 @@ final class local_api_test extends \advanced_testcase {
         $assigngenerator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
         $assigninstance = $assigngenerator->create_instance(['course' => $course->id]);
 
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
         $lessoninstance = $lessongenerator->create_instance(['course' => $course->id]);
         $student = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
@@ -824,7 +824,7 @@ final class local_api_test extends \advanced_testcase {
                 'courseid' => $course->id,
                 'groupid' => 0,
                 'userid' => 2,
-                'modulename' => 'lesson',
+                'modulename' => 'page',
                 'instance' => $lessoninstance->id,
                 'eventtype' => 'end',
                 'timestart' => time(),
@@ -843,7 +843,7 @@ final class local_api_test extends \advanced_testcase {
         $this->assertCount(2, $events);
 
         // Disable the lesson module.
-        $modulerecord = $DB->get_record('modules', ['name' => 'lesson']);
+        $modulerecord = $DB->get_record('modules', ['name' => 'page']);
         $modulerecord->visible = 0;
         $DB->update_record('modules', $modulerecord);
 
@@ -1120,7 +1120,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_no_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1155,7 +1155,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_less_than_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1192,7 +1192,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_equal_to_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1228,7 +1228,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_after_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1259,7 +1259,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_no_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1295,7 +1295,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_greater_than_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1332,7 +1332,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_equal_to_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1369,7 +1369,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_before_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/feedback/lib.php');
+        require_once($CFG->dirroot . '/mod/page/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();

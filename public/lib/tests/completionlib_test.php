@@ -576,26 +576,28 @@ final class completionlib_test extends advanced_testcase {
      * Test for internal_get_state() for an activity that supports custom completion.
      */
     public function test_internal_get_state_with_custom_completion(): void {
+        global $DB;
         $this->setup_data();
 
-        $choicerecord = [
-            'course' => $this->course,
+        $assign = $this->getDataGenerator()->create_module('assign', [
+            'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionsubmit' => COMPLETION_ENABLED,
-        ];
-        $choice = $this->getDataGenerator()->create_module('choice', $choicerecord);
-        $cminfo = cm_info::create(get_coursemodule_from_instance('choice', $choice->id));
+        ]);
+        $cm = get_coursemodule_from_instance('assign', $assign->id);
+        $cminfo = cm_info::create($cm);
 
         $completioninfo = new completion_info($this->course);
 
-        // Fetch completion for the user who hasn't made a choice yet.
+        // No submission yet.
         $completion = $completioninfo->internal_get_state($cminfo, $this->user->id, COMPLETION_INCOMPLETE);
         $this->assertCompletionEquals(COMPLETION_INCOMPLETE, $completion);
 
-        // Have the user make a choice.
-        $choicewithoptions = choice_get_choice($choice->id);
-        $optionids = array_keys($choicewithoptions->option);
-        choice_user_submit_response($optionids[0], $choice, $this->user->id, $this->course, $cminfo);
+        $this->setUser($this->user);
+        $assignment = new \assign($cminfo->context, $cm, $this->course);
+        $submission = $assignment->get_user_submission($this->user->id, true);
+        $submission->status = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        $DB->update_record('assign_submission', $submission);
         $completion = $completioninfo->internal_get_state($cminfo, $this->user->id, COMPLETION_INCOMPLETE);
         $this->assertCompletionEquals(COMPLETION_COMPLETE, $completion);
     }
@@ -973,32 +975,31 @@ final class completionlib_test extends advanced_testcase {
 
         $this->setAdminUser();
 
-        $choicegenerator = $this->getDataGenerator()->get_plugin_generator('mod_choice');
-        $choice = $choicegenerator->create_instance([
+        $assigngenerator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
+        $choice = $assigngenerator->create_instance([
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            'completionsubmit' => true,
+            'completionsubmit' => 1,
         ]);
 
-        $cmchoice = cm_info::create(get_coursemodule_from_instance('choice', $choice->id));
+        $cmchoice = cm_info::create(get_coursemodule_from_instance('assign', $choice->id));
 
-        $choice2 = $choicegenerator->create_instance([
+        $choice2 = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
         ]);
 
-        $cmchoice2 = cm_info::create(get_coursemodule_from_instance('choice', $choice2->id));
+        $cmchoice2 = cm_info::create(get_coursemodule_from_instance('page', $choice2->id));
 
-        $workshopgenerator = $this->getDataGenerator()->get_plugin_generator('mod_workshop');
-        $workshop = $workshopgenerator->create_instance([
+        $workshop = $assigngenerator->create_instance([
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            // Submission grade required.
-            'completiongradeitemnumber' => 0,
+            'completionusegrade' => 1,
             'completionpassgrade' => 1,
+            'gradepass' => 50,
         ]);
 
-        $cmworkshop = cm_info::create(get_coursemodule_from_instance('workshop', $workshop->id));
+        $cmworkshop = cm_info::create(get_coursemodule_from_instance('assign', $workshop->id));
 
         $completioninfo = new completion_info($this->course);
 
@@ -1011,12 +1012,11 @@ final class completionlib_test extends advanced_testcase {
         $this->assertArrayHasKey('completionsubmit', $choicecompletiondata['customcompletion']);
         $this->assertCompletionEquals(COMPLETION_INCOMPLETE, $choicecompletiondata['customcompletion']['completionsubmit']);
 
-        // Mock a choice answer so user has completed the requirement.
-        $choicemockinfo = [
-            'choiceid' => $cmchoice->instance,
-            'userid' => $this->user->id
-        ];
-        $DB->insert_record('choice_answers', $choicemockinfo, false);
+        $this->setUser($user);
+        $assignment = new \assign($cmchoice->context, $cmchoice, $this->course);
+        $submission = $assignment->get_user_submission($user->id, true);
+        $submission->status = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
+        $DB->update_record('assign_submission', $submission);
 
         // Confirm fetching again reflects the completion.
         $choicecompletiondata = $method->invoke($completioninfo, $cmchoice, $user->id);
@@ -1111,11 +1111,11 @@ final class completionlib_test extends advanced_testcase {
         $c->internal_set_data($cm, $data);
 
         // 4) Test instant course completions.
-        $dataactivity = $this->getDataGenerator()->create_module('data', array('course' => $this->course->id),
+        $dataactivity = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id),
             array('completion' => 1));
-        $cm = get_coursemodule_from_instance('data', $dataactivity->id);
+        $cm = get_coursemodule_from_instance('page', $dataactivity->id);
         $c = new completion_info($this->course);
-        $cmdata = get_coursemodule_from_id('data', $dataactivity->cmid);
+        $cmdata = get_coursemodule_from_id('page', $dataactivity->cmid);
 
         // Add activity completion criteria.
         $criteriadata = new stdClass();
@@ -1391,17 +1391,17 @@ final class completionlib_test extends advanced_testcase {
         $completionnone = array('completion' => COMPLETION_TRACKING_NONE);
         $forum = $this->getDataGenerator()->create_module('forum', array('course' => $course->id), $completionauto);
         $page = $this->getDataGenerator()->create_module('page', array('course' => $course->id), $completionauto);
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id), $completionmanual);
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id), $completionmanual);
 
         $forum2 = $this->getDataGenerator()->create_module('forum', array('course' => $course->id), $completionnone);
         $page2 = $this->getDataGenerator()->create_module('page', array('course' => $course->id), $completionnone);
-        $data2 = $this->getDataGenerator()->create_module('data', array('course' => $course->id), $completionnone);
+        $data2 = $this->getDataGenerator()->create_module('page', array('course' => $course->id), $completionnone);
 
         // Create data in another course to make sure it's not considered.
         $course2 = $this->getDataGenerator()->create_course(array('enablecompletion' => true));
         $c2forum = $this->getDataGenerator()->create_module('forum', array('course' => $course2->id), $completionauto);
         $c2page = $this->getDataGenerator()->create_module('page', array('course' => $course2->id), $completionmanual);
-        $c2data = $this->getDataGenerator()->create_module('data', array('course' => $course2->id), $completionnone);
+        $c2data = $this->getDataGenerator()->create_module('page', array('course' => $course2->id), $completionnone);
 
         $c = new completion_info($course);
         $activities = $c->get_activities();
@@ -1775,9 +1775,9 @@ final class completionlib_test extends advanced_testcase {
             $this->getDataGenerator()->enrol_user($student->id, $course->id, $studentrole->id);
         }
 
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
             array('completion' => 1));
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
 
         // Add activity completion criteria.
         $criteriadata = new stdClass();
@@ -1792,7 +1792,7 @@ final class completionlib_test extends advanced_testcase {
         $this->setUser($teacher);
 
         // Mark activity complete for both students.
-        $cm = get_coursemodule_from_instance('data', $data->id);
+        $cm = get_coursemodule_from_instance('page', $data->id);
         $completioncriteria = $DB->get_record('course_completion_criteria', []);
         foreach ($students as $student) {
             $cmcompletionrecords[] = (object)[
@@ -2103,7 +2103,7 @@ final class completionlib_test extends advanced_testcase {
                         'completionstate' => COMPLETION_COMPLETE,
                     ],
                     [
-                        'name' => 'choice',
+                        'name' => 'page',
                         'completionstate' => COMPLETION_INCOMPLETE,
                     ],
                 ],
@@ -2118,11 +2118,11 @@ final class completionlib_test extends advanced_testcase {
                         'completionstate' => COMPLETION_COMPLETE,
                     ],
                     [
-                        'name' => 'choice',
+                        'name' => 'page',
                         'completionstate' => COMPLETION_INCOMPLETE,
                     ],
                     [
-                        'name' => 'workshop',
+                        'name' => 'assign',
                         'completionstate' => COMPLETION_COMPLETE,
                     ],
                 ],

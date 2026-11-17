@@ -1447,8 +1447,8 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         // This event contains HTML in the subject field that will be removed by the WS (otherwise it will generate an exception).
         $eventdata = new \core\message\message();
         $eventdata->courseid         = $course->id;
-        $eventdata->name             = 'submission';
-        $eventdata->component        = 'mod_feedback';
+        $eventdata->name             = 'posts';
+        $eventdata->component        = 'mod_forum';
         $eventdata->userfrom         = $user1;
         $eventdata->userto           = $user2;
         $eventdata->subject          = 'Feedback submitted <span>with html</span>';
@@ -1491,9 +1491,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->assertCount(1, $messages['messages']);
         // Check we receive custom data as a unserialisable json.
         $this->assertObjectHasProperty('datakey', json_decode($messages['messages'][0]['customdata']));
-        $this->assertEquals('mod_feedback', $messages['messages'][0]['component']);
-        $this->assertEquals('submission', $messages['messages'][0]['eventtype']);
-        $feedbackicon = clean_param($PAGE->get_renderer('core')->image_url('monologo', 'mod_feedback')->out(), PARAM_URL);
+        $this->assertEquals('mod_forum', $messages['messages'][0]['component']);
+        $this->assertEquals('posts', $messages['messages'][0]['eventtype']);
+        $feedbackicon = clean_param($PAGE->get_renderer('core')->image_url('monologo', 'mod_forum')->out(), PARAM_URL);
         $this->assertEquals($feedbackicon, $messages['messages'][0]['iconurl']);
 
         // Test warnings.

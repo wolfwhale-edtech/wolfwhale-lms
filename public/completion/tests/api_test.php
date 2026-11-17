@@ -236,10 +236,10 @@ final class api_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($student1->id, $course->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($student2->id, $course->id, $studentrole->id);
 
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
             array('completion' => 1));
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
-        $cm = get_coursemodule_from_instance('data', $data->id);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
+        $cm = get_coursemodule_from_instance('page', $data->id);
         $c = new \completion_info($course);
 
         // Add activity completion criteria.

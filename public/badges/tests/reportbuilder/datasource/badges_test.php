@@ -39,17 +39,13 @@ require_once("{$CFG->libdir}/badgeslib.php");
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_badges\reportbuilder\datasource\badges::class)]
 final class badges_test extends core_reportbuilder_testcase {
-    protected function setUp(): void {
-        parent::setUp();
-        set_config('usetags', 1);
-    }
-
 
     /**
      * Test default datasource
      */
     public function test_datasource_default(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $user1 = $this->getDataGenerator()->create_user(['firstname' => 'Alan', 'lastname' => 'Apple']);
         $user2 = $this->getDataGenerator()->create_user(['firstname' => 'Barry', 'lastname' => 'Banana']);
@@ -98,6 +94,7 @@ final class badges_test extends core_reportbuilder_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $user1 = $this->getDataGenerator()->create_user(['firstname' => 'Alan', 'lastname' => 'Apple']);
         $user2 = $this->getDataGenerator()->create_user(['firstname' => 'Barry', 'lastname' => 'Banana']);

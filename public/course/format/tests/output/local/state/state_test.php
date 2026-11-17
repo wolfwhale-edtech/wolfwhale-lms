@@ -73,11 +73,11 @@ final class state_test extends \advanced_testcase {
                 'visible' => 1]);
             $this->getDataGenerator()->create_module('assign', ['course' => $course->id], ['section' => 2,
                 'visible' => 0]);
-            $this->getDataGenerator()->create_module('glossary', ['course' => $course->id], ['section' => 4,
+            $this->getDataGenerator()->create_module('page', ['course' => $course->id], ['section' => 4,
                 'visible' => 1]);
             $this->getDataGenerator()->create_module('label', ['course' => $course->id], ['section' => 5,
                 'visible' => 0]);
-            $this->getDataGenerator()->create_module('feedback', ['course' => $course->id], ['section' => 5,
+            $this->getDataGenerator()->create_module('page', ['course' => $course->id], ['section' => 5,
                 'visible' => 1]);
         }
 

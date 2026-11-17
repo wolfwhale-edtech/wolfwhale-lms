@@ -1017,7 +1017,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
         $this->setAdminUser();
-        $lesson = $this->getDataGenerator()->create_module('lesson', [
+        $lesson = $this->getDataGenerator()->create_module('page', [
                 'name' => 'Lesson 1',
                 'course' => $course->id,
                 'available' => time(),
@@ -1048,7 +1048,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $course = $this->getDataGenerator()->create_course();
         $this->setAdminUser();
         // Create test activity and make it available only for student2.
-        $lesson = $this->getDataGenerator()->create_module('lesson', [
+        $lesson = $this->getDataGenerator()->create_module('page', [
                 'name' => 'Lesson 1',
                 'course' => $course->id,
                 'available' => time(),

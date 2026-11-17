@@ -80,14 +80,14 @@ final class reportlib_test extends advanced_testcase {
         $coursegradeitem = grade_item::fetch_course_item($course->id);
         $coursecontext = context_course::instance($course->id);
 
-        $data = $this->getDataGenerator()->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
-        $datacm = get_coursemodule_from_id('data', $data->cmid);
+        $data = $this->getDataGenerator()->create_module('assign', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
+        $datacm = get_coursemodule_from_id('assign', $data->cmid);
 
         $forum = $this->getDataGenerator()->create_module('forum', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
         $forumcm = get_coursemodule_from_id('forum', $forum->cmid);
 
         // Insert student grades for the two activities.
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id, 'courseid' => $course->id));
+        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $data->id, 'courseid' => $course->id));
         $datagrade = 50;
         $grade_grade = new grade_grade();
         $grade_grade->itemid = $gi->id;
@@ -156,13 +156,13 @@ final class reportlib_test extends advanced_testcase {
         $coursegradeitem = grade_item::fetch_course_item($course->id);
         $coursecontext = context_course::instance($course->id);
 
-        $data = $this->getDataGenerator()->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
-        $datacm = get_coursemodule_from_id('data', $data->cmid);
+        $data = $this->getDataGenerator()->create_module('assign', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
+        $datacm = get_coursemodule_from_id('assign', $data->cmid);
 
         $forum = $this->getDataGenerator()->create_module('forum', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
         $forumcm = get_coursemodule_from_id('forum', $forum->cmid);
 
-        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'data', 'iteminstance' => $data->id, 'courseid' => $course->id));
+        $gi = grade_item::fetch(array('itemtype' => 'mod', 'itemmodule' => 'assign', 'iteminstance' => $data->id, 'courseid' => $course->id));
         $datagrade = 50;
         $grade_grade = new grade_grade();
         $grade_grade->itemid = $gi->id;

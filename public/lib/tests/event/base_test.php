@@ -810,18 +810,17 @@ final class base_test extends \advanced_testcase {
         // Retrieve all observers.
         $observers = \core\event\manager::get_all_observers();
 
-        // Expected information from the workshop allocation scheduled observer.
+        // Expected information from the forum enrolment observer.
         $expected = new \stdClass();
-        $expected->callable = '\workshopallocation_scheduled\observer::workshop_viewed';
+        $expected->callable = 'mod_forum_observer::user_enrolment_deleted';
         $expected->priority = 0;
         $expected->internal = true;
         $expected->includefile = null;
-        $expected->plugintype = 'workshopallocation';
-        $expected->plugin = 'scheduled';
+        $expected->plugintype = 'mod';
+        $expected->plugin = 'forum';
 
-        // May be more than one observer for the mod_workshop event.
         $found = false;
-        foreach ($observers['\mod_workshop\event\course_module_viewed'] as $observer) {
+        foreach ($observers['\core\event\user_enrolment_deleted'] as $observer) {
             if ($expected == $observer) {
                 $found = true;
                 break;
@@ -891,7 +890,7 @@ and nothing else.";
         \core_tests\event\unittest_observer::reset();
 
         $course  = $this->getDataGenerator()->create_course();
-        $feed    = $this->getDataGenerator()->create_module('feedback', ['course' => $course->id]);
+        $feed    = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
         $context = \context_module::instance($feed->cmid);
         $data    = [
             'context'  => $context,

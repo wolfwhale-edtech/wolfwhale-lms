@@ -102,7 +102,7 @@ final class registration_test extends \advanced_testcase {
         $generator->create_block('online_users');
 
         // Disabled a plugin.
-        $DB->set_field('modules', 'visible', 0, ['name' => 'feedback']);
+        $DB->set_field('modules', 'visible', 0, ['name' => 'page']);
         \core_plugin_manager::reset_caches();
 
         // Check our plugin usage counts and enabled states are correct.
@@ -110,7 +110,7 @@ final class registration_test extends \advanced_testcase {
         $this->assertEquals(3, $pluginusage['mod']['assign']['count']);
         $this->assertEquals(2, $pluginusage['mod']['quiz']['count']);
         $this->assertEquals(4, $pluginusage['block']['online_users']['count']);
-        $this->assertEquals(0, $pluginusage['mod']['feedback']['enabled']);
+        $this->assertEquals(0, $pluginusage['mod']['page']['enabled']);
         $this->assertEquals(1, $pluginusage['mod']['assign']['enabled']);
     }
 

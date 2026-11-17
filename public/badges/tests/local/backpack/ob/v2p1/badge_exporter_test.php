@@ -34,10 +34,6 @@ use core_badges\local\backpack\ob\v2p0\badge_exporter_test as badge_exporter_v2p
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_badges\local\backpack\ob\v2p1\badge_exporter::class)]
 final class badge_exporter_test extends badge_exporter_v2p0_test {
-    protected function setUp(): void {
-        parent::setUp();
-        set_config('usetags', 1);
-    }
 
     /**
      * Check this class is testing the expected OB version.

@@ -36,6 +36,7 @@ final class tags_test extends \advanced_testcase {
         require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         $backupid = 'abc';

@@ -562,7 +562,7 @@ final class event_vault_test extends \advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
         $this->setAdminuser();
-        $lesson = $this->getDataGenerator()->create_module('lesson', [
+        $lesson = $this->getDataGenerator()->create_module('page', [
                 'name' => 'Lesson 1',
                 'course' => $course->id,
                 'available' => time(),

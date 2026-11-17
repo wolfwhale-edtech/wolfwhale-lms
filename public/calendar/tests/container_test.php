@@ -413,7 +413,7 @@ final class container_test extends \advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
 
         // Add the assignment.
-        $generator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $generator = $this->getDataGenerator()->get_plugin_generator('mod_page');
         $lesson = $generator->create_instance(array('course' => $course->id));
 
         // Create a user override event for the lesson.
@@ -424,7 +424,7 @@ final class container_test extends \advanced_testcase {
         $event->format = FORMAT_HTML;
         $event->eventtype = 'close';
         $event->userid = $user->id;
-        $event->modulename = 'lesson';
+        $event->modulename = 'page';
         $event->instance = $lesson->id;
         $event->categoryid = 0;
         $event->courseid = $course->id;

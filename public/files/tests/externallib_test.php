@@ -178,40 +178,15 @@ final class externallib_test extends \advanced_testcase {
         $record->name = "Mod data upload test";
         $record->intro = "Some intro of some sort";
 
-        // Create a database module.
-        $module = $this->getDataGenerator()->create_module('data', $record);
+        // Create an assignment and store a file in its intro area.
+        $module = $this->getDataGenerator()->create_module('assign', $record);
 
-        // Create a new field in the database activity.
-        $field = data_get_field_new('file', $module);
-        // Add more detail about the field.
-        $fielddetail = new \stdClass();
-        $fielddetail->d = $module->id;
-        $fielddetail->mode = 'add';
-        $fielddetail->type = 'file';
-        $fielddetail->sesskey = sesskey();
-        $fielddetail->name = 'Upload file';
-        $fielddetail->description = 'Some description';
-        $fielddetail->param3 = '0';
-
-        $field->define_field($fielddetail);
-        $field->insert_field();
-        $recordid = data_add_record($module);
-
-        // File information for the database module record.
-        $datacontent = array();
-        $datacontent['fieldid'] = $field->field->id;
-        $datacontent['recordid'] = $recordid;
-        $datacontent['content'] = 'Simple4.txt';
-
-        // Insert the information about the file.
-        $contentid = $DB->insert_record('data_content', $datacontent);
-        // Required information for uploading a file.
         $context = \context_module::instance($module->cmid);
         $usercontext = \context_user::instance($USER->id);
-        $component = 'mod_data';
-        $filearea = 'content';
-        $itemid = $contentid;
-        $filename = $datacontent['content'];
+        $component = 'mod_assign';
+        $filearea = 'intro';
+        $itemid = 0;
+        $filename = 'Simple4.txt';
         $filecontent = base64_encode("Let us create a nice simple file.");
 
         $filerecord = array();
@@ -263,21 +238,21 @@ final class externallib_test extends \advanced_testcase {
                                           'filearea' => null,
                                           'itemid' => null,
                                           'filepath' => null,
-                                          'filename' => 'Mod data upload test (Database)');
+                                          'filename' => 'Mod data upload test (Assignment)');
         $testdata['parents']['4'] = array('contextid' => $context->id,
-                                          'component' => 'mod_data',
-                                          'filearea' => 'content',
+                                          'component' => 'mod_assign',
+                                          'filearea' => 'intro',
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Fields');
         $testdata['files'] = array();
         $testdata['files']['0'] = array('contextid' => $context->id,
-                                        'component' => 'mod_data',
-                                        'filearea' => 'content',
+                                        'component' => 'mod_assign',
+                                        'filearea' => 'intro',
                                         'itemid' => $itemid,
                                         'filepath' => '/',
                                         'filename' => 'Simple4.txt',
-                                        'url' => 'https://www.example.com/moodle/pluginfile.php/'.$context->id.'/mod_data/content/'.$itemid.'/Simple4.txt',
+                                        'url' => 'https://www.example.com/moodle/pluginfile.php/'.$context->id.'/mod_assign/intro/'.$itemid.'/Simple4.txt',
                                         'isdir' => false,
                                         'timemodified' => $timemodified,
                                         'timecreated' => $timecreated,

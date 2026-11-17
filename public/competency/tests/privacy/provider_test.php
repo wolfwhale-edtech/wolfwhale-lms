@@ -398,8 +398,8 @@ final class provider_test extends provider_testcase {
         $dg = $this->getDataGenerator();
         $ccg = $dg->get_plugin_generator('core_competency');
         $c1 = $dg->create_course();
-        $m1 = $dg->create_module('choice', ['course' => $c1]);
-        $m2 = $dg->create_module('choice', ['course' => $c1]);
+        $m1 = $dg->create_module('page', ['course' => $c1]);
+        $m2 = $dg->create_module('page', ['course' => $c1]);
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
         $m1ctx = \context_module::instance($m1->cmid);
@@ -431,8 +431,8 @@ final class provider_test extends provider_testcase {
         $dg = $this->getDataGenerator();
         $ccg = $dg->get_plugin_generator('core_competency');
         $c1 = $dg->create_course();
-        $m1 = $dg->create_module('choice', ['course' => $c1]);
-        $m2 = $dg->create_module('choice', ['course' => $c1]);
+        $m1 = $dg->create_module('page', ['course' => $c1]);
+        $m2 = $dg->create_module('page', ['course' => $c1]);
         $u1 = $dg->create_user();
         $u2 = $dg->create_user();
         $m1ctx = \context_module::instance($m1->cmid);

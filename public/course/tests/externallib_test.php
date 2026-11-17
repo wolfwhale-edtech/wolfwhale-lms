@@ -1110,9 +1110,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $record->userid = 0;
         $record->forum = $forum->id;
         $discussionforce = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
-        $data = $this->getDataGenerator()->create_module('data',
-            array('assessed' => 1, 'scale' => 100, 'course' => $course->id, 'completion' => 2, 'completionentries' => 3));
-        $datacm = get_coursemodule_from_instance('data', $data->id);
+        $data = $this->getDataGenerator()->create_module('assign',
+            array('course' => $course->id, 'completion' => 2));
+        $datacm = get_coursemodule_from_instance('assign', $data->id);
         $page = $this->getDataGenerator()->create_module('page', array('course' => $course->id));
         $pagecm = get_coursemodule_from_instance('page', $page->id);
         // This is an stealth page (set by visibleoncoursepage).
@@ -1833,7 +1833,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $resource = self::getDataGenerator()->create_module('resource', ['course' => $course->id]);
         // Create activities with dates.
         $resource = self::getDataGenerator()->create_module('forum', ['course' => $course->id, 'duedate' => $timenow]);
-        $resource = self::getDataGenerator()->create_module('choice',
+        $resource = self::getDataGenerator()->create_module('quiz',
             ['course' => $course->id, 'timeopen' => $timenow, 'timeclose' => $timenow + DAYSECS]);
         $resource = self::getDataGenerator()->create_module('assign',
             ['course' => $course->id, 'allowsubmissionsfromdate' => $timenow]);
@@ -1848,7 +1848,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 $this->assertCount(1, $module['dates']);
                 $this->assertEquals('duedate', $module['dates'][0]['dataid']);
                 $this->assertEquals($timenow, $module['dates'][0]['timestamp']);
-            } else if ($module['modname'] == 'choice') {
+            } else if ($module['modname'] == 'quiz') {
                 $this->assertCount(2, $module['dates']);
                 $this->assertEquals('timeopen', $module['dates'][0]['dataid']);
                 $this->assertEquals($timenow, $module['dates'][0]['timestamp']);
@@ -1935,9 +1935,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $forum = $this->getDataGenerator()->create_module('forum', array('course'=>$course->id));
         $forumcm = get_coursemodule_from_id('forum', $forum->cmid);
         $forumcontext = context_module::instance($forum->cmid);
-        $data = $this->getDataGenerator()->create_module('data', array('assessed'=>1, 'scale'=>100, 'course'=>$course->id));
+        $data = $this->getDataGenerator()->create_module('assign', array('course'=>$course->id));
         $datacontext = context_module::instance($data->cmid);
-        $datacm = get_coursemodule_from_instance('page', $data->id);
+        $datacm = get_coursemodule_from_instance('assign', $data->id);
         $page = $this->getDataGenerator()->create_module('page', array('course'=>$course->id));
         $pagecontext = context_module::instance($page->cmid);
         $pagecm = get_coursemodule_from_instance('page', $page->id);

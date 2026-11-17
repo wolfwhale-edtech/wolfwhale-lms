@@ -69,6 +69,7 @@ final class questionlib_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usetags', 1);
     }
 
     /**
@@ -1848,12 +1849,6 @@ final class questionlib_test extends \advanced_testcase {
                     'mod-forum-*',
                     'mod-forum-view',
                     'mod-forum-discuss',
-                ],
-            ],
-            'scorm' => [
-                'module' => 'scorm',
-                'pagetypes' => [
-                    'mod-scorm-*',
                 ],
             ],
             'lti' => [ // LTI has no additional page types.

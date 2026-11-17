@@ -73,7 +73,6 @@ $event = \report_outline\event\activity_report_viewed::create(array('context' =>
 $event->trigger();
 
 $showlastaccess = true;
-$showblogs = !empty($CFG->enableblogs) && $CFG->useblogassociations;
 $hiddenfields = explode(',', $CFG->hiddenuserfields);
 
 if (array_search('lastaccess', $hiddenfields) !== false and !has_capability('moodle/user:viewhiddendetails', $context)) {
@@ -199,7 +198,7 @@ if ($useinternalreader) {
     }
 }
 
-$activitieslist = new report_outline\output\activitieslist($modinfo, $views, $showlastaccess, $minlog, $showblogs);
+$activitieslist = new report_outline\output\activitieslist($modinfo, $views, $showlastaccess, $minlog);
 echo $OUTPUT->render_from_template('report_outline/report', $activitieslist->export_for_template($OUTPUT));
 echo $OUTPUT->footer();
 

@@ -49,7 +49,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         foreach ($courses as $course) {
             $generator->enrol_user($student->id, $course->id, 'student');
             $forum[] = $this->getDataGenerator()->create_module('forum', array('course' => $course));
-            $glossary[] = $this->getDataGenerator()->create_module('glossary', array('course' => $course));
+            $glossary[] = $this->getDataGenerator()->create_module('page', array('course' => $course));
             $assign[] = $this->getDataGenerator()->create_module('assign', ['course' => $course]);
             $h5pactivity[] = $this->getDataGenerator()->create_module('h5pactivity', ['course' => $course]);
         }

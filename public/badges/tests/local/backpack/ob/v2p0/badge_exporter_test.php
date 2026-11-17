@@ -31,10 +31,6 @@ use core_badges\local\backpack\ob_factory;
 #[\PHPUnit\Framework\Attributes\CoversFunction('get_json')]
 #[\PHPUnit\Framework\Attributes\CoversFunction('get_json_url')]
 class badge_exporter_test extends \advanced_testcase {
-    protected function setUp(): void {
-        parent::setUp();
-        set_config('usetags', 1);
-    }
 
     #[\Override]
     public static function setUpBeforeClass(): void {
@@ -74,6 +70,7 @@ class badge_exporter_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         /** @var core_badges_generator $generator */
@@ -177,6 +174,7 @@ class badge_exporter_test extends \advanced_testcase {
      */
     public function test_get_json(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         /** @var core_badges_generator $generator */
@@ -198,6 +196,7 @@ class badge_exporter_test extends \advanced_testcase {
      */
     public function test_get_json_url(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         /** @var core_badges_generator $generator */

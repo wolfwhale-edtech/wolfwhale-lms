@@ -145,9 +145,6 @@ final class profilelib_test extends \advanced_testcase {
      * Test that {@link user_not_fully_set_up()} takes required custom fields into account.
      */
     public function test_profile_has_required_custom_fields_set(): void {
-        global $CFG;
-        require_once($CFG->dirroot.'/mnet/lib.php');
-
         $this->resetAfterTest();
 
         // Add a required, visible, unlocked custom field.
@@ -198,24 +195,12 @@ final class profilelib_test extends \advanced_testcase {
         unset($hermione->email);
         $this->assertTrue(user_not_fully_set_up($hermione, true));
         $this->assertTrue(user_not_fully_set_up($hermione, false));
-
-        // When confirming remote MNet users, we do not have custom fields available.
-        $roamingharry = mnet_strip_user($harry, ['firstname', 'lastname', 'email']);
-        $roaminghermione = mnet_strip_user($hermione, ['firstname', 'lastname', 'email']);
-
-        $this->assertTrue(user_not_fully_set_up($roamingharry, true));
-        $this->assertFalse(user_not_fully_set_up($roamingharry, false));
-        $this->assertTrue(user_not_fully_set_up($roaminghermione, true));
-        $this->assertTrue(user_not_fully_set_up($roaminghermione, false));
     }
 
     /**
      * Test that user generator sets the custom profile fields
      */
     public function test_profile_fields_in_generator(): void {
-        global $CFG;
-        require_once($CFG->dirroot.'/mnet/lib.php');
-
         $this->resetAfterTest();
 
         // Add a required, visible, unlocked custom field.

@@ -90,37 +90,13 @@ final class overviewfactory_test extends \advanced_testcase {
             'resourcetype' => 'assign',
             'expected' => \mod_assign\courseformat\overview::class,
         ];
-        yield 'bigbluebuttonbn' => [
-            'resourcetype' => 'bigbluebuttonbn',
-            'expected' => \mod_bigbluebuttonbn\courseformat\overview::class,
-        ];
-        yield 'choice' => [
-            'resourcetype' => 'choice',
-            'expected' => \mod_choice\courseformat\overview::class,
-        ];
-        yield 'data' => [
-            'resourcetype' => 'data',
-            'expected' => \mod_data\courseformat\overview::class,
-        ];
-        yield 'feedback' => [
-            'resourcetype' => 'feedback',
-            'expected' => \mod_feedback\courseformat\overview::class,
-        ];
         yield 'forum' => [
             'resourcetype' => 'forum',
             'expected' => \mod_forum\courseformat\overview::class,
         ];
-        yield 'glossary' => [
-            'resourcetype' => 'glossary',
-            'expected' => \mod_glossary\courseformat\overview::class,
-        ];
         yield 'h5pactivity' => [
             'resourcetype' => 'h5pactivity',
             'expected' => \mod_h5pactivity\courseformat\overview::class,
-        ];
-        yield 'lesson' => [
-            'resourcetype' => 'lesson',
-            'expected' => \mod_lesson\courseformat\overview::class,
         ];
         yield 'lti' => [
             'resourcetype' => 'lti',
@@ -133,18 +109,6 @@ final class overviewfactory_test extends \advanced_testcase {
         yield 'quiz' => [
             'resourcetype' => 'quiz',
             'expected' => \mod_quiz\courseformat\overview::class,
-        ];
-        yield 'scorm' => [
-            'resourcetype' => 'scorm',
-            'expected' => \mod_scorm\courseformat\overview::class,
-        ];
-        yield 'wiki' => [
-            'resourcetype' => 'wiki',
-            'expected' => \mod_wiki\courseformat\overview::class,
-        ];
-        yield 'workshop' => [
-            'resourcetype' => 'workshop',
-            'expected' => \mod_workshop\courseformat\overview::class,
         ];
     }
 

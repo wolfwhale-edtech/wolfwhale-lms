@@ -50,7 +50,7 @@ final class events_test extends \advanced_testcase {
 
         // Create course and wiki.
         $this->course = $this->getDataGenerator()->create_course();
-        $this->wiki = $this->getDataGenerator()->create_module('wiki', array('course' => $this->course->id));
+        $this->wiki = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
     }
 
     /**

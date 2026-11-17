@@ -365,7 +365,7 @@ final class base_activity_test extends \advanced_testcase {
         $this->assertEquals([\context_module::instance($page->cmid)], $contexts);
 
         // Check another module area that has no instances.
-        $glossaryarea = new \mod_glossary\search\activity();
+        $glossaryarea = new \mod_book\search\activity();
         $contexts = iterator_to_array($glossaryarea->get_contexts_to_reindex(), false);
         $this->assertEquals([], $contexts);
     }

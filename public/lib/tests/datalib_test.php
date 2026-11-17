@@ -402,14 +402,14 @@ final class datalib_test extends \advanced_testcase {
         $this->setAdminUser(); // Some generators have bogus access control.
 
         $this->assertFileExists("$CFG->dirroot/mod/folder/lib.php");
-        $this->assertFileExists("$CFG->dirroot/mod/glossary/lib.php");
+        $this->assertFileExists("$CFG->dirroot/mod/page/lib.php");
 
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
 
         $folder1a = $this->getDataGenerator()->create_module('folder', array('course' => $course1, 'section' => 3));
         $folder1b = $this->getDataGenerator()->create_module('folder', array('course' => $course1));
-        $glossary1 = $this->getDataGenerator()->create_module('glossary', array('course' => $course1));
+        $glossary1 = $this->getDataGenerator()->create_module('page', array('course' => $course1));
 
         $folder2 = $this->getDataGenerator()->create_module('folder', array('course' => $course2));
 
@@ -468,7 +468,7 @@ final class datalib_test extends \advanced_testcase {
         $this->setAdminUser(); // Some generators have bogus access control.
 
         $this->assertFileExists("$CFG->dirroot/mod/folder/lib.php");
-        $this->assertFileExists("$CFG->dirroot/mod/glossary/lib.php");
+        $this->assertFileExists("$CFG->dirroot/mod/page/lib.php");
 
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
@@ -532,7 +532,7 @@ final class datalib_test extends \advanced_testcase {
         $this->setAdminUser(); // Some generators have bogus access control.
 
         $this->assertFileExists("$CFG->dirroot/mod/folder/lib.php");
-        $this->assertFileExists("$CFG->dirroot/mod/glossary/lib.php");
+        $this->assertFileExists("$CFG->dirroot/mod/page/lib.php");
         $this->assertFileExists("$CFG->dirroot/mod/label/lib.php");
 
         $course1 = $this->getDataGenerator()->create_course();
@@ -540,11 +540,11 @@ final class datalib_test extends \advanced_testcase {
 
         $folder1a = $this->getDataGenerator()->create_module('folder', array('course' => $course1, 'section' => 3));
         $folder1b = $this->getDataGenerator()->create_module('folder', array('course' => $course1));
-        $glossary1 = $this->getDataGenerator()->create_module('glossary', array('course' => $course1));
+        $glossary1 = $this->getDataGenerator()->create_module('page', array('course' => $course1));
 
         $folder2 = $this->getDataGenerator()->create_module('folder', array('course' => $course2));
-        $glossary2a = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
-        $glossary2b = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
+        $glossary2a = $this->getDataGenerator()->create_module('page', array('course' => $course2));
+        $glossary2b = $this->getDataGenerator()->create_module('page', array('course' => $course2));
 
         $modules = get_coursemodules_in_course('folder', $course1->id);
         $this->assertCount(2, $modules);
@@ -601,7 +601,7 @@ final class datalib_test extends \advanced_testcase {
         $this->setAdminUser(); // Some generators have bogus access control.
 
         $this->assertFileExists("$CFG->dirroot/mod/folder/lib.php");
-        $this->assertFileExists("$CFG->dirroot/mod/glossary/lib.php");
+        $this->assertFileExists("$CFG->dirroot/mod/page/lib.php");
 
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
@@ -609,11 +609,11 @@ final class datalib_test extends \advanced_testcase {
 
         $folder1a = $this->getDataGenerator()->create_module('folder', array('course' => $course1, 'section' => 3));
         $folder1b = $this->getDataGenerator()->create_module('folder', array('course' => $course1));
-        $glossary1 = $this->getDataGenerator()->create_module('glossary', array('course' => $course1));
+        $glossary1 = $this->getDataGenerator()->create_module('page', array('course' => $course1));
 
         $folder2 = $this->getDataGenerator()->create_module('folder', array('course' => $course2));
-        $glossary2a = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
-        $glossary2b = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
+        $glossary2a = $this->getDataGenerator()->create_module('page', array('course' => $course2));
+        $glossary2b = $this->getDataGenerator()->create_module('page', array('course' => $course2));
 
         $folder3 = $this->getDataGenerator()->create_module('folder', array('course' => $course3));
 
@@ -656,7 +656,7 @@ final class datalib_test extends \advanced_testcase {
         $this->setAdminUser(); // Some generators have bogus access control.
 
         $this->assertFileExists("$CFG->dirroot/mod/folder/lib.php");
-        $this->assertFileExists("$CFG->dirroot/mod/glossary/lib.php");
+        $this->assertFileExists("$CFG->dirroot/mod/page/lib.php");
 
         $course1 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
@@ -664,11 +664,11 @@ final class datalib_test extends \advanced_testcase {
 
         $folder1a = $this->getDataGenerator()->create_module('folder', array('course' => $course1, 'section' => 3));
         $folder1b = $this->getDataGenerator()->create_module('folder', array('course' => $course1));
-        $glossary1 = $this->getDataGenerator()->create_module('glossary', array('course' => $course1));
+        $glossary1 = $this->getDataGenerator()->create_module('page', array('course' => $course1));
 
         $folder2 = $this->getDataGenerator()->create_module('folder', array('course' => $course2));
-        $glossary2a = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
-        $glossary2b = $this->getDataGenerator()->create_module('glossary', array('course' => $course2));
+        $glossary2a = $this->getDataGenerator()->create_module('page', array('course' => $course2));
+        $glossary2b = $this->getDataGenerator()->create_module('page', array('course' => $course2));
 
         $folder3 = $this->getDataGenerator()->create_module('folder', array('course' => $course3));
 

@@ -62,7 +62,7 @@ final class progress_test extends \advanced_testcase {
         // Add four activities that use completion.
         $assign = $this->getDataGenerator()->create_module('assign', array('course' => $course->id),
             array('completion' => 1));
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
             array('completion' => 1));
         $this->getDataGenerator()->create_module('forum', array('course' => $course->id),
             array('completion' => 1));
@@ -76,7 +76,7 @@ final class progress_test extends \advanced_testcase {
 
         // Mark two of them as completed for a user.
         $cmassign = get_coursemodule_from_id('assign', $assign->cmid);
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
         $completion = new \completion_info($course);
         $completion->update_state($cmassign, COMPLETION_COMPLETE, $user->id);
         $completion->update_state($cmdata, COMPLETION_COMPLETE, $user->id);
@@ -103,7 +103,7 @@ final class progress_test extends \advanced_testcase {
         // Add four activities that use completion.
         $assign = $this->getDataGenerator()->create_module('assign', array('course' => $course->id),
             array('completion' => 1));
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
             array('completion' => 1));
         $this->getDataGenerator()->create_module('forum', array('course' => $course->id),
             array('completion' => 1));
@@ -115,7 +115,7 @@ final class progress_test extends \advanced_testcase {
 
         // Mark two of them as completed for a user.
         $cmassign = get_coursemodule_from_id('assign', $assign->cmid);
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
         $completion = new \completion_info($course);
         $completion->update_state($cmassign, COMPLETION_COMPLETE, $user->id);
         $completion->update_state($cmdata, COMPLETION_COMPLETE, $user->id);

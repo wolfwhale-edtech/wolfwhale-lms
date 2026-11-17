@@ -36,6 +36,6 @@ Feature: Web service user settings
     And I navigate to "Server > Web services > External services" in site administration
     And I click on "Functions" "link" in the "Silly service" "table_row"
     And I follow "Add functions"
-    And I set the field "Name" to "core_blog_get_entries"
+    And I set the field "Name" to "core_course_get_courses"
     And I click on "Add functions" "button" in the "#fgroup_id_buttonar" "css_element"
-    Then I should see "core_blog_get_entries" in the "generaltable" "table"
+    Then I should see "core_course_get_courses" in the "generaltable" "table"

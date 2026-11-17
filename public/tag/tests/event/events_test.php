@@ -27,11 +27,6 @@ namespace core_tag\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-
-// Used to create a wiki page to tag.
-require_once($CFG->dirroot . '/mod/wiki/locallib.php');
-
 final class events_test extends \advanced_testcase {
 
     /**
@@ -42,6 +37,7 @@ final class events_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usetags', 1);
     }
 
     /**
@@ -145,11 +141,11 @@ final class events_test extends \advanced_testcase {
         // Create a course to tag.
         $course = $this->getDataGenerator()->create_course();
 
-        // Create a wiki page to tag.
-        $wikigenerator = $this->getDataGenerator()->get_plugin_generator('mod_wiki');
-        $wiki = $wikigenerator->create_instance(array('course' => $course->id));
-        $subwikiid = wiki_add_subwiki($wiki->id, 0);
-        $wikipageid = wiki_create_page($subwikiid, 'Title', FORMAT_HTML, '2');
+        // Create a forum post to tag.
+        $forumgenerator = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+        $wiki = $forumgenerator->create_instance(array('course' => $course->id));
+        $discussion = $forumgenerator->create_discussion(array('course' => $course->id, 'forum' => $wiki->id, 'userid' => 2));
+        $wikipageid = $discussion->firstpost;
 
         // Create the tag.
         $tag = $this->getDataGenerator()->create_tag();
@@ -172,11 +168,11 @@ final class events_test extends \advanced_testcase {
         $tag = $this->getDataGenerator()->create_tag();
 
         // Assign a tag to a wiki this time.
-        \core_tag_tag::add_item_tag('mod_wiki', 'wiki_pages', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
+        \core_tag_tag::add_item_tag('mod_forum', 'forum_posts', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
 
         // Trigger and capture the event for deleting this tag instance.
         $sink = $this->redirectEvents();
-        \core_tag_tag::remove_item_tag('mod_wiki', 'wiki_pages', $wikipageid, $tag->rawname);
+        \core_tag_tag::remove_item_tag('mod_forum', 'forum_posts', $wikipageid, $tag->rawname);
         $events = $sink->get_events();
         $event = reset($events);
 
@@ -189,7 +185,7 @@ final class events_test extends \advanced_testcase {
         $tag = $this->getDataGenerator()->create_tag();
 
         // Assign a tag to the wiki again.
-        \core_tag_tag::add_item_tag('mod_wiki', 'wiki_pages', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
+        \core_tag_tag::add_item_tag('mod_forum', 'forum_posts', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
 
         // Now we want to delete this tag, and because there is only one tag instance
         // associated with it, it should get deleted as well.
@@ -207,11 +203,11 @@ final class events_test extends \advanced_testcase {
         $tag = $this->getDataGenerator()->create_tag();
 
         // Assign a tag to the wiki again.
-        \core_tag_tag::add_item_tag('mod_wiki', 'wiki_pages', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
+        \core_tag_tag::add_item_tag('mod_forum', 'forum_posts', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
 
         // Delete all tag instances for this wiki instance.
         $sink = $this->redirectEvents();
-        \core_tag_tag::delete_instances('mod_wiki', 'wiki_pages', \context_module::instance($wiki->cmid)->id);
+        \core_tag_tag::delete_instances('mod_forum', 'forum_posts', \context_module::instance($wiki->cmid)->id);
         $events = $sink->get_events();
         $event = reset($events);
 
@@ -220,18 +216,18 @@ final class events_test extends \advanced_testcase {
         $this->assertInstanceOf('\core\event\tag_removed', $event);
         $this->assertEquals(\context_module::instance($wiki->cmid), $event->get_context());
 
-        // Create another wiki.
-        $wiki2 = $wikigenerator->create_instance(array('course' => $course->id));
-        $subwikiid2 = wiki_add_subwiki($wiki2->id, 0);
-        $wikipageid2 = wiki_create_page($subwikiid2, 'Title', FORMAT_HTML, '2');
+        // Create another forum post.
+        $wiki2 = $forumgenerator->create_instance(array('course' => $course->id));
+        $discussion2 = $forumgenerator->create_discussion(array('course' => $course->id, 'forum' => $wiki2->id, 'userid' => 2));
+        $wikipageid2 = $discussion2->firstpost;
 
         // Assign a tag to both wiki pages.
-        \core_tag_tag::add_item_tag('mod_wiki', 'wiki_pages', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
-        \core_tag_tag::add_item_tag('mod_wiki', 'wiki_pages', $wikipageid2, \context_module::instance($wiki2->cmid), $tag->rawname);
+        \core_tag_tag::add_item_tag('mod_forum', 'forum_posts', $wikipageid, \context_module::instance($wiki->cmid), $tag->rawname);
+        \core_tag_tag::add_item_tag('mod_forum', 'forum_posts', $wikipageid2, \context_module::instance($wiki2->cmid), $tag->rawname);
 
         // Now remove all tag_instances associated with all wikis.
         $sink = $this->redirectEvents();
-        \core_tag_tag::delete_instances('mod_wiki');
+        \core_tag_tag::delete_instances('mod_forum');
         $events = $sink->get_events();
 
         // There will be two events - one for each wiki instance removed.

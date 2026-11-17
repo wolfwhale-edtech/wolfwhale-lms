@@ -83,7 +83,7 @@ final class reportuserlib_test extends \advanced_testcase {
         }
 
         // Add 2 activities.
-        $data1 = $this->getDataGenerator()->create_module('data', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
+        $data1 = $this->getDataGenerator()->create_module('assign', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
 
         $forum1 = $this->getDataGenerator()->create_module('forum', array('assessed' => 1, 'scale' => 100, 'course' => $course->id));
         $forum1cm = get_coursemodule_from_id('forum', $forum1->cmid);

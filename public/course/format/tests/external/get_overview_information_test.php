@@ -42,7 +42,7 @@ final class get_overview_information_test extends \core_external\tests\externall
         $mod2 = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
 
         // This should not be included in the overview table.
-        $this->getDataGenerator()->create_module('feedback', ['course' => $course->id]);
+        $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
 
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'student');

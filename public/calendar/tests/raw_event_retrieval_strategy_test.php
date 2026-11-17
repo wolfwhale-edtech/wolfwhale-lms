@@ -67,7 +67,7 @@ final class raw_event_retrieval_strategy_test extends \advanced_testcase {
                 'courseid' => $course->id,
                 'groupid' => 0,
                 'userid' => 2,
-                'modulename' => 'lesson',
+                'modulename' => 'page',
                 'instance' => 1,
                 'eventtype' => 'end',
                 'timestart' => time(),
@@ -85,7 +85,7 @@ final class raw_event_retrieval_strategy_test extends \advanced_testcase {
         $this->assertCount(2, $events);
 
         // Disable the lesson module.
-        $DB->set_field('modules', 'visible', 0, ['name' => 'lesson']);
+        $DB->set_field('modules', 'visible', 0, ['name' => 'page']);
 
         // Check that we only return the assign event.
         $events = $retrievalstrategy->get_raw_events(null, [0], null);
@@ -103,7 +103,7 @@ final class raw_event_retrieval_strategy_test extends \advanced_testcase {
         $this->assertEquals('assign', $event->modulename);
 
         // Enable the lesson module.
-        $DB->set_field('modules', 'visible', 1, ['name' => 'lesson']);
+        $DB->set_field('modules', 'visible', 1, ['name' => 'page']);
 
         // Get all events.
         $events = $retrievalstrategy->get_raw_events(null, [0], null);

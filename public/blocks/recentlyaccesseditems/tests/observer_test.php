@@ -87,7 +87,7 @@ final class observer_test extends \advanced_testcase {
 
         // Create items.
         $this->forum = $this->getDataGenerator()->create_module('forum', array('course' => $this->course));
-        $this->glossary = $this->getDataGenerator()->create_module('glossary', array('course' => $this->course));
+        $this->glossary = $this->getDataGenerator()->create_module('page', array('course' => $this->course));
         $this->assign = $this->getDataGenerator()->create_module('assign', ['course' => $this->course]);
     }
 

@@ -119,9 +119,9 @@ final class indicators_test extends \advanced_testcase {
 
         // Calculate using course_modules samples.
         $indicator->clear_sample_data();
-        $data1 = $this->getDataGenerator()->create_module('data', array('course' => $course3->id),
+        $data1 = $this->getDataGenerator()->create_module('page', array('course' => $course3->id),
                                                              array('completion' => 0));
-        $data2 = $this->getDataGenerator()->create_module('data', array('course' => $course3->id),
+        $data2 = $this->getDataGenerator()->create_module('page', array('course' => $course3->id),
                                                              array('completion' => 1));
 
         $sampleids = array($data1->cmid => $data1->cmid, $data2->cmid => $data2->cmid);
