@@ -27,4 +27,4 @@ Each later change gets its own entry with:
 - Date: 2026-11-17
 - Summary: Brought in Moodle v5.3.1 exactly as released, with no edits to any upstream file. Added this changelog, `NOTICE.md`, and `WOLFWHALE.md` (the short WolfWhale readme, moved here because Moodle already has `README.md`).
 - Folders touched: repository root only (`WOLFWHALE.md`, `WOLFWHALE_CHANGELOG.md`, `NOTICE.md`). No upstream folder was changed.
-- Pull request: link added once this pull request exists.
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/1
