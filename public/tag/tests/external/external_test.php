@@ -27,6 +27,12 @@ use core_external\external_api;
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class external_test extends \core_external\tests\externallib_testcase {
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test update_categories
      */

@@ -1197,7 +1197,7 @@ final class upgradelib_test extends advanced_testcase {
         $student3 = $generator->create_and_enrol($course, 'student');
 
         // Create some activities and some override events.
-        foreach (['assign', 'lesson', 'quiz'] as $modulename) {
+        foreach (['assign', 'forum', 'quiz'] as $modulename) {
             $instance = $generator->create_module($modulename, ['course' => $course->id]);
             create_user_override_event($modulename, $instance->id, $student1->id);
             create_user_override_event($modulename, $instance->id, $student2->id);
@@ -1257,7 +1257,7 @@ final class upgradelib_test extends advanced_testcase {
         $group3 = $generator->create_group(['courseid' => $course->id]);
 
         // Create some activities and some override events.
-        foreach (['assign', 'lesson', 'quiz'] as $modulename) {
+        foreach (['assign', 'forum', 'quiz'] as $modulename) {
             $instance = $generator->create_module($modulename, ['course' => $course->id]);
             create_group_override_event($modulename, $instance->id, $course->id, $group1->id);
             create_group_override_event($modulename, $instance->id, $course->id, $group2->id);

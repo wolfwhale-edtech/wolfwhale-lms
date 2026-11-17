@@ -240,7 +240,7 @@ final class stateactions_test extends \advanced_testcase {
             $references['cm1'] = $this->create_activity($course->id, 'book', 0, false);
             $references['cm2'] = $this->create_activity($course->id, 'assign', 1, true);
             $references['cm3'] = $this->create_activity($course->id, 'book', 1, false);
-            $references['cm4'] = $this->create_activity($course->id, 'glossary', 2, true);
+            $references['cm4'] = $this->create_activity($course->id, 'page', 2, true);
             $references['cm5'] = $this->create_activity($course->id, 'page', 2, false);
         }
 
@@ -695,10 +695,10 @@ final class stateactions_test extends \advanced_testcase {
         // Add some activities to the course. One visible and one hidden in both sections 1 and 2.
         $references["cm0"] = $this->create_activity($course->id, 'assign', 1, true);
         $references["cm1"] = $this->create_activity($course->id, 'book', 1, false);
-        $references["cm2"] = $this->create_activity($course->id, 'glossary', 2, true);
+        $references["cm2"] = $this->create_activity($course->id, 'page', 2, true);
         $references["cm3"] = $this->create_activity($course->id, 'page', 2, false);
         $references["cm4"] = $this->create_activity($course->id, 'forum', 2, false);
-        $references["cm5"] = $this->create_activity($course->id, 'wiki', 2, false);
+        $references["cm5"] = $this->create_activity($course->id, 'assign', 2, false);
 
         if ($expectedexception) {
             $this->expectException(moodle_exception::class);
@@ -1287,10 +1287,10 @@ final class stateactions_test extends \advanced_testcase {
         // Add some activities to the course. One visible and one hidden in both sections 1 and 2.
         $references["cm0"] = $this->create_activity($course->id, 'assign', 1, true);
         $references["cm1"] = $this->create_activity($course->id, 'book', 1, false);
-        $references["cm2"] = $this->create_activity($course->id, 'glossary', 2, true);
+        $references["cm2"] = $this->create_activity($course->id, 'page', 2, true);
         $references["cm3"] = $this->create_activity($course->id, 'page', 2, false);
         $references["cm4"] = $this->create_activity($course->id, 'forum', 3, false);
-        $references["cm5"] = $this->create_activity($course->id, 'wiki', 3, false);
+        $references["cm5"] = $this->create_activity($course->id, 'assign', 3, false);
 
         $user = $this->getDataGenerator()->create_user();
         $this->getDataGenerator()->enrol_user($user->id, $course->id, 'editingteacher');

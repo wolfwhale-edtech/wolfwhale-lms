@@ -52,7 +52,7 @@ final class local_api_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $mapper = container::get_event_mapper();
-        $feedbackgenerator = $generator->get_plugin_generator('mod_page');
+        $feedbackgenerator = $generator->get_plugin_generator('mod_quiz');
         $feedback = $feedbackgenerator->create_instance(array_merge(
             ['course' => $course->id],
             $feedbackproperties
@@ -61,7 +61,7 @@ final class local_api_test extends \advanced_testcase {
         $event = create_event(array_merge(
             [
                 'courseid' => $course->id,
-                'modulename' => 'feedback',
+                'modulename' => 'quiz',
                 'instance' => $feedback->id
             ],
              $eventproperties
@@ -1120,7 +1120,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_no_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1133,7 +1133,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => 0
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_OPEN,
+                'eventtype' => QUIZ_EVENT_TYPE_OPEN,
                 'timestart' => $timeopen->getTimestamp()
             ]
         );
@@ -1155,7 +1155,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_less_than_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1169,7 +1169,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp()
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_OPEN,
+                'eventtype' => QUIZ_EVENT_TYPE_OPEN,
                 'timestart' => $timeopen->getTimestamp()
             ]
         );
@@ -1192,7 +1192,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_equal_to_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1205,7 +1205,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp(),
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_OPEN,
+                'eventtype' => QUIZ_EVENT_TYPE_OPEN,
                 'timestart' => $timeopen->getTimestamp()
             ]
         );
@@ -1228,7 +1228,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_after_max(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1241,7 +1241,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp(),
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_OPEN,
+                'eventtype' => QUIZ_EVENT_TYPE_OPEN,
                 'timestart' => $timeopen->getTimestamp()
             ]
         );
@@ -1259,7 +1259,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_no_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1272,7 +1272,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp()
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_OPEN,
+                'eventtype' => QUIZ_EVENT_TYPE_OPEN,
                 'timestart' => $timeclose->getTimestamp()
             ]
         );
@@ -1295,7 +1295,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_greater_than_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1309,7 +1309,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp()
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_CLOSE,
+                'eventtype' => QUIZ_EVENT_TYPE_CLOSE,
                 'timestart' => $timeclose->getTimestamp()
             ]
         );
@@ -1332,7 +1332,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_equal_to_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1346,7 +1346,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp(),
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_CLOSE,
+                'eventtype' => QUIZ_EVENT_TYPE_CLOSE,
                 'timestart' => $timeclose->getTimestamp()
             ]
         );
@@ -1369,7 +1369,7 @@ final class local_api_test extends \advanced_testcase {
      */
     public function test_update_event_start_day_activity_event_before_min(): void {
         global $CFG, $DB;
-        require_once($CFG->dirroot . '/mod/page/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
 
         $this->resetAfterTest(true);
         $this->setAdminUser();
@@ -1382,7 +1382,7 @@ final class local_api_test extends \advanced_testcase {
                 'timeclose' => $timeclose->getTimestamp(),
             ],
             [
-                'eventtype' => FEEDBACK_EVENT_TYPE_CLOSE,
+                'eventtype' => QUIZ_EVENT_TYPE_CLOSE,
                 'timestart' => $timeclose->getTimestamp()
             ]
         );

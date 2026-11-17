@@ -127,9 +127,9 @@ final class get_state_test extends \core_external\tests\externallib_testcase {
             $this->create_activity($course->id, 'forum', 1, true, $canedit);
             $this->create_activity($course->id, 'book', 1, false, $canedit);
             $this->create_activity($course->id, 'assign', 2, false, $canedit);
-            $this->create_activity($course->id, 'glossary', 4, true, $canedit);
+            $this->create_activity($course->id, 'page', 4, true, $canedit);
             $this->create_activity($course->id, 'label', 5, false, $canedit);
-            $this->create_activity($course->id, 'feedback', 5, true, $canedit);
+            $this->create_activity($course->id, 'forum', 5, true, $canedit);
         }
 
         if ($expectedexception) {

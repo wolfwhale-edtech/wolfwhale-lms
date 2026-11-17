@@ -58,6 +58,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         parent::setUp();
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
         $this->setAdminUser();
 
         // Create courses.

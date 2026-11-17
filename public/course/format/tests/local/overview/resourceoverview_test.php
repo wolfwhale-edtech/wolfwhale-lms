@@ -220,32 +220,12 @@ final class resourceoverview_test extends \advanced_testcase {
             'expected' => 'URL',
         ];
         // Non-resource activities.
-        yield 'bigbluebuttonbn' => [
-            'resourcetype' => 'bigbluebuttonbn',
-            'expected' => null,
-        ];
-        yield 'choice' => [
-            'resourcetype' => 'choice',
-            'expected' => null,
-        ];
-        yield 'data' => [
-            'resourcetype' => 'data',
-            'expected' => null,
-        ];
         yield 'forum' => [
             'resourcetype' => 'forum',
             'expected' => null,
         ];
-        yield 'glossary' => [
-            'resourcetype' => 'glossary',
-            'expected' => null,
-        ];
         yield 'h5pactivity' => [
             'resourcetype' => 'h5pactivity',
-            'expected' => null,
-        ];
-        yield 'lesson' => [
-            'resourcetype' => 'lesson',
             'expected' => null,
         ];
         yield 'lti' => [
@@ -258,14 +238,6 @@ final class resourceoverview_test extends \advanced_testcase {
         ];
         yield 'quiz' => [
             'resourcetype' => 'quiz',
-            'expected' => null,
-        ];
-        yield 'scorm' => [
-            'resourcetype' => 'scorm',
-            'expected' => null,
-        ];
-        yield 'wiki' => [
-            'resourcetype' => 'wiki',
             'expected' => null,
         ];
     }

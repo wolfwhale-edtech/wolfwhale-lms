@@ -240,40 +240,6 @@ final class send_login_notifications_test extends \advanced_testcase {
     }
 
     /**
-     * Test new login notification where the user auth method provides a custom change password URL
-     */
-    public function test_login_notification_custom_change_password_url(): void {
-        global $SESSION;
-
-        $this->resetAfterTest();
-        $this->setUser(0);
-
-        // Set LDAP auth change password URL.
-        $changepasswordurl = (new moodle_url('/changepassword.php'))->out(false);
-        set_config('changepasswordurl', $changepasswordurl, 'auth_ldap');
-
-        $ldapuser = $this->getDataGenerator()->create_user(['auth' => 'ldap']);
-
-        // Mock data for test.
-        $ldapuser->lastip = '1.2.3.4';
-        $SESSION->isnewsessioncookie = true;
-        @complete_user_login($ldapuser);
-
-        // Redirect messages to sink and stop buffer output from CLI task.
-        $sink = $this->redirectMessages();
-        ob_start();
-        $this->runAdhocTasks(send_login_notifications::class);
-        ob_end_clean();
-        $messages = $sink->get_messages();
-        $sink->close();
-
-        // Send notification, assert custom change password URL is present.
-        $this->assertCount(1, $messages);
-        $this->assertStringContainsString("If you don't recognise this activity, please " .
-            "<a href=\"{$changepasswordurl}\">change your password</a>.", $messages[0]->fullmessagehtml);
-    }
-
-    /**
      * Test new mobile app login notification.
      */
     public function test_mobile_app_login_notification(): void {

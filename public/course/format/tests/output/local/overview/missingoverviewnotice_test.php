@@ -64,25 +64,9 @@ final class missingoverviewnotice_test extends \advanced_testcase {
             'modname' => 'assign',
             'expectempty' => true,
         ];
-        yield 'bigbluebuttonbn' => [
-            'modname' => 'bigbluebuttonbn',
-            'expectempty' => true,
-        ];
         yield 'book' => [
             'modname' => 'book',
             'expectempty' => false,
-        ];
-        yield 'choice' => [
-            'modname' => 'choice',
-            'expectempty' => true,
-        ];
-        yield 'data' => [
-            'modname' => 'data',
-            'expectempty' => true,
-        ];
-        yield 'feedback' => [
-            'modname' => 'feedback',
-            'expectempty' => true,
         ];
         yield 'folder' => [
             'modname' => 'folder',
@@ -92,25 +76,13 @@ final class missingoverviewnotice_test extends \advanced_testcase {
             'modname' => 'forum',
             'expectempty' => true,
         ];
-        yield 'glossary' => [
-            'modname' => 'glossary',
-            'expectempty' => true,
-        ];
         yield 'h5pactivity' => [
             'modname' => 'h5pactivity',
             'expectempty' => true,
         ];
-        yield 'imscp' => [
-            'modname' => 'imscp',
-            'expectempty' => false,
-        ];
         yield 'label' => [
             'modname' => 'label',
             'expectempty' => false,
-        ];
-        yield 'lesson' => [
-            'modname' => 'lesson',
-            'expectempty' => true,
         ];
         yield 'lti' => [
             'modname' => 'lti',
@@ -132,21 +104,9 @@ final class missingoverviewnotice_test extends \advanced_testcase {
             'modname' => 'resource',
             'expectempty' => true,
         ];
-        yield 'scorm' => [
-            'modname' => 'scorm',
-            'expectempty' => true,
-        ];
         yield 'url' => [
             'modname' => 'url',
             'expectempty' => false,
-        ];
-        yield 'wiki' => [
-            'modname' => 'wiki',
-            'expectempty' => true,
-        ];
-        yield 'workshop' => [
-            'modname' => 'workshop',
-            'expectempty' => true,
         ];
     }
 }
