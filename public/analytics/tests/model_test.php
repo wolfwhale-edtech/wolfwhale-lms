@@ -79,7 +79,7 @@ final class model_test extends \advanced_testcase {
     }
 
     public function test_create(): void {
-        $target = \core_analytics\manager::get_target('\core_course\analytics\target\course_dropout');
+        $target = \core_analytics\manager::get_target('test_target_shortname');
         $indicators = array(
             \core_analytics\manager::get_indicator('\core\analytics\indicator\any_write_action'),
             \core_analytics\manager::get_indicator('\core\analytics\indicator\read_actions')
@@ -271,7 +271,7 @@ final class model_test extends \advanced_testcase {
      * @return void
      */
     public function test_exists(): void {
-        $target = \core_analytics\manager::get_target('\core_course\analytics\target\no_teaching');
+        $target = \core_analytics\manager::get_target('test_target_shortname');
         $this->assertTrue(\core_analytics\model::exists($target));
 
         foreach (\core_analytics\manager::get_all_models() as $model) {

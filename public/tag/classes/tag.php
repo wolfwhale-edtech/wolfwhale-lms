@@ -1443,7 +1443,11 @@ class core_tag_tag {
         global $CFG;
         if (!empty($tagarea->callback)) {
             if (!empty($tagarea->callbackfile)) {
-                require_once($CFG->dirroot . '/' . ltrim($tagarea->callbackfile, '/'));
+                $callbackfile = $CFG->dirroot . '/' . ltrim($tagarea->callbackfile, '/');
+                if (!is_readable($callbackfile)) {
+                    return null;
+                }
+                require_once($callbackfile);
             }
             $callback = $tagarea->callback;
             return call_user_func_array($callback, [$this, $exclusivemode, $fromctx, $ctx, $rec, $page]);

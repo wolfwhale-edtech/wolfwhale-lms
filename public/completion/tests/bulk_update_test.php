@@ -141,7 +141,7 @@ final class bulk_update_test extends \advanced_testcase {
         return [
             'Several modules with the same module type (choice)' => [
                 [
-                    'modulenames' => ['choice', 'choice', 'choice'],
+                    'modulenames' => ['assign', 'assign', 'assign'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionsubmit' => 1],
                     'validatedata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionsubmit' => 1],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC],
@@ -150,7 +150,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'Several modules with different module type' => [
                 [
-                    'modulenames' => ['choice', 'forum'],
+                    'modulenames' => ['page', 'forum'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],
                     'validatedata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC],
@@ -159,7 +159,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'Setting manual completion (completionview shoud be ignored)' => [
                 [
-                    'modulenames' => ['scorm', 'forum', 'label', 'assign'],
+                    'modulenames' => ['page', 'forum', 'label', 'assign'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_MANUAL, 'completionview' => 1],
                     'validatedata' => [],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_MANUAL, 'completionview' => 0],
@@ -168,7 +168,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'If at least one module does not support completionsubmit it can\'t be set' => [
                 [
-                    'modulenames' => ['assign', 'wiki'],
+                    'modulenames' => ['assign', 'page'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionsubmit' => 1],
                     'validatedata' => [],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],

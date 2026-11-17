@@ -231,7 +231,7 @@ final class step_test extends \advanced_testcase {
         // Create mocked task, step and element.
         $bt = new \mock_backup_task_basepath('taskname');
         $bs = new \mock_backup_structure_step('steptest', null, $bt);
-        $el = new backup_nested_element('workshop', array('id'), array('one', 'two', 'qtype'));
+        $el = new backup_nested_element('assign', array('id'), array('one', 'two', 'qtype'));
         // Wrong plugin type.
         try {
             $bs->add_subplugin_structure('fakesubplugin', $el, true, 'fakeplugintype', 'fakepluginname');
@@ -267,7 +267,7 @@ final class step_test extends \advanced_testcase {
         }
         // Wrong subplugin type.
         try {
-            $bs->add_subplugin_structure('fakesubplugin', $el, true, 'mod', 'workshop');
+            $bs->add_subplugin_structure('fakesubplugin', $el, true, 'mod', 'assign');
             $this->assertTrue(false, 'base_step_exception expected');
         } catch (\Exception $e) {
             $this->assertTrue($e instanceof backup_step_exception);
@@ -275,34 +275,35 @@ final class step_test extends \advanced_testcase {
         }
         // Wrong BC subplugin type.
         try {
-            $bt->set_modulename('workshop');
+            $bt->set_modulename('assign');
             $bs->add_subplugin_structure('fakesubplugin', $el, true);
             $this->assertTrue(false, 'base_step_exception expected');
         } catch (\Exception $e) {
             $this->assertTrue($e instanceof backup_step_exception);
             $this->assertEquals('incorrect_subplugin_type', $e->errorcode);
         }
-        // Correct call to workshopform subplugin (@ 'workshop' level).
-        $bs->add_subplugin_structure('workshopform', $el, true, 'mod', 'workshop');
+        // Correct call to assignsubmission subplugin (@ 'submission' level).
+        $el = new backup_nested_element('submission', array('id'), array('one', 'two', 'qtype'));
+        $bs->add_subplugin_structure('assignsubmission', $el, true, 'mod', 'assign');
         $ch = $el->get_children();
         $this->assertEquals(1, count($ch));
         $og = reset($ch);
         $this->assertTrue($og instanceof backup_optigroup);
         $ch = $og->get_children();
-        $this->assertTrue(array_key_exists('optigroup_workshopform_accumulative_workshop', $ch));
-        $this->assertTrue($ch['optigroup_workshopform_accumulative_workshop'] instanceof backup_subplugin_element);
+        $this->assertTrue(array_key_exists('optigroup_assignsubmission_onlinetext_submission', $ch));
+        $this->assertTrue($ch['optigroup_assignsubmission_onlinetext_submission'] instanceof backup_subplugin_element);
 
-        // Correct BC call to workshopform subplugin (@ 'assessment' level).
-        $el = new backup_nested_element('assessment', array('id'), array('one', 'two', 'qtype'));
-        $bt->set_modulename('workshop');
-        $bs->add_subplugin_structure('workshopform', $el, true);
+        // Correct BC call to assignsubmission subplugin (@ 'submission' level).
+        $el = new backup_nested_element('submission', array('id'), array('one', 'two', 'qtype'));
+        $bt->set_modulename('assign');
+        $bs->add_subplugin_structure('assignsubmission', $el, true);
         $ch = $el->get_children();
         $this->assertEquals(1, count($ch));
         $og = reset($ch);
         $this->assertTrue($og instanceof backup_optigroup);
         $ch = $og->get_children();
-        $this->assertTrue(array_key_exists('optigroup_workshopform_accumulative_assessment', $ch));
-        $this->assertTrue($ch['optigroup_workshopform_accumulative_assessment'] instanceof backup_subplugin_element);
+        $this->assertTrue(array_key_exists('optigroup_assignsubmission_onlinetext_submission', $ch));
+        $this->assertTrue($ch['optigroup_assignsubmission_onlinetext_submission'] instanceof backup_subplugin_element);
 
         // TODO: Add some test covering a non-mod subplugin once we have some implemented in core.
     }
@@ -388,7 +389,7 @@ final class step_test extends \advanced_testcase {
         }
         // Wrong subplugin type.
         try {
-            $bs->add_subplugin_structure('fakesubplugin', $el, 'mod', 'workshop');
+            $bs->add_subplugin_structure('fakesubplugin', $el, 'mod', 'assign');
             $this->assertTrue(false, 'base_step_exception expected');
         } catch (\Exception $e) {
             $this->assertTrue($e instanceof restore_step_exception);
@@ -396,25 +397,24 @@ final class step_test extends \advanced_testcase {
         }
         // Wrong BC subplugin type.
         try {
-            $bt->set_modulename('workshop');
+            $bt->set_modulename('assign');
             $bs->add_subplugin_structure('fakesubplugin', $el);
             $this->assertTrue(false, 'base_step_exception expected');
         } catch (\Exception $e) {
             $this->assertTrue($e instanceof restore_step_exception);
             $this->assertEquals('incorrect_subplugin_type', $e->errorcode);
         }
-        // Correct call to workshopform subplugin (@ 'workshop' level).
+        // Correct call to assignsubmission subplugin (@ 'submission' level).
         $bt = new \mock_restore_task_basepath('taskname');
         $bs = new \mock_restore_structure_step('steptest', null, $bt);
-        $el = new restore_path_element('workshop', '/path/to/workshop');
-        $bs->add_subplugin_structure('workshopform', $el, 'mod', 'workshop');
+        $el = new restore_path_element('submission', '/path/to/submission');
+        $bs->add_subplugin_structure('assignsubmission', $el, 'mod', 'assign');
         $patheles = $bs->get_pathelements();
-        // Verify some well-known workshopform subplugin restore_path_elements have been added.
+        // Verify some well-known assignsubmission subplugin restore_path_elements have been added.
         $keys = array(
-            '/path/to/workshop/subplugin_workshopform_accumulative_workshop/workshopform_accumulative_dimension',
-            '/path/to/workshop/subplugin_workshopform_comments_workshop/workshopform_comments_dimension',
-            '/path/to/workshop/subplugin_workshopform_numerrors_workshop/workshopform_numerrors_map',
-            '/path/to/workshop/subplugin_workshopform_rubric_workshop/workshopform_rubric_config');
+            '/path/to/submission/subplugin_assignsubmission_onlinetext_submission/submission_onlinetext',
+            '/path/to/submission/subplugin_assignsubmission_file_submission/submission_file',
+        );
         foreach ($keys as $key) {
             // Verify the element exists.
             $this->assertArrayHasKey($key, $patheles);
@@ -425,19 +425,17 @@ final class step_test extends \advanced_testcase {
             $this->assertTrue($po instanceof restore_subplugin);
         }
 
-        // Correct BC call to workshopform subplugin (@ 'assessment' level).
+        // Correct BC call to assignsubmission subplugin (@ 'submission' level).
         $bt = new \mock_restore_task_basepath('taskname');
         $bs = new \mock_restore_structure_step('steptest', null, $bt);
-        $el = new restore_path_element('assessment', '/a/assessment');
-        $bt->set_modulename('workshop');
-        $bs->add_subplugin_structure('workshopform', $el);
+        $el = new restore_path_element('submission', '/a/submission');
+        $bt->set_modulename('assign');
+        $bs->add_subplugin_structure('assignsubmission', $el);
         $patheles = $bs->get_pathelements();
-        // Verify some well-known workshopform subplugin restore_path_elements have been added.
         $keys = array(
-            '/a/assessment/subplugin_workshopform_accumulative_assessment/workshopform_accumulative_grade',
-            '/a/assessment/subplugin_workshopform_comments_assessment/workshopform_comments_grade',
-            '/a/assessment/subplugin_workshopform_numerrors_assessment/workshopform_numerrors_grade',
-            '/a/assessment/subplugin_workshopform_rubric_assessment/workshopform_rubric_grade');
+            '/a/submission/subplugin_assignsubmission_onlinetext_submission/submission_onlinetext',
+            '/a/submission/subplugin_assignsubmission_file_submission/submission_file',
+        );
         foreach ($keys as $key) {
             // Verify the element exists.
             $this->assertArrayHasKey($key, $patheles);

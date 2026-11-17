@@ -63,6 +63,7 @@ final class backup_test extends \advanced_testcase {
     protected function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usecomments', 1);
         $this->setAdminUser();
 
         // Set up custom fields.

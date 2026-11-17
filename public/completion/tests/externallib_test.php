@@ -206,7 +206,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                     $this->assertEquals($name, $details[$index]['rulename']);
                     $this->assertEquals(0, $details[$index]['rulevalue']['status']);
                 }
-            } else if ($status['cmid'] == $data->cmid and $status['modname'] == 'data' and $status['instance'] == $data->id) {
+            } else if ($status['cmid'] == $data->cmid and $status['modname'] == 'page' and $status['instance'] == $data->id) {
                 $activitiesfound++;
                 $this->assertEquals(COMPLETION_INCOMPLETE, $status['state']);
                 $this->assertEquals(COMPLETION_TRACKING_MANUAL, $status['tracking']);

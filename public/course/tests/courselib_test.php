@@ -3499,11 +3499,11 @@ final class courselib_test extends advanced_testcase {
         $this->setAdminUser();
 
         $navoptions = course_get_user_navigation_options($context, $course);
-        $this->assertTrue($navoptions->blogs);
-        $this->assertTrue($navoptions->notes);
+        $this->assertFalse($navoptions->blogs);
+        $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertTrue($navoptions->badges);
-        $this->assertTrue($navoptions->tags);
+        $this->assertFalse($navoptions->tags);
         $this->assertFalse($navoptions->search);
         $this->assertTrue($navoptions->competencies);
 
@@ -3523,11 +3523,11 @@ final class courselib_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
         $navoptions = course_get_user_navigation_options($context, $course);
-        $this->assertTrue($navoptions->blogs);
+        $this->assertFalse($navoptions->blogs);
         $this->assertFalse($navoptions->notes);
         $this->assertFalse($navoptions->participants);
         $this->assertTrue($navoptions->badges);
-        $this->assertTrue($navoptions->tags);
+        $this->assertFalse($navoptions->tags);
         $this->assertTrue($navoptions->search);
     }
 
@@ -3542,8 +3542,8 @@ final class courselib_test extends advanced_testcase {
         $this->setAdminUser();
 
         $navoptions = course_get_user_navigation_options($context);
-        $this->assertTrue($navoptions->blogs);
-        $this->assertTrue($navoptions->notes);
+        $this->assertFalse($navoptions->blogs);
+        $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertTrue($navoptions->badges);
     }
@@ -3564,7 +3564,7 @@ final class courselib_test extends advanced_testcase {
         $this->setUser($user);
 
         $navoptions = course_get_user_navigation_options($context);
-        $this->assertTrue($navoptions->blogs);
+        $this->assertFalse($navoptions->blogs);
         $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertFalse($navoptions->badges);
@@ -3639,7 +3639,7 @@ final class courselib_test extends advanced_testcase {
         $this->assertTrue($adminoptions->backup);
         $this->assertTrue($adminoptions->restore);
         $this->assertFalse($adminoptions->files);
-        $this->assertTrue($adminoptions->tags);
+        $this->assertFalse($adminoptions->tags);
         $this->assertTrue($adminoptions->gradebook);
         $this->assertFalse($adminoptions->outcomes);
         $this->assertTrue($adminoptions->badges);
@@ -3959,6 +3959,7 @@ final class courselib_test extends advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
 
@@ -3977,7 +3978,11 @@ final class courselib_test extends advanced_testcase {
         $resetdata->reset_end_date_old = $course->enddate;
         $resetdata->reset_events = true;
 
-        $event = $generator->create_event(['courseid' => $course->id, 'name' => 'Reset me']);
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me',
+        ]);
         $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset once with a long timeout that won't be exceeded.
@@ -3987,7 +3992,11 @@ final class courselib_test extends advanced_testcase {
         // Verify the course has been reset.
         $this->assertFalse($DB->record_exists('event', ['id' => $event->id]));
 
-        $event = $generator->create_event(['courseid' => $course->id, 'name' => 'Reset me again']);
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me again',
+        ]);
         $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset with a timeout that will be exceeded. Confirm an exception is thrown.
@@ -7493,38 +7502,6 @@ final class courselib_test extends advanced_testcase {
             $file->get_id(),
             $image->get_id(),
         );
-    }
-
-    /**
-     * Test the course_get_communication_instance_data() function.
-     */
-    public function test_course_get_communication_instance_data(): void {
-        $this->resetAfterTest();
-        $course = $this->getDataGenerator()->create_course();
-
-        // Set admin user as a valid enrolment will be checked in the callback function.
-        $this->setAdminUser();
-
-        // Use the callback function and return the data.
-        list($instance, $context, $heading, $returnurl) = component_callback(
-            'core_course',
-            'get_communication_instance_data',
-            [$course->id]
-        );
-
-        // Check the url is as expected.
-        $expectedreturnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
-        $this->assertEquals($expectedreturnurl, $returnurl);
-
-        // Check the context is as expected.
-        $expectedcontext = context_course::instance($course->id);
-        $this->assertEquals($expectedcontext, $context);
-
-        // Check the instance id is as expected.
-        $this->assertEquals($course->id, $instance->id);
-
-        // Check the heading is as expected.
-        $this->assertEquals($course->fullname, $heading);
     }
 
     /**

@@ -38,6 +38,12 @@ use invalid_parameter_exception;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_reportbuilder\local\helpers\report::class)]
 final class report_test extends advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test creation report
      */

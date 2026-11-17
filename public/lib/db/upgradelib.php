@@ -1181,8 +1181,6 @@ function upgrade_calendar_override_events_fix(stdClass $info, bool $output = tru
     include_once($CFG->dirroot. '/course/lib.php');
     include_once($CFG->dirroot. '/mod/assign/lib.php');
     include_once($CFG->dirroot. '/mod/assign/locallib.php');
-    include_once($CFG->dirroot. '/mod/lesson/lib.php');
-    include_once($CFG->dirroot. '/mod/lesson/locallib.php');
     include_once($CFG->dirroot. '/mod/quiz/lib.php');
     include_once($CFG->dirroot. '/mod/quiz/locallib.php');
 

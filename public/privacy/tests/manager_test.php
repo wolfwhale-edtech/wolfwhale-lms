@@ -282,7 +282,7 @@ final class manager_test extends \advanced_testcase {
                 true,
             ],
             'A subsystem with a directory' => [
-                'core_portfolio',
+                'core_comment',
                 false,
             ],
             'A plugin' => [

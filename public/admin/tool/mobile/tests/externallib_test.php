@@ -264,9 +264,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $expected[] = ['name' => 'tool_dataprivacy_contactdataprotectionofficer', 'value' => get_config('tool_dataprivacy', 'contactdataprotectionofficer')];
         $expected[] = ['name' => 'tool_dataprivacy_showdataretentionsummary', 'value' => get_config('tool_dataprivacy', 'showdataretentionsummary')];
 
-        $expected[] = ['name' => 'useblogassociations', 'value' => $CFG->useblogassociations];
-        $expected[] = ['name' => 'bloglevel', 'value' => $CFG->bloglevel];
-        $expected[] = ['name' => 'blogusecomments', 'value' => $CFG->blogusecomments];
+        $expected[] = ['name' => 'useblogassociations', 'value' => 0];
+        $expected[] = ['name' => 'bloglevel', 'value' => 0];
+        $expected[] = ['name' => 'blogusecomments', 'value' => 0];
 
         $this->assertCount(0, $result['warnings']);
         $this->assertEquals($expected, $result['settings']);

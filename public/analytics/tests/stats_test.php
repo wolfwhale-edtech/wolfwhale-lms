@@ -47,23 +47,22 @@ final class stats_test extends \advanced_testcase {
      * Test the {@link \core_analytics\stats::enabled_models()} implementation.
      */
     public function test_enabled_models(): void {
-        // By default, sites have {@link \core_course\analytics\target\no_teaching} and
-        // {@link \core_user\analytics\target\upcoming_activities_due} enabled.
-        $this->assertEquals(4, \core_analytics\stats::enabled_models());
+        // Shipped models were removed, so a new site has none enabled.
+        $this->assertEquals(0, \core_analytics\stats::enabled_models());
 
         $model = \core_analytics\model::create(
-            \core_analytics\manager::get_target('\core_course\analytics\target\course_dropout'),
+            \core_analytics\manager::get_target('test_target_shortname'),
             [
                 \core_analytics\manager::get_indicator('\core\analytics\indicator\any_write_action'),
             ]
         );
 
         // Purely adding a new model does not make it included in the stats.
-        $this->assertEquals(4, \core_analytics\stats::enabled_models());
+        $this->assertEquals(0, \core_analytics\stats::enabled_models());
 
         // New models must be enabled to have them counted.
         $model->enable('\core\analytics\time_splitting\quarters');
-        $this->assertEquals(5, \core_analytics\stats::enabled_models());
+        $this->assertEquals(1, \core_analytics\stats::enabled_models());
     }
 
     /**

@@ -346,8 +346,11 @@ class calendar_event {
             $cm = get_coursemodule_from_instance($this->properties->modulename, $this->properties->instance, 0,
                 false, MUST_EXIST);
             $context = \context_course::instance($cm->course);
-        } else {
+        } else if (!empty($this->properties->userid)) {
             $context = \context_user::instance($this->properties->userid);
+        } else {
+            // Course reset and other site tasks create events with no user.
+            $context = \context_system::instance();
         }
 
         return $context;

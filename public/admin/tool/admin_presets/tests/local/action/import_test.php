@@ -114,16 +114,12 @@ final class import_test extends \advanced_testcase {
                 if ($expectedsettings) {
                     // Check the items have been created.
                     $items = $DB->get_records('adminpresets_it', ['adminpresetid' => $presetid]);
-                    $this->assertCount(4, $items);
+                    $this->assertCount(3, $items);
                     $presetitems = [
                         'none' => [
-                            'enablebadges' => 0,
-                            'enableportfolios' => 1,
                             'allowemojipicker' => 1,
-                        ],
-                        'mod_lesson' => [
-                            'mediawidth' => 900,
-                            'maxanswers' => 2,
+                            'forum_maxattachments' => 3,
+                            'forum_manydiscussions' => 10,
                         ],
                     ];
                     foreach ($items as $item) {
@@ -131,23 +127,14 @@ final class import_test extends \advanced_testcase {
                         $this->assertEquals($presetitems[$item->plugin][$item->name], $item->value);
                     }
 
-                    // Check the advanced attributes have been created.
                     $advitems = $DB->get_records('adminpresets_it_a');
-                    $this->assertCount($currentadvitems + 1, $advitems);
-                    $advitemfound = false;
-                    foreach ($advitems as $advitem) {
-                        if ($advitem->name == 'maxanswers_adv') {
-                            $this->assertEmpty($advitem->value);
-                            $advitemfound = true;
-                        }
-                    }
-                    $this->assertTrue($advitemfound);
+                    $this->assertCount($currentadvitems, $advitems);
                 }
 
                 if ($expectedplugins) {
                     // Check the plugins have been created.
                     $plugins = $DB->get_records('adminpresets_plug', ['adminpresetid' => $presetid]);
-                    $this->assertCount(6, $plugins);
+                    $this->assertCount(4, $plugins);
                     $presetplugins = [
                         'atto' => [
                             'html' => 1,
@@ -158,8 +145,6 @@ final class import_test extends \advanced_testcase {
                         ],
                         'mod' => [
                             'page' => 0,
-                            'data' => 0,
-                            'lesson' => 1,
                         ],
                     ];
                     foreach ($plugins as $plugin) {

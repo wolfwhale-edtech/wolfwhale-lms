@@ -27,6 +27,12 @@ namespace qbank_tagquestion\event;
 #[\PHPUnit\Framework\Attributes\CoversClass(\qbank_tagquestion\event\question_deleted_observer::class)]
 final class question_deleted_observer_test extends \advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Deleting a question with tags should also delete the tags.
      *

@@ -786,13 +786,14 @@ final class completionlib_test extends advanced_testcase {
         $this->setup_data();
         $user = $this->user;
 
-        $page = $this->getDataGenerator()->create_module('page', [
+        $page = $this->getDataGenerator()->create_module('forum', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionview' => 1,
+            'completionposts' => 1,
         ]);
 
-        $cm = get_coursemodule_from_instance('page', $page->id);
+        $cm = get_coursemodule_from_instance('forum', $page->id);
 
         // Let's manually create a course completion record instead of going through the hoops to complete an activity.
         if ($hasrecord) {
@@ -852,13 +853,14 @@ final class completionlib_test extends advanced_testcase {
         $this->setup_data();
         $this->setUser($this->user);
 
-        $page = $this->getDataGenerator()->create_module('page', [
+        $page = $this->getDataGenerator()->create_module('forum', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionview' => 1,
+            'completionposts' => 1,
         ]);
 
-        $cm = get_coursemodule_from_instance('page', $page->id);
+        $cm = get_coursemodule_from_instance('forum', $page->id);
 
         // Let's manually create a course completion record instead of going through the hoops to complete an activity.
         $cmcompletionrecord = (object) [

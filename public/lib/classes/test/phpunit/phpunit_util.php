@@ -492,7 +492,11 @@ class phpunit_util extends \core\test\testing_util {
         $DB->set_field('user', 'email', 'admin@example.com', ['username' => 'admin']);
 
         // Disable all logging for performance and sanity reasons.
+        // Install writes a config-change event for every default setting. Drop those
+        // rows after the store is switched off so the test database starts empty.
         set_config('enabled_stores', '', 'tool_log');
+        get_log_manager(true);
+        $DB->delete_records('logstore_standard_log');
 
         // Remove any default blocked hosts and port restrictions, to avoid blocking tests (eg those using local files).
         set_config('curlsecurityblockedhosts', '');
@@ -776,6 +780,7 @@ class phpunit_util extends \core\test\testing_util {
      * @return void may terminate execution with exit code
      */
     public static function upgrade_site(): void {
+        global $DB;
 
         if (!self::is_test_site()) {
             phpunit_bootstrap_error(PHPUNIT_EXITCODE_CONFIGERROR, 'Can not upgrade non-test site!!');
@@ -794,7 +799,11 @@ class phpunit_util extends \core\test\testing_util {
         admin_apply_default_settings(null, true);
 
         // Disable all logging for performance and sanity reasons.
+        // Applying defaults logs one event per setting. Drop those rows after the
+        // store is switched off so the test database stays empty.
         set_config('enabled_stores', '', 'tool_log');
+        get_log_manager(true);
+        $DB->delete_records('logstore_standard_log');
 
         // Remove any default blocked hosts and port restrictions, to avoid blocking tests (eg those using local files).
         set_config('curlsecurityblockedhosts', '');

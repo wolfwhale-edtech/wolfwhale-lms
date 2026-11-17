@@ -82,8 +82,16 @@ class analysis {
 
         $options = $this->analyser->get_options();
 
-        // Time limit control.
-        $modeltimelimit = intval(get_config('analytics', 'modeltimelimit'));
+        // Time limit control. The admin default is 20 minutes, but that setting page is
+        // only registered while analytics is enabled, so a site with analytics off has no
+        // stored value. Treat a missing value as the same 20 minute default. Zero still
+        // means "stop as soon as the first analysable has been processed".
+        $modeltimelimit = get_config('analytics', 'modeltimelimit');
+        if ($modeltimelimit === false) {
+            $modeltimelimit = 20 * MINSECS;
+        } else {
+            $modeltimelimit = intval($modeltimelimit);
+        }
 
         if ($this->includetarget) {
             $action = 'training';

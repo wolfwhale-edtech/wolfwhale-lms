@@ -71,16 +71,6 @@ $tagareas = [
         'multiplecontexts' => true,
     ],
     [
-        'itemtype' => 'post', // Blog posts.
-        'component' => 'core',
-        'callback' => 'blog_get_tagged_posts',
-        'callbackfile' => '/blog/lib.php',
-    ],
-    [
-        'itemtype' => 'blog_external', // External blogs.
-        'component' => 'core',
-    ],
-    [
         'itemtype' => 'course_modules', // Course modules.
         'component' => 'core',
         'callback' => 'course_get_tagged_course_modules',

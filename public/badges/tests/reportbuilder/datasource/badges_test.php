@@ -382,6 +382,7 @@ final class badges_test extends core_reportbuilder_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $course = $this->getDataGenerator()->create_course(['fullname' => 'Course 1']);
         $user = $this->getDataGenerator()->create_and_enrol($course, 'student', ['firstname' => 'Zoe', 'lastname' => 'Zebra']);

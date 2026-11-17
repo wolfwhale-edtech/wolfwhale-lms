@@ -51,7 +51,7 @@ final class global_navigation_test extends navigation_testcase {
         $res2 = $section2->add('resource 2', null, navigation_node::TYPE_RESOURCE, null, 'res2');
         $res3 = $section2->add('resource 3', null, navigation_node::TYPE_RESOURCE, null, 'res3');
 
-        $this->assertTrue($node->exposed_module_extends_navigation('data'));
+        $this->assertTrue($node->exposed_module_extends_navigation('subsection'));
         $this->assertFalse($node->exposed_module_extends_navigation('test1'));
     }
 

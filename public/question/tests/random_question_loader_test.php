@@ -42,6 +42,12 @@ require_once($CFG->dirroot . '/mod/quiz/tests/quiz_question_helper_test_trait.ph
 #[\PHPUnit\Framework\Attributes\CoversClass(\random_question_loader::class)]
 final class random_question_loader_test extends \advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     use \quiz_question_helper_test_trait;
 
     public function test_empty_category_gives_null(): void {

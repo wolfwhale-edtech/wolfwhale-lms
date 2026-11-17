@@ -27,10 +27,10 @@ defined('MOODLE_INTERNAL') || die();
 
 $models = [
     [
-        'target' => '\core_course\analytics\target\no_teaching',
+        'target' => '\test_target_course_level_shortname',
         'indicators' => [
-            '\core_course\analytics\indicator\no_teacher',
-            '\core_course\analytics\indicator\no_student',
+            '\core\analytics\indicator\any_write_action',
+            '\core\analytics\indicator\read_actions',
         ],
         'timesplitting' => '\core\analytics\time_splitting\single_range',
         'enabled' => true,

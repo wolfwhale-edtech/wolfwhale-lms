@@ -68,6 +68,7 @@ final class qbank_preview_helper_test extends \advanced_testcase {
         global $USER;
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usecomments', 1);
         $this->setAdminUser();
         $generator = $this->getDataGenerator();
         $questiongenerator = $generator->get_plugin_generator('core_question');

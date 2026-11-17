@@ -990,6 +990,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->assertEquals(1, $results['total']);
 
         // Enable coursetag option.
+        set_config('usetags', 1);
         set_config('block_tags_showcoursetags', true);
         // Add tag 'TAG-LABEL ON SECOND COURSE' to Course2.
         core_tag_tag::set_item_tags('core', 'course', $course2->id, context_course::instance($course2->id),
@@ -1248,14 +1249,14 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 );
                 $this->assertFalse($module['branded']);
                 $testexecuted = $testexecuted + 1;
-            } else if ($module['id'] == $datacm->id and $module['modname'] == 'data') {
+            } else if ($module['id'] == $datacm->id and $module['modname'] == 'assign') {
                 $this->assertStringContainsString('customcompletionrules', $module['customdata']);
                 $this->assertFalse($module['noviewlink']);
                 $this->assertArrayNotHasKey('description', $module);
                 $this->assertEquals(
                     plugin_supports(
                         'mod',
-                        'data',
+                        'assign',
                         FEATURE_MOD_PURPOSE,
                         MOD_PURPOSE_OTHER
                     ), $module['purpose']
@@ -2843,11 +2844,11 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             }
             $this->assertCount(11, $course['options']);
             if ($course['id'] == SITEID) {
-                $this->assertTrue($navoptions->blogs);
+                $this->assertFalse($navoptions->blogs);
                 $this->assertFalse($navoptions->notes);
                 $this->assertFalse($navoptions->participants);
                 $this->assertTrue($navoptions->badges);
-                $this->assertTrue($navoptions->tags);
+                $this->assertFalse($navoptions->tags);
                 $this->assertFalse($navoptions->grades);
                 $this->assertFalse($navoptions->search);
                 $this->assertTrue($navoptions->competencies);
@@ -2855,7 +2856,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 $this->assertFalse($navoptions->overview);
                 $this->assertFalse($navoptions->learningoutcomes);
             } else {
-                $this->assertTrue($navoptions->blogs);
+                $this->assertFalse($navoptions->blogs);
                 $this->assertFalse($navoptions->notes);
                 $this->assertTrue($navoptions->participants);
                 $this->assertFalse($navoptions->badges);
@@ -3255,20 +3256,14 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $tocreate = [
             'assign',
             'book',
-            'choice',
             'folder',
             'forum',
-            'glossary',
-            'imscp',
             'label',
-            'lesson',
             'lti',
             'page',
             'quiz',
             'resource',
-            'scorm',
             'url',
-            'wiki',
         ];
 
         $modules = array();

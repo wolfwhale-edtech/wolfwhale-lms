@@ -199,27 +199,6 @@ final class login_lib_test extends \advanced_testcase {
         $sink->clear();
     }
 
-    public function test_core_login_process_password_reset_auth_not_supporting_email_reset(): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-        $CFG->auth = $CFG->auth . ',ldap';
-        $user = $this->getDataGenerator()->create_user(['auth' => 'ldap']);
-
-        $sink = $this->redirectEmails();
-
-        core_login_process_password_reset($user->username, null);
-        $emails = $sink->get_messages();
-        $this->assertCount(1, $emails);
-        $email = reset($emails);
-        $this->assertSame($user->email, $email->to);
-        $this->assertNotEmpty($email->header);
-        $this->assertNotEmpty($email->body);
-        $this->assertMatchesRegularExpression('/Unfortunately passwords cannot be reset on this site/',
-            quoted_printable_decode($email->body));
-        $sink->clear();
-    }
-
     public function test_core_login_process_password_reset_missing_parameters(): void {
         $this->expectException('moodle_exception');
         $this->expectExceptionMessage(get_string('cannotmailconfirm', 'error'));

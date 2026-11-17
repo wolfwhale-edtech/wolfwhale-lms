@@ -86,6 +86,7 @@ final class generator_test extends \advanced_testcase {
      */
     public function test_update_question_with_tags(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
 

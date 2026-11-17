@@ -482,6 +482,10 @@ class provider implements
     private static function analytics_prediction_actions_user_sql($userid, $modelids, $contextsql = false) {
         global $DB;
 
+        if (!$modelids) {
+            return [' FROM {analytics_predictions} ap WHERE 1=0', []];
+        }
+
         list($insql, $params) = $DB->get_in_or_equal($modelids, SQL_PARAMS_NAMED);
         $sql = " FROM {analytics_predictions} ap
                   JOIN {context} ctx ON ctx.id = ap.contextid
@@ -507,6 +511,10 @@ class provider implements
      */
     private static function analytics_prediction_actions_context_sql($contextid, $modelids, $usersql = false) {
         global $DB;
+
+        if (!$modelids) {
+            return [' FROM {analytics_predictions} ap WHERE 1=0', []];
+        }
 
         list($insql, $params) = $DB->get_in_or_equal($modelids, SQL_PARAMS_NAMED);
         $sql = " FROM {analytics_predictions} ap

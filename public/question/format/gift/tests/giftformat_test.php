@@ -37,6 +37,12 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class giftformat_test extends \question_testcase {
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
     public function assert_same_gift($expectedtext, $text) {
         $this->assertEquals(
             phpunit_util::normalise_line_endings($expectedtext),

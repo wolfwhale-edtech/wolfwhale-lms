@@ -174,8 +174,8 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         global $DB;
         [$module1, $recordid, $teacher1, $student1, $student2] = $this->setup_course_and_users_basic();
 
-        // Disable comments for the module.
-        $DB->set_field('data', 'comments', 0, array('id' => $module1->id));
+        // Disable comments for the site. Assignment comments follow that switch.
+        set_config('usecomments', 0);
 
         // Verify we can't add a comment.
         $this->setUser($student1);

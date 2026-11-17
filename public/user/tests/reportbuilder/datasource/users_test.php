@@ -32,6 +32,12 @@ use core_reportbuilder\tests\core_reportbuilder_testcase;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_user\reportbuilder\datasource\users::class)]
 final class users_test extends core_reportbuilder_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test default datasource
      */
@@ -421,7 +427,7 @@ final class users_test extends core_reportbuilder_testcase {
             ], true],
             'Filter auth (no match)' => ['user:auth', [
                 'user:auth_operator' => select::EQUAL_TO,
-                'user:auth_value' => 'ldap',
+                'user:auth_value' => 'oauth2',
             ], false],
             'Filter username' => ['user:username', [
                 'user:username_operator' => text::IS_EQUAL_TO,
@@ -546,6 +552,7 @@ final class users_test extends core_reportbuilder_testcase {
     #[\PHPUnit\Framework\Attributes\DataProvider('datasource_filters_provider')]
     public function test_datasource_filters(string $filtername, array $filtervalues, bool $expectmatch): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $user = $this->getDataGenerator()->create_user([
             'username' => 'zoe1',

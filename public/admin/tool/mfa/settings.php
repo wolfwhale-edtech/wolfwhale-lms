@@ -36,7 +36,7 @@ if ($hassiteconfig) {
         plugintype: 'factor',
         tableclass: \tool_mfa\table\admin_setting_managemfa::class,
         name: 'managemfatable',
-        visiblename: new lang_string('manageaiproviders', 'core_ai'),
+        visiblename: new lang_string('mfasettings', 'tool_mfa'),
     ));
 
     $heading = new lang_string('settings:general', 'tool_mfa');

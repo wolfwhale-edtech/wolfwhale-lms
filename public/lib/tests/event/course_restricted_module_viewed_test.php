@@ -56,7 +56,7 @@ final class course_restricted_module_viewed_test extends advanced_testcase {
         $sink->close();
 
         $this->assertSame('course_modules', $event->objecttable);
-        $url = new moodle_url('/mod/feedback/view.php', ['id' => $cm->id]);
+        $url = new moodle_url('/mod/page/view.php', ['id' => $cm->id]);
         $this->assertEquals($url, $event->get_url());
         $this->assertEventContextNotUsed($event);
     }

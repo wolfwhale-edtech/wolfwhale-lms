@@ -239,12 +239,6 @@ final class externallib_test extends \advanced_testcase {
                                           'itemid' => null,
                                           'filepath' => null,
                                           'filename' => 'Mod data upload test (Assignment)');
-        $testdata['parents']['4'] = array('contextid' => $context->id,
-                                          'component' => 'mod_assign',
-                                          'filearea' => 'intro',
-                                          'itemid' => null,
-                                          'filepath' => null,
-                                          'filename' => 'Fields');
         $testdata['files'] = array();
         $testdata['files']['0'] = array('contextid' => $context->id,
                                         'component' => 'mod_assign',
@@ -252,7 +246,7 @@ final class externallib_test extends \advanced_testcase {
                                         'itemid' => $itemid,
                                         'filepath' => '/',
                                         'filename' => 'Simple4.txt',
-                                        'url' => 'https://www.example.com/moodle/pluginfile.php/'.$context->id.'/mod_assign/intro/'.$itemid.'/Simple4.txt',
+                                        'url' => 'https://www.example.com/moodle/pluginfile.php/'.$context->id.'/mod_assign/intro/Simple4.txt',
                                         'isdir' => false,
                                         'timemodified' => $timemodified,
                                         'timecreated' => $timecreated,

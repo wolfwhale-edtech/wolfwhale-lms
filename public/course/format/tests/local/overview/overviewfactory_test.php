@@ -162,25 +162,9 @@ final class overviewfactory_test extends \advanced_testcase {
             'modname' => 'assign',
             'hasintegration' => true,
         ];
-        yield 'bigbluebuttonbn' => [
-            'modname' => 'bigbluebuttonbn',
-            'hasintegration' => true,
-        ];
         yield 'book' => [
             'modname' => 'book',
             'hasintegration' => false,
-        ];
-        yield 'choice' => [
-            'modname' => 'choice',
-            'hasintegration' => true,
-        ];
-        yield 'data' => [
-            'modname' => 'data',
-            'hasintegration' => true,
-        ];
-        yield 'feedback' => [
-            'modname' => 'feedback',
-            'hasintegration' => true,
         ];
         yield 'folder' => [
             'modname' => 'folder',
@@ -190,25 +174,13 @@ final class overviewfactory_test extends \advanced_testcase {
             'modname' => 'forum',
             'hasintegration' => true,
         ];
-        yield 'glossary' => [
-            'modname' => 'glossary',
-            'hasintegration' => true,
-        ];
         yield 'h5pactivity' => [
             'modname' => 'h5pactivity',
             'hasintegration' => true,
         ];
-        yield 'imscp' => [
-            'modname' => 'imscp',
-            'hasintegration' => false,
-        ];
         yield 'label' => [
             'modname' => 'label',
             'hasintegration' => false,
-        ];
-        yield 'lesson' => [
-            'modname' => 'lesson',
-            'hasintegration' => true,
         ];
         yield 'lti' => [
             'modname' => 'lti',
@@ -230,21 +202,9 @@ final class overviewfactory_test extends \advanced_testcase {
             'modname' => 'resource',
             'hasintegration' => true,
         ];
-        yield 'scorm' => [
-            'modname' => 'scorm',
-            'hasintegration' => true,
-        ];
         yield 'url' => [
             'modname' => 'url',
             'hasintegration' => false,
-        ];
-        yield 'wiki' => [
-            'modname' => 'wiki',
-            'hasintegration' => true,
-        ];
-        yield 'workshop' => [
-            'modname' => 'workshop',
-            'hasintegration' => true,
         ];
     }
 

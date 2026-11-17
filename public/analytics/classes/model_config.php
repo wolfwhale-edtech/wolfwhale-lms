@@ -87,6 +87,9 @@ class model_config {
         // ML backend.
         if ($includeweights && $this->model->is_trained()) {
             $processor = $this->model->get_predictions_processor(true);
+            if (!$processor) {
+                throw new \moodle_exception('errornoexportconfig', 'analytics');
+            }
             $outputdir = $this->model->get_output_dir(array('execution'));
             $mlbackenddir = $processor->export($this->model->get_unique_id(), $outputdir);
             $mlbackendfiles = get_directory_list($mlbackenddir);
@@ -128,7 +131,8 @@ class model_config {
 
         if ($mlbackenddir) {
             $modeldir = $model->get_output_dir(['execution']);
-            if (!$model->get_predictions_processor(true)->import($model->get_unique_id(), $modeldir, $mlbackenddir)) {
+            $processor = $model->get_predictions_processor(true);
+            if (!$processor || !$processor->import($model->get_unique_id(), $modeldir, $mlbackenddir)) {
                 throw new \moodle_exception('errorimport', 'analytics');
             }
             $model->mark_as_trained();
@@ -309,11 +313,15 @@ class model_config {
             $requiredclasses[] = $indicatorid;
         }
 
-        // Return the predictions processor this model is using, even if no predictions processor
-        // was explicitly selected.
-        $predictionsprocessor = $this->model->get_predictions_processor();
-        $data->processor = '\\' . get_class($predictionsprocessor);
-        $requiredclasses[] = $data->processor;
+        // Return the predictions processor this model is using. Sites with no machine-learning
+        // backend export an empty processor; static models do not need one.
+        $predictionsprocessor = $this->model->get_predictions_processor(false);
+        if ($predictionsprocessor) {
+            $data->processor = '\\' . get_class($predictionsprocessor);
+            $requiredclasses[] = $data->processor;
+        } else {
+            $data->processor = '';
+        }
 
         // Add information for versioning.
         $data->dependencies = [];

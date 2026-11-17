@@ -223,8 +223,9 @@ function search_spammers($keywords) {
                     AND u.id <> :userid";
 
     $spamusers_desc = $DB->get_recordset_sql($sql, $params);
-    $spamusers_blog = $DB->get_recordset_sql($sql2, $params);
-    $spamusers_blogsub = $DB->get_recordset_sql($sql3, $params);
+    // Blog posts are not installed. Keep the result slots empty.
+    $spamusers_blog = $DB->get_recordset_sql("SELECT * FROM {user} WHERE id < 0");
+    $spamusers_blogsub = $DB->get_recordset_sql("SELECT * FROM {user} WHERE id < 0");
     $spamusers_comment = $DB->get_recordset_sql($sql4, $params);
     $spamusers_message = $DB->get_recordset_sql($sql5, $params);
     $spamusers_forumpost = $DB->get_recordset_sql($sql6, $params);

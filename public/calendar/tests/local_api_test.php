@@ -1139,7 +1139,7 @@ final class local_api_test extends \advanced_testcase {
         );
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($expected->getTimestamp(), $feedback->timeopen);
@@ -1176,7 +1176,7 @@ final class local_api_test extends \advanced_testcase {
 
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($expected->getTimestamp(), $feedback->timeopen);
@@ -1212,7 +1212,7 @@ final class local_api_test extends \advanced_testcase {
 
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($timeclose->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($timeclose->getTimestamp(), $feedback->timeopen);
@@ -1279,7 +1279,7 @@ final class local_api_test extends \advanced_testcase {
 
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($expected->getTimestamp(), $feedback->timeopen);
@@ -1316,7 +1316,7 @@ final class local_api_test extends \advanced_testcase {
 
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($expected->getTimestamp(), $feedback->timeclose);
@@ -1353,7 +1353,7 @@ final class local_api_test extends \advanced_testcase {
 
         $newevent = \core_calendar\local\api::update_event_start_day($event, $newstartdate);
         $actual = $newevent->get_times()->get_start_time();
-        $feedback = $DB->get_record('feedback', ['id' => $feedback->id]);
+        $feedback = $DB->get_record('quiz', ['id' => $feedback->id]);
 
         $this->assertEquals($expected->getTimestamp(), $actual->getTimestamp());
         $this->assertEquals($expected->getTimestamp(), $feedback->timeclose);

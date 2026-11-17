@@ -185,25 +185,18 @@ final class taglib_test extends \advanced_testcase {
         $coursetags = $DB->count_records('tag_instance', array('itemtype' => 'course'));
         $this->assertEquals(0, $coursetags);
 
-        // Test clean up where a post has been removed.
-        // Create default post.
-        $post = new \stdClass();
-        $post->userid = $users[1]->id;
-        $post->content = 'test post content text';
-        $post->id = $DB->insert_record('post', $post);
-        $context = \context_system::instance();
-        core_tag_tag::set_item_tags('core', 'post', $post->id, $context, array($tags[0]->rawname));
+        // Test clean up where a course record is gone but its tag instance remains.
+        $keptcourse = $this->getDataGenerator()->create_course();
+        $context = \context_course::instance($keptcourse->id);
+        core_tag_tag::set_item_tags('core', 'course', $keptcourse->id, $context, array($tags[0]->rawname));
 
-        // Add another one with a fake post id to be removed.
-        core_tag_tag::set_item_tags('core', 'post', 15, $context, array($tags[0]->rawname));
-        // Check that there are two tag instances.
-        $posttags = $DB->count_records('tag_instance', array('itemtype' => 'post'));
-        $this->assertEquals(2, $posttags);
-        // Clean up the tags.
+        // Add another one with a fake course id to be removed.
+        core_tag_tag::set_item_tags('core', 'course', 999999, $context, array($tags[0]->rawname));
+        $coursetags = $DB->count_records('tag_instance', array('itemtype' => 'course'));
+        $this->assertEquals(2, $coursetags);
         $task->cleanup();
-        // We should only have one entry left now.
-        $posttags = $DB->count_records('tag_instance', array('itemtype' => 'post'));
-        $this->assertEquals(1, $posttags);
+        $coursetags = $DB->count_records('tag_instance', array('itemtype' => 'course'));
+        $this->assertEquals(1, $coursetags);
     }
 
     /**
@@ -706,19 +699,7 @@ final class taglib_test extends \advanced_testcase {
         $collid2 = core_tag_collection::create(array('name' => 'newcoll'))->id;
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
-        $blogpost = (object) ['id' => $DB->insert_record('post', (object) [
-            'module' => 'forum',
-            'userid' => $user1->id,
-            'courseid' => 1,
-            'groupid' => 0,
-            'moduleid' => 0,
-            'coursemoduleid' => 0,
-            'subject' => 'test',
-            'uniquehash' => sha1(random_string(20)),
-            'publishstate' => 'site',
-            'lastmodified' => time(),
-            'created' => time(),
-        ])];
+        $course = $this->getDataGenerator()->create_course();
 
         core_tag_tag::set_item_tags('core', 'user', $user1->id, \context_user::instance($user1->id),
                 array('Tag1', 'Tag2'));
@@ -729,12 +710,12 @@ final class taglib_test extends \advanced_testcase {
         $this->getDataGenerator()->create_tag(array('rawname' => 'Tag5',
             'tagcollid' => $collid2, 'isstandard' => 1));
 
-        return array($collid1, $collid2, $user1, $user2, $blogpost);
+        return array($collid1, $collid2, $user1, $user2, $course);
     }
 
     public function test_move_tags_simple(): void {
         global $DB;
-        list($collid1, $collid2, $user1, $user2, $blogpost) = $this->prepare_move_tags();
+        list($collid1, $collid2, $user1, $user2, $course) = $this->prepare_move_tags();
 
         // Move 'user' area from collection 1 to collection 2, make sure tags were moved completely.
         $tagarea = $DB->get_record('tag_area', array('itemtype' => 'user', 'component' => 'core'));
@@ -756,9 +737,9 @@ final class taglib_test extends \advanced_testcase {
 
     public function test_move_tags_split_tag(): void {
         global $DB;
-        list($collid1, $collid2, $user1, $user2, $blogpost) = $this->prepare_move_tags();
+        list($collid1, $collid2, $user1, $user2, $course) = $this->prepare_move_tags();
 
-        core_tag_tag::set_item_tags('core', 'post', $blogpost->id, \context_system::instance(),
+        core_tag_tag::set_item_tags('core', 'course', $course->id, \context_system::instance(),
                 array('Tag1', 'Tag3'));
 
         // Move 'user' area from collection 1 to collection 2, make sure tag Tag2 was moved and tags Tag1 and Tag3 were duplicated.
@@ -777,18 +758,18 @@ final class taglib_test extends \advanced_testcase {
                 $DB->get_fieldset_select('tag', 'rawname', 'tagcollid = ? ORDER BY name', array($collid2)));
         $this->assertEquals(array('Tag1', 'Tag2'), array_values(core_tag_tag::get_item_tags_array('core', 'user', $user1->id)));
         $this->assertEquals(array('Tag2', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'user', $user2->id)));
-        $this->assertEquals(array('Tag1', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'post', $blogpost->id)));
+        $this->assertEquals(array('Tag1', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'course', $course->id)));
     }
 
     public function test_move_tags_merge_tag(): void {
         global $DB;
-        list($collid1, $collid2, $user1, $user2, $blogpost) = $this->prepare_move_tags();
+        list($collid1, $collid2, $user1, $user2, $course) = $this->prepare_move_tags();
 
         // Set collection for 'post' tag area to be collection 2 and add some tags there.
-        $tagareablog = $DB->get_record('tag_area', array('itemtype' => 'post', 'component' => 'core'));
+        $tagareablog = $DB->get_record('tag_area', array('itemtype' => 'course', 'component' => 'core'));
         core_tag_area::update($tagareablog, array('tagcollid' => $collid2));
 
-        core_tag_tag::set_item_tags('core', 'post', $blogpost->id, \context_system::instance(),
+        core_tag_tag::set_item_tags('core', 'course', $course->id, \context_system::instance(),
                 array('TAG1', 'Tag3'));
 
         // Move 'user' area from collection 1 to collection 2,
@@ -808,21 +789,21 @@ final class taglib_test extends \advanced_testcase {
                 $DB->get_fieldset_select('tag', 'rawname', 'tagcollid = ? ORDER BY name', array($collid2)));
         $this->assertEquals(array('TAG1', 'Tag2'), array_values(core_tag_tag::get_item_tags_array('core', 'user', $user1->id)));
         $this->assertEquals(array('Tag2', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'user', $user2->id)));
-        $this->assertEquals(array('TAG1', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'post', $blogpost->id)));
+        $this->assertEquals(array('TAG1', 'Tag3'), array_values(core_tag_tag::get_item_tags_array('core', 'course', $course->id)));
     }
 
     public function test_move_tags_with_related(): void {
         global $DB;
-        list($collid1, $collid2, $user1, $user2, $blogpost) = $this->prepare_move_tags();
+        list($collid1, $collid2, $user1, $user2, $course) = $this->prepare_move_tags();
 
         // Set Tag1 to be related to Tag2 and Tag4 (in collection 1).
         core_tag_tag::get_by_name($collid1, 'Tag1')->set_related_tags(array('Tag2', 'Tag4'));
 
         // Set collection for 'post' tag area to be collection 2 and add some tags there.
-        $tagareablog = $DB->get_record('tag_area', array('itemtype' => 'post', 'component' => 'core'));
+        $tagareablog = $DB->get_record('tag_area', array('itemtype' => 'course', 'component' => 'core'));
         core_tag_area::update($tagareablog, array('tagcollid' => $collid2));
 
-        core_tag_tag::set_item_tags('core', 'post', $blogpost->id, \context_system::instance(),
+        core_tag_tag::set_item_tags('core', 'course', $course->id, \context_system::instance(),
                 array('TAG1', 'Tag3'));
 
         // Move 'user' area from collection 1 to collection 2, make sure tags were moved completely.
@@ -857,7 +838,7 @@ final class taglib_test extends \advanced_testcase {
 
     public function test_move_tags_corrupted(): void {
         global $DB;
-        list($collid1, $collid2, $user1, $user2, $blogpost) = $this->prepare_move_tags();
+        list($collid1, $collid2, $user1, $user2, $course) = $this->prepare_move_tags();
         $collid3 = core_tag_collection::create(array('name' => 'weirdcoll'))->id;
 
         // We already have Tag1 in coll1, now let's create it in coll3.

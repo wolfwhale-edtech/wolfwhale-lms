@@ -52,6 +52,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         global $DB;
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         // Setup test data.

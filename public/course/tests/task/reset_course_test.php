@@ -60,6 +60,7 @@ final class reset_course_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
 
@@ -79,7 +80,11 @@ final class reset_course_test extends \advanced_testcase {
         $resetdata->reset_events = true;
         $task = reset_course::create($resetdata);
 
-        $event = $generator->create_event(['courseid' => $course->id, 'name' => 'Reset me']);
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me',
+        ]);
         $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         $this->expectOutputRegex("~Resetting course ID {$course->id}~");

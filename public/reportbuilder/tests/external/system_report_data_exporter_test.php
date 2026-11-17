@@ -35,6 +35,12 @@ use core_user\reportbuilder\datasource\users;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_reportbuilder\external\system_report_data_exporter::class)]
 final class system_report_data_exporter_test extends advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test exported data structure
      */

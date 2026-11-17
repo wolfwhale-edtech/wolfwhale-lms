@@ -34,6 +34,12 @@ use core_user\reportbuilder\datasource\users;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_reportbuilder\external\reports\listing::class)]
 final class listing_test extends \core_external\tests\externallib_testcase {
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
     /**
      * Text execute method
      */

@@ -42,6 +42,12 @@ use core_privacy\local\request\approved_userlist;
  */
 final class provider_test extends provider_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Check the exporting of tags for a user id in a context.
      */

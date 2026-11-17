@@ -33,6 +33,12 @@ use core_reportbuilder\tests\core_reportbuilder_testcase;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_course\reportbuilder\datasource\courses::class)]
 final class courses_test extends core_reportbuilder_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test default datasource
      */

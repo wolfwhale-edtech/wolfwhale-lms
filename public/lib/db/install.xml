@@ -220,38 +220,6 @@
         <INDEX NAME="useridcourse" UNIQUE="true" FIELDS="userid, course"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="communication" COMMENT="Communication records">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the context that this communication instance relates to"/>
-        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the instance where the communication is a part of"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Component of the instance where the communication room is a part of"/>
-        <FIELD NAME="instancetype" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The type of the instance for the given component"/>
-        <FIELD NAME="provider" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the selected communication provider"/>
-        <FIELD NAME="roomname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the communication room"/>
-        <FIELD NAME="avatarfilename" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Name of the avatar file name for the communication instance"/>
-        <FIELD NAME="active" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="The communication instance is active or not"/>
-        <FIELD NAME="avatarsynced" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Indicate if the avatar has been synced with the provider"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="communication_user" COMMENT="Communication user records mapping">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="commid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the communication instance"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of the moodle user to map with communication instance"/>
-        <FIELD NAME="synced" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The user is synced or not"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The user need to be deleted or not"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="commid" TYPE="foreign" FIELDS="commid" REFTABLE="communication" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
     <TABLE NAME="enrol" COMMENT="Instances of enrolment plugins used in courses, fields marked as custom have a plugin defined meaning, core does not touch them. Create a new linked table if you need even more custom fields.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -1146,41 +1114,6 @@
         <INDEX NAME="timeend" UNIQUE="false" FIELDS="timeend"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="post" COMMENT="Generic post table to hold data blog entries etc in different modules">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="module" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="groupid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="moduleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="coursemoduleid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="subject" TYPE="char" LENGTH="128" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="summary" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="uniquehash" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="rating" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="format" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="summaryformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="attachment" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="attachment"/>
-        <FIELD NAME="publishstate" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="draft" SEQUENCE="false"/>
-        <FIELD NAME="lastmodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="created" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
-        <KEY NAME="coursemoduleid" TYPE="foreign" FIELDS="coursemoduleid" REFTABLE="course_modules" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="id-userid" UNIQUE="true" FIELDS="id, userid"/>
-        <INDEX NAME="lastmodified" UNIQUE="false" FIELDS="lastmodified"/>
-        <INDEX NAME="module" UNIQUE="false" FIELDS="module"/>
-        <INDEX NAME="subject" UNIQUE="false" FIELDS="subject"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="role" COMMENT="moodle roles">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -1766,29 +1699,6 @@
         <INDEX NAME="hostid_serviceid" UNIQUE="true" FIELDS="hostid, serviceid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="mnet_log" COMMENT="Store session data from users migrating to other sites">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="hostid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unique host ID"/>
-        <FIELD NAME="remoteid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="ip" TYPE="char" LENGTH="45" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="coursename" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="module" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="action" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="url" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="info" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the mnet_log table"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="hostid_userid_course" UNIQUE="false" FIELDS="hostid, userid, course"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="mnet_rpc" COMMENT="Functions or methods that we may publish or subscribe to">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Unique Function ID"/>
@@ -1859,27 +1769,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="rpcid_serviceid" UNIQUE="true" FIELDS="rpcid, serviceid"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="mnet_session" COMMENT="Store session data from users migrating to other sites">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="Required ID field"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unique user ID"/>
-        <FIELD NAME="username" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Unique username"/>
-        <FIELD NAME="token" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="Unique SHA1 Token"/>
-        <FIELD NAME="mnethostid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Unique remote host ID"/>
-        <FIELD NAME="useragent" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="SHA1 hash of User Agent"/>
-        <FIELD NAME="confirm_timeout" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="UNIX timestamp for expiry of session"/>
-        <FIELD NAME="session_id" TYPE="char" LENGTH="40" NOTNULL="true" SEQUENCE="false" COMMENT="The PHP Session ID"/>
-        <FIELD NAME="expires" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Expire time of session on peer"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="primary key of the mnet_session table"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="mnethostid" TYPE="foreign" FIELDS="mnethostid" REFTABLE="mnet_host" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="token" UNIQUE="true" FIELDS="token"/>
       </INDEXES>
     </TABLE>
     <TABLE NAME="mnet_sso_access_control" COMMENT="Users by host permitted (or not) to login from a remote provider">
@@ -2553,82 +2442,6 @@
         <INDEX NAME="courseid-name" UNIQUE="true" FIELDS="courseid, name"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="portfolio_instance" COMMENT="base table (not including config data) for instances of portfolio plugins.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="plugin" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="fk to plugin"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name of plugin instance"/>
-        <FIELD NAME="visible" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="whether this instance is visible or not"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="portfolio_instance_config" COMMENT="config for portfolio plugin instances">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="instance" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="instance of plugin we're configurating"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="config field"/>
-        <FIELD NAME="value" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="config value"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="instancefk" TYPE="foreign" FIELDS="instance" REFTABLE="portfolio_instance" REFFIELDS="id" COMMENT="fk to plugin instance"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="name" UNIQUE="false" FIELDS="name" COMMENT="name index"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="portfolio_instance_user" COMMENT="user data for portfolio instances.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="instance" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="fk to instance table"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="fk to user table"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="name of config item"/>
-        <FIELD NAME="value" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="value of config item"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="instancefk" TYPE="foreign" FIELDS="instance" REFTABLE="portfolio_instance" REFFIELDS="id" COMMENT="fk to portfolio_instance"/>
-        <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="fk to user table"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="portfolio_log" COMMENT="log of portfolio transfers (used to later check for duplicates)">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="user who exported content"/>
-        <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time of transfer (in the case of a queued transfer this is the time the actual transfer ran, not when the user started)"/>
-        <FIELD NAME="portfolio" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="fk to portfolio_instance"/>
-        <FIELD NAME="caller_class" TYPE="char" LENGTH="150" NOTNULL="true" SEQUENCE="false" COMMENT="the name of the class used to create the transfer"/>
-        <FIELD NAME="caller_file" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="path to file to include where the class definition lives. (relative to dirroot)"/>
-        <FIELD NAME="caller_component" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="the component name responsible for exporting"/>
-        <FIELD NAME="caller_sha1" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="sha1 of exported content as far as the caller is concerned (before the portfolio plugin gets a hold of it)"/>
-        <FIELD NAME="tempdataid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="old id from portfolio_tempdata.  This is so that we can gracefully catch a race condition between an external system requesting a file and causing the tempdata to be deleted, before the user gets the &quot;your transfer is requested&quot; page"/>
-        <FIELD NAME="returnurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the original &quot;returnurl&quot; of the export - takes us to the moodle page we started from"/>
-        <FIELD NAME="continueurl" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="the url the external system has set to view the transfer"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="fk to user table"/>
-        <KEY NAME="portfoliofk" TYPE="foreign" FIELDS="portfolio" REFTABLE="portfolio_instance" REFFIELDS="id" COMMENT="fk to portfolio_instance"/>
-        <KEY NAME="tempdataid" TYPE="foreign" FIELDS="tempdataid" REFTABLE="portfolio_tempdata" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="portfolio_tempdata" COMMENT="stores temporary data for portfolio exports. the id of this table is used for the itemid for the temporary files area.  cron can clean up stale records (and associated file data) after expirytime.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="dumping ground for portfolio callers to store their data in."/>
-        <FIELD NAME="expirytime" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="time this record will expire (used for cron cleanups) - the start of export + 24 hours"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="psuedo fk to user.  this is stored in the serialised data structure in the data field, but added here for ease of lookups."/>
-        <FIELD NAME="instance" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="which portfolio plugin instance is being used"/>
-        <FIELD NAME="queued" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Value 1 means the entry should be processed in cron."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userfk" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="fk to usertable"/>
-        <KEY NAME="instance" TYPE="foreign" FIELDS="instance" REFTABLE="portfolio_instance" REFFIELDS="id" COMMENT="fk to portfolio_instance"/>
-      </KEYS>
-    </TABLE>
     <TABLE NAME="message_providers" COMMENT="This table stores the message providers (modules and core systems)">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" COMMENT="id of the table, please edit me"/>
@@ -2955,35 +2768,6 @@
         <INDEX NAME="token" UNIQUE="false" FIELDS="token" COMMENT="This index will be used anytime a token is validated."/>
         <INDEX NAME="sid" UNIQUE="false" FIELDS="sid" COMMENT="This index will be used anytime a token is looked up by its sid."/>
       </INDEXES>
-    </TABLE>
-    <TABLE NAME="blog_association" COMMENT="Associations of blog entries with courses and module instances">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="blogid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
-        <KEY NAME="blogid" TYPE="foreign" FIELDS="blogid" REFTABLE="post" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="blog_external" COMMENT="External blog links used for RSS copying of blog entries to Moodle user blogs">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="url" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="filtertags" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Comma-separated list of tags that will be used to filter which entries are copied over from the external blog. They refer to existing tags in the external blog."/>
-        <FIELD NAME="failedlastsync" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether or not the last sync failed for some reason"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timefetched" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
     </TABLE>
     <TABLE NAME="rating" COMMENT="moodle ratings">
       <FIELDS>
@@ -4521,61 +4305,6 @@
         <INDEX NAME="instance" UNIQUE="false" FIELDS="contextid, contenttype, instanceid"/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="payment_accounts" COMMENT="Payment accounts">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="idnumber" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="archived" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="contextid" TYPE="foreign" FIELDS="contextid" REFTABLE="context" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="payment_gateways" COMMENT="Configuration for one gateway for one payment account">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="accountid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="gateway" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="config" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="accountid" TYPE="foreign" FIELDS="accountid" REFTABLE="payment_accounts" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="payments" COMMENT="Stores information about payments">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="component" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The plugin this payment belongs to."/>
-        <FIELD NAME="paymentarea" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="The name of payable area"/>
-        <FIELD NAME="itemid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="amount" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="currency" TYPE="char" LENGTH="3" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="accountid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="gateway" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-        <KEY NAME="accountid" TYPE="foreign" FIELDS="accountid" REFTABLE="payment_accounts" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="gateway" UNIQUE="false" FIELDS="gateway"/>
-        <INDEX NAME="component-paymentarea-itemid" UNIQUE="false" FIELDS="component, paymentarea, itemid"/>
-      </INDEXES>
-    </TABLE>
     <TABLE NAME="infected_files" COMMENT="Table to store infected file details.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -4920,116 +4649,6 @@
       <INDEXES>
         <INDEX NAME="uid_index" UNIQUE="false" FIELDS="idnumber"/>
       </INDEXES>
-    </TABLE>
-    <TABLE NAME="ai_providers" COMMENT="AI provider instances">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The human readbale name of the provider"/>
-        <FIELD NAME="provider" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The provider class name this provider is an instance of"/>
-        <FIELD NAME="enabled" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Is this plugin enabled"/>
-        <FIELD NAME="config" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Provider specific config in JSON format"/>
-        <FIELD NAME="actionconfig" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Stores instance specific action configuration in JSON format."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="provider" UNIQUE="false" FIELDS="provider" COMMENT="Index on provider class"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="ai_policy_register" COMMENT="Register of users who have accepted this sites AI usage policy">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the user that has accepted the policy"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The context id that the policy was accepted in"/>
-        <FIELD NAME="timeaccepted" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the policy was accepted"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign-unique" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="Foreign key to user table"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="ai_action_generate_image" COMMENT="Stores specific data about generate image actions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The text from the user that was used to generate the image"/>
-        <FIELD NAME="numberimages" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The number of images requested to be generated"/>
-        <FIELD NAME="quality" TYPE="char" LENGTH="21" NOTNULL="true" SEQUENCE="false" COMMENT="The quality of the image, e.g. hd."/>
-        <FIELD NAME="aspectratio" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="The aspect ratio of the generate image, e.g landscape"/>
-        <FIELD NAME="style" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="The style of the image, e.g. vivid"/>
-        <FIELD NAME="sourceurl" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="URL of the generated response."/>
-        <FIELD NAME="revisedprompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The actual prompt the AI used to generate the image"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="ai_action_register" COMMENT="Stores information about processed ai actions.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="actionname" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Name of the action"/>
-        <FIELD NAME="actionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID in related action table with more details about the action"/>
-        <FIELD NAME="success" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Was the action successful when run"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The user who made the request to run the action"/>
-        <FIELD NAME="contextid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The id of the context the action request was made in"/>
-        <FIELD NAME="provider" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="The provider plugin name that processed the action"/>
-        <FIELD NAME="errorcode" TYPE="int" LENGTH="4" NOTNULL="false" SEQUENCE="false" COMMENT="If there was an error this was the error code"/>
-        <FIELD NAME="errormessage" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="If there was an error this was the message"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Timestamp of when the action was created"/>
-        <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp of when the action was completed, as recorded by the manager"/>
-        <FIELD NAME="model" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="The model used to generate the response"/>
-        <FIELD NAME="prompttokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of tokens in the prompt."/>
-        <FIELD NAME="completiontokens" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Number of tokens in the generated completion."/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The id of the course the action's context resolves to; -1 if the context does not resolve to a course; 0 is the not-yet-backfilled default for rows created before this column existed"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id" COMMENT="Relationship to user table"/>
-        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id" COMMENT="Relationship to course table"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="action" UNIQUE="true" FIELDS="actionname, actionid" COMMENT="Unique index of actionname and actionid"/>
-        <INDEX NAME="provider" UNIQUE="false" FIELDS="actionname, provider" COMMENT="Index of actionname and provider"/>
-      </INDEXES>
-    </TABLE>
-    <TABLE NAME="ai_action_generate_text" COMMENT="Stores specific data about generate text actions.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The text from the user that was used to generate the text response"/>
-        <FIELD NAME="responseid" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="A unique identifier for the chat completion, returned by the AI."/>
-        <FIELD NAME="fingerprint" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="This fingerprint represents the backend configuration that the model runs with."/>
-        <FIELD NAME="generatedcontent" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The contents of the generated message."/>
-        <FIELD NAME="finishreason" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="The reason the model stopped generating tokens."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="ai_action_summarise_text" COMMENT="Stores specific data about summarise text actions.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The text from the user that was used to generate the text response"/>
-        <FIELD NAME="responseid" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="A unique identifier for the chat completion, returned by the AI."/>
-        <FIELD NAME="fingerprint" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="This fingerprint represents the backend configuration that the model runs with."/>
-        <FIELD NAME="generatedcontent" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The contents of the generated message."/>
-        <FIELD NAME="finishreason" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="The reason the model stopped generating tokens."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    <TABLE NAME="ai_action_explain_text" COMMENT="Stores specific data about explain text actions.">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The text from the user that was used to generate the text response"/>
-        <FIELD NAME="responseid" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="A unique identifier for the chat completion, returned by the AI."/>
-        <FIELD NAME="fingerprint" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="This fingerprint represents the backend configuration that the model runs with."/>
-        <FIELD NAME="generatedcontent" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The contents of the generated message."/>
-        <FIELD NAME="finishreason" TYPE="char" LENGTH="128" NOTNULL="false" SEQUENCE="false" COMMENT="The reason the model stopped generating tokens."/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
     </TABLE>
     <TABLE NAME="sms_messages" COMMENT="SMS Messages sent via the SMS subsystem">
       <FIELDS>

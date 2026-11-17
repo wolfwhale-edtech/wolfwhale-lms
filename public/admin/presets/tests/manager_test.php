@@ -193,9 +193,8 @@ final class manager_test extends \advanced_testcase {
         // Set the config values (to confirm they change after applying the preset).
         set_config('enablebadges', 1);
         set_config('allowemojipicker', 1);
-        set_config('mediawidth', '640', 'mod_lesson');
-        set_config('maxanswers', '5', 'mod_lesson');
-        set_config('maxanswers_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
+        set_config('forum_manydiscussions', '5');
         set_config('enablecompletion', 1);
         set_config('usecomments', 0);
 
@@ -208,8 +207,8 @@ final class manager_test extends \advanced_testcase {
         // Applied items: enablebadges@none, mediawitdh@mod_lesson and maxanswers@@mod_lesson.
         $this->assertCount($currentappitems + 3, $DB->get_records('adminpresets_app_it'));
         // Applied advanced items: maxanswers_adv@mod_lesson.
-        $this->assertCount($currentappadvitems + 1, $DB->get_records('adminpresets_app_it_a'));
-        // Applied plugins: enrol_guest and mod_glossary.
+        $this->assertCount($currentappadvitems, $DB->get_records('adminpresets_app_it_a'));
+        // Applied plugins: enrol_guest and mod_page.
         $this->assertCount($currentappplugins + 2, $DB->get_records('adminpresets_app_plug'));
         // Check no new preset has been created.
         $this->assertCount($currentpresets, $DB->get_records('adminpresets'));
@@ -219,9 +218,8 @@ final class manager_test extends \advanced_testcase {
 
         // Check the setting values have changed accordingly with the ones defined in the preset.
         $this->assertEquals(0, get_config('core', 'enablebadges'));
-        $this->assertEquals(900, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(2, get_config('mod_lesson', 'maxanswers'));
-        $this->assertEquals(0, get_config('mod_lesson', 'maxanswers_adv'));
+        $this->assertEquals(3, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(10, get_config('core', 'forum_manydiscussions'));
 
         // These settings will never change.
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
@@ -233,7 +231,7 @@ final class manager_test extends \advanced_testcase {
         $this->assertArrayNotHasKey('guest', $enabledplugins);
         $this->assertArrayHasKey('manual', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayNotHasKey('glossary', $enabledplugins);
+        $this->assertArrayNotHasKey('page', $enabledplugins);
         $this->assertArrayHasKey('assign', $enabledplugins);
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);
@@ -269,11 +267,8 @@ final class manager_test extends \advanced_testcase {
         // Initialise some settings (to compare their values have been exported as expected).
         set_config('recaptchapublickey', 'abcde');
         set_config('enablebadges', '0');
-        set_config('mediawidth', '900', 'mod_lesson');
-        set_config('maxanswers', '2', 'mod_lesson');
-        set_config('maxanswers_adv', '0', 'mod_lesson');
-        set_config('defaultfeedback', '0', 'mod_lesson');
-        set_config('defaultfeedback_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '3');
+        set_config('forum_manydiscussions', '10');
 
         // Prepare the data to export preset.
         $data = [
@@ -309,23 +304,13 @@ final class manager_test extends \advanced_testcase {
         $setting = $DB->get_record('adminpresets_it', $params);
         $this->assertEquals('0', $setting->value);
 
-        $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'mediawidth'];
+        $params = ['adminpresetid' => $presetid, 'plugin' => 'none', 'name' => 'forum_maxattachments'];
         $setting = $DB->get_record('adminpresets_it', $params);
-        $this->assertEquals('900', $setting->value);
+        $this->assertEquals('3', $setting->value);
 
-        $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'maxanswers'];
+        $params = ['adminpresetid' => $presetid, 'plugin' => 'none', 'name' => 'forum_manydiscussions'];
         $setting = $DB->get_record('adminpresets_it', $params);
-        $this->assertEquals('2', $setting->value);
-        $params = ['itemid' => $setting->id, 'name' => 'maxanswers_adv'];
-        $setting = $DB->get_record('adminpresets_it_a', $params);
-        $this->assertEquals('0', $setting->value);
-
-        $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'defaultfeedback'];
-        $setting = $DB->get_record('adminpresets_it', $params);
-        $this->assertEquals('0', $setting->value);
-        $params = ['itemid' => $setting->id, 'name' => 'defaultfeedback_adv'];
-        $setting = $DB->get_record('adminpresets_it_a', $params);
-        $this->assertEquals('1', $setting->value);
+        $this->assertEquals('10', $setting->value);
 
         // Check plugins have been created with the expected values.
         $manager = \core_plugin_manager::instance();
@@ -453,40 +438,24 @@ final class manager_test extends \advanced_testcase {
                 if ($expectedsettings) {
                     // Check the items have been created.
                     $items = $DB->get_records('adminpresets_it', ['adminpresetid' => $preset->id]);
-                    $this->assertCount(4, $items);
+                    $this->assertCount(3, $items);
                     $presetitems = [
                         'none' => [
-                            'enablebadges' => 0,
-                            'enableportfolios' => 1,
                             'allowemojipicker' => 1,
-                        ],
-                        'mod_lesson' => [
-                            'mediawidth' => 900,
-                            'maxanswers' => 2,
+                            'forum_maxattachments' => 3,
+                            'forum_manydiscussions' => 10,
                         ],
                     ];
                     foreach ($items as $item) {
                         $this->assertArrayHasKey($item->name, $presetitems[$item->plugin]);
                         $this->assertEquals($presetitems[$item->plugin][$item->name], $item->value);
                     }
-
-                    // Check the advanced attributes have been created.
-                    $advitems = $DB->get_records('adminpresets_it_a');
-                    $this->assertCount($currentadvitems + 1, $advitems);
-                    $advitemfound = false;
-                    foreach ($advitems as $advitem) {
-                        if ($advitem->name == 'maxanswers_adv') {
-                            $this->assertEmpty($advitem->value);
-                            $advitemfound = true;
-                        }
-                    }
-                    $this->assertTrue($advitemfound);
                 }
 
                 if ($expectedplugins) {
                     // Check the plugins have been created.
                     $plugins = $DB->get_records('adminpresets_plug', ['adminpresetid' => $preset->id]);
-                    $this->assertCount(6, $plugins);
+                    $this->assertCount(4, $plugins);
                     $presetplugins = [
                         'atto' => [
                             'html' => 1,
@@ -497,8 +466,6 @@ final class manager_test extends \advanced_testcase {
                         ],
                         'mod' => [
                             'page' => 0,
-                            'data' => 0,
-                            'lesson' => 1,
                         ],
                     ];
                     foreach ($plugins as $plugin) {
@@ -651,11 +618,10 @@ final class manager_test extends \advanced_testcase {
 
         // Only preset1 has been applied.
         $this->assertCount(1, $DB->get_records('adminpresets_app'));
-        // Only the preset1 settings that have changed: enablebadges, mediawidth and maxanswers.
+        // Only the preset1 settings that have changed: enablebadges and the two forum settings.
         $this->assertCount(3, $DB->get_records('adminpresets_app_it'));
-        // Only the preset1 advanced settings that have changed: maxanswers_adv.
-        $this->assertCount(1, $DB->get_records('adminpresets_app_it_a'));
-        // Only the preset1 plugins that have changed: enrol_guest and mod_glossary.
+        $this->assertCount(0, $DB->get_records('adminpresets_app_it_a'));
+        // Only the preset1 plugins that have changed: enrol_guest and mod_page.
         $this->assertCount(2, $DB->get_records('adminpresets_app_plug'));
 
         // Call the method to be tested.
@@ -671,7 +637,7 @@ final class manager_test extends \advanced_testcase {
         $this->assertCount($currentitems - 4, $DB->get_records('adminpresets_it'));
         $this->assertCount(0, $DB->get_records('adminpresets_it', ['adminpresetid' => $presetid1]));
         // Check preset advanced items.
-        $this->assertCount($currentadvitems - 1, $DB->get_records('adminpresets_it_a'));
+        $this->assertCount($currentadvitems, $DB->get_records('adminpresets_it_a'));
         // Check preset plugins.
         $this->assertCount($currentplugins - 3, $DB->get_records('adminpresets_plug'));
         $this->assertCount(0, $DB->get_records('adminpresets_plug', ['adminpresetid' => $presetid1]));
@@ -716,9 +682,8 @@ final class manager_test extends \advanced_testcase {
         // Set the config values (to confirm they change after applying the preset).
         set_config('enablebadges', 1);
         set_config('allowemojipicker', 1);
-        set_config('mediawidth', '640', 'mod_lesson');
-        set_config('maxanswers', '5', 'mod_lesson');
-        set_config('maxanswers_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
+        set_config('forum_manydiscussions', '5');
         set_config('enablecompletion', 1);
         set_config('usecomments', 0);
 
@@ -733,13 +698,13 @@ final class manager_test extends \advanced_testcase {
         $currentplugins = $DB->count_records('adminpresets_plug');
         $this->assertCount(1, $DB->get_records('adminpresets_app'));
         $this->assertCount(3, $DB->get_records('adminpresets_app_it'));
-        $this->assertCount(1, $DB->get_records('adminpresets_app_it_a'));
+        $this->assertCount(0, $DB->get_records('adminpresets_app_it_a'));
         $this->assertCount(2, $DB->get_records('adminpresets_app_plug'));
 
         // Check the setttings have changed accordingly after applying the preset.
         $this->assertEquals(0, get_config('core', 'enablebadges'));
-        $this->assertEquals(900, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(2, get_config('mod_lesson', 'maxanswers'));
+        $this->assertEquals(3, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(10, get_config('core', 'forum_manydiscussions'));
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
         $this->assertEquals(1, get_config('core', 'enablecompletion'));
         $this->assertEquals(0, get_config('core', 'usecomments'));
@@ -748,7 +713,7 @@ final class manager_test extends \advanced_testcase {
         $enabledplugins = \core\plugininfo\enrol::get_enabled_plugins();
         $this->assertArrayNotHasKey('guest', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayNotHasKey('glossary', $enabledplugins);
+        $this->assertArrayNotHasKey('page', $enabledplugins);
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);
 
@@ -772,9 +737,8 @@ final class manager_test extends \advanced_testcase {
 
         // Check the setting values have been reverted accordingly.
         $this->assertEquals(1, get_config('core', 'enablebadges'));
-        $this->assertEquals(640, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(5, get_config('mod_lesson', 'maxanswers'));
-        $this->assertEquals(1, get_config('mod_lesson', 'maxanswers_adv'));
+        $this->assertEquals(1, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(5, get_config('core', 'forum_manydiscussions'));
         // These settings won't change, regardless if they are posted to the form.
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
         $this->assertEquals(1, get_config('core', 'enablecompletion'));
@@ -784,7 +748,7 @@ final class manager_test extends \advanced_testcase {
         $enabledplugins = \core\plugininfo\enrol::get_enabled_plugins();
         $this->assertArrayHasKey('guest', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayHasKey('glossary', $enabledplugins);
+        $this->assertArrayHasKey('page', $enabledplugins);
         // This plugin won't change (because it had the same value than before the preset was applied).
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);

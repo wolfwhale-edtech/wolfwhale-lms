@@ -191,14 +191,8 @@ class helper {
         static::add_item($presetid, 'forum_maxattachments', '3');
         static::add_item($presetid, 'guestloginbutton', '0');
 
-        // Modules: Hide database, external tool (lti), IMS content package (imscp), lesson, SCORM, wiki, workshop.
-        static::add_plugin($presetid, 'mod', 'data', false);
+        // Modules: Hide the external tool.
         static::add_plugin($presetid, 'mod', 'lti', false);
-        static::add_plugin($presetid, 'mod', 'imscp', false);
-        static::add_plugin($presetid, 'mod', 'lesson', false);
-        static::add_plugin($presetid, 'mod', 'scorm', false);
-        static::add_plugin($presetid, 'mod', 'wiki', false);
-        static::add_plugin($presetid, 'mod', 'workshop', false);
 
         // Availability restrictions: Hide Grouping, User profile.
         static::add_plugin($presetid, 'availability', 'grouping', false);
@@ -209,8 +203,6 @@ class helper {
         // Private files, Recent blog entries, Recently accessed courses, Search forums, Social activities,
         // Starred courses, Tags, YouTube.
         // Hidden by default: Course/site summary, RSS feeds, Self completion, Feedback.
-        static::add_plugin($presetid, 'block', 'blog_menu', false);
-        static::add_plugin($presetid, 'block', 'blog_tags', false);
         static::add_plugin($presetid, 'block', 'comments', false);
         static::add_plugin($presetid, 'block', 'completionstatus', false);
         static::add_plugin($presetid, 'block', 'course_summary', false);
@@ -224,14 +216,11 @@ class helper {
         static::add_plugin($presetid, 'block', 'site_main_menu', false);
         static::add_plugin($presetid, 'block', 'mentees', false);
         static::add_plugin($presetid, 'block', 'private_files', false);
-        static::add_plugin($presetid, 'block', 'blog_recent', false);
-        static::add_plugin($presetid, 'block', 'rss_client', false);
         static::add_plugin($presetid, 'block', 'search_forums', false);
         static::add_plugin($presetid, 'block', 'selfcompletion', false);
         static::add_plugin($presetid, 'block', 'social_activities', false);
         static::add_plugin($presetid, 'block', 'tags', false);
         static::add_plugin($presetid, 'block', 'tag_youtube', false);
-        static::add_plugin($presetid, 'block', 'feedback', false);
         static::add_plugin($presetid, 'block', 'online_users', false);
         static::add_plugin($presetid, 'block', 'recentlyaccessedcourses', false);
         static::add_plugin($presetid, 'block', 'starredcourses', false);
@@ -289,14 +278,8 @@ class helper {
         static::add_item($presetid, 'forum_maxattachments', '9');
         static::add_item($presetid, 'guestloginbutton', '0');
 
-        // Modules: Enable database, external tool (lti), IMS content package (imscp), lesson, SCORM, wiki, workshop.
-        static::add_plugin($presetid, 'mod', 'data', true);
+        // Modules: Enable the external tool.
         static::add_plugin($presetid, 'mod', 'lti', true);
-        static::add_plugin($presetid, 'mod', 'imscp', true);
-        static::add_plugin($presetid, 'mod', 'lesson', true);
-        static::add_plugin($presetid, 'mod', 'scorm', true);
-        static::add_plugin($presetid, 'mod', 'wiki', true);
-        static::add_plugin($presetid, 'mod', 'workshop', true);
 
         // Availability restrictions: Enable Grouping, User profile.
         static::add_plugin($presetid, 'availability', 'grouping', true);
@@ -307,8 +290,6 @@ class helper {
         // Private files, Recent blog entries, Recently accessed courses, Search forums, Social activities,
         // Starred courses, Tags, YouTube.
         // Hidden by default: Course/site summary, RSS feeds, Self completion, Feedback.
-        static::add_plugin($presetid, 'block', 'blog_menu', true);
-        static::add_plugin($presetid, 'block', 'blog_tags', true);
         static::add_plugin($presetid, 'block', 'comments', true);
         static::add_plugin($presetid, 'block', 'completionstatus', true);
         static::add_plugin($presetid, 'block', 'course_list', true);
@@ -321,7 +302,6 @@ class helper {
         static::add_plugin($presetid, 'block', 'site_main_menu', true);
         static::add_plugin($presetid, 'block', 'mentees', true);
         static::add_plugin($presetid, 'block', 'private_files', true);
-        static::add_plugin($presetid, 'block', 'blog_recent', true);
         static::add_plugin($presetid, 'block', 'search_forums', true);
         static::add_plugin($presetid, 'block', 'social_activities', true);
         static::add_plugin($presetid, 'block', 'tags', true);

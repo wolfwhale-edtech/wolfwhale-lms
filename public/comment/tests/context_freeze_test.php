@@ -74,6 +74,7 @@ final class context_freeze_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -96,6 +97,7 @@ final class context_freeze_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -118,6 +120,7 @@ final class context_freeze_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -139,6 +142,7 @@ final class context_freeze_test extends \advanced_testcase {
         global $CFG;
 
         $this->resetAfterTest();
+        set_config('usecomments', 1);
 
         $course = $this->getDataGenerator()->create_course();
 

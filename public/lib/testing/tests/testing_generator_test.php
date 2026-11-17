@@ -27,6 +27,12 @@ namespace core;
 #[\PHPUnit\Framework\Attributes\CoversClass(\testing_data_generator::class)]
 #[\PHPUnit\Framework\Attributes\CoversFunction('create_course')]
 final class testing_generator_test extends \advanced_testcase {
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
     public function test_get_plugin_generator_good_case(): void {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $this->assertInstanceOf('core_question_generator', $generator);

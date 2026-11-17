@@ -500,6 +500,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
 
         $user1 = [
             'username' => 'usernametest1',
@@ -794,6 +795,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         global $USER, $CFG, $DB;
 
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
         $this->preventResetByRollback();
 
         $wsuser = self::getDataGenerator()->create_user();

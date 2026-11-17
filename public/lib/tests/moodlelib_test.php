@@ -5616,18 +5616,6 @@ EOT;
                 'modname' => 'book',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],            'choice' => [
-                'modname' => 'choice',
-                'purpose' => MOD_PURPOSE_COMMUNICATION,
-                'otherpurpose' => MOD_PURPOSE_COLLABORATION,
-            ],            'data' => [
-                'modname' => 'data',
-                'purpose' => MOD_PURPOSE_COLLABORATION,
-                'otherpurpose' => null,
-            ],            'feedback' => [
-                'modname' => 'feedback',
-                'purpose' => MOD_PURPOSE_COMMUNICATION,
-                'otherpurpose' => null,
             ],            'folder' => [
                 'modname' => 'folder',
                 'purpose' => MOD_PURPOSE_CONTENT,
@@ -5636,26 +5624,14 @@ EOT;
                 'modname' => 'forum',
                 'purpose' => MOD_PURPOSE_COLLABORATION,
                 'otherpurpose' => MOD_PURPOSE_COMMUNICATION,
-            ],            'glossary' => [
-                'modname' => 'glossary',
-                'purpose' => MOD_PURPOSE_COLLABORATION,
-                'otherpurpose' => MOD_PURPOSE_CONTENT,
             ],            'h5pactivity' => [
                 'modname' => 'h5pactivity',
                 'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
                 'otherpurpose' => MOD_PURPOSE_ASSESSMENT,
-            ],            'imscp' => [
-                'modname' => 'imscp',
-                'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
-                'otherpurpose' => MOD_PURPOSE_CONTENT,
             ],            'label' => [
                 'modname' => 'label',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],            'lesson' => [
-                'modname' => 'lesson',
-                'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
-                'otherpurpose' => MOD_PURPOSE_ASSESSMENT,
             ],            'lti' => [
                 'modname' => 'lti',
                 'purpose' => MOD_PURPOSE_OTHER,
@@ -5676,10 +5652,6 @@ EOT;
                 'modname' => 'resource',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],            'scorm' => [
-                'modname' => 'scorm',
-                'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
-                'otherpurpose' => MOD_PURPOSE_CONTENT,
             ],            'subsection' => [
                 'modname' => 'subsection',
                 'purpose' => MOD_PURPOSE_CONTENT,
@@ -5688,14 +5660,6 @@ EOT;
                 'modname' => 'url',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],            'wiki' => [
-                'modname' => 'wiki',
-                'purpose' => MOD_PURPOSE_COLLABORATION,
-                'otherpurpose' => null,
-            ],            'workshop' => [
-                'modname' => 'workshop',
-                'purpose' => MOD_PURPOSE_ASSESSMENT,
-                'otherpurpose' => MOD_PURPOSE_COLLABORATION,
             ],
         ];
     }
@@ -5776,6 +5740,7 @@ EOT;
     #[\PHPUnit\Framework\Attributes\DataProvider('should_vary_by_accept_language_provider')]
     public function test_should_vary_by_accept_language(array $translations, string $script, bool $expected): void {
         $this->resetAfterTest();
+        require_once(__DIR__ . '/fixtures/testable_string_manager_for_current_language_tests.php');
         testable_string_manager_for_current_language_tests::set_fake_list_of_installed_languages($translations);
 
         $originalscript = $_SERVER['SCRIPT_NAME'] ?? null;

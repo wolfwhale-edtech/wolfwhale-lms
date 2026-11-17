@@ -44,6 +44,7 @@ final class lib_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
     }
 
