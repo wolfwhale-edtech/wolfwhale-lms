@@ -350,11 +350,10 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_user();
 
-        // Make a choice.
+        // A module that is not a quiz.
         $this->setUser();
-        $plugingenerator = $this->getDataGenerator()->get_plugin_generator('mod_choice');
-        $choice = $plugingenerator->create_instance(['course' => $course->id]);
-        $cm = get_coursemodule_from_instance('choice', $choice->id);
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('page', $page->id);
         $context = \context_module::instance($cm->id);
 
         // Fetch the contexts - no context should be returned.

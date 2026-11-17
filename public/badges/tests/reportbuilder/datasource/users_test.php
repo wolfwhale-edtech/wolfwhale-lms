@@ -37,6 +37,11 @@ require_once("{$CFG->libdir}/badgeslib.php");
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_badges\reportbuilder\datasource\users::class)]
 final class users_test extends core_reportbuilder_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        set_config('usetags', 1);
+    }
+
 
     /**
      * Test default datasource

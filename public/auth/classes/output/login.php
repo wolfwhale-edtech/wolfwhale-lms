@@ -124,9 +124,7 @@ class login implements renderable, templatable {
 
         // Authentication instructions.
         $this->instructions = $CFG->auth_instructions;
-        if (\core\di::get(\core\authentication::class)->is_enabled('none')) {
-            $this->instructions = get_string('loginstepsnone');
-        } else if ($CFG->registerauth == 'email' && empty($this->instructions)) {
+        if ($CFG->registerauth == 'email' && empty($this->instructions)) {
             $this->instructions = get_string('logindonthaveaccount');
             $this->instructionsfromsignupfallback = true;
         }

@@ -4000,8 +4000,7 @@ final class courselib_test extends advanced_testcase {
      * Test that the course reset throws an exception if it takes too long.
      */
     public function test_course_reset_timeout(): void {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/notes/lib.php');
+        global $DB;
 
         $this->resetAfterTest();
 
@@ -4020,33 +4019,25 @@ final class courselib_test extends advanced_testcase {
         $resetdata->reset_start_date = $course->startdate;
         $resetdata->reset_end_date = $course->enddate;
         $resetdata->reset_end_date_old = $course->enddate;
-        $resetdata->reset_notes = true;
+        $resetdata->reset_events = true;
 
-        // Create a note that will be deleted by the reset.
-        $note = (object) ['content' => 'Note 1', 'courseid' => $course->id];
-        note_save($note);
-
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $event = $generator->create_event(['courseid' => $course->id, 'name' => 'Reset me']);
+        $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset once with a long timeout that won't be exceeded.
         $timeout = new reset_timeout($course->shortname, time() + 10);
         reset_course_userdata($resetdata, $timeout);
 
         // Verify the course has been reset.
-        $this->assertFalse($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $this->assertFalse($DB->record_exists('event', ['id' => $event->id]));
 
-        $note = (object) ['content' => 'Note 2', 'courseid' => $course->id];
-        note_save($note);
-
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $event = $generator->create_event(['courseid' => $course->id, 'name' => 'Reset me again']);
+        $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset with a timeout that will be exceeded. Confirm an exception is thrown.
         $timeout = new reset_timeout($course->shortname, time() - 1);
         $this->expectExceptionObject($timeout);
         reset_course_userdata($resetdata, $timeout);
-
-        // Verify the course has not been reset.
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
     }
 
     public function test_course_check_module_updates_since(): void {

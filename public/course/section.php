@@ -189,17 +189,6 @@ $PAGE->set_secondary_navigation(false);
 
 echo $OUTPUT->header();
 
-// Show communication room status notification.
-if (core_communication\api::is_available() && has_capability('moodle/course:update', $context)) {
-    $communication = \core_communication\api::load_by_instance(
-        $context,
-        'core_course',
-        'coursecommunication',
-        $course->id
-    );
-    $communication->show_communication_room_status_notification();
-}
-
 $containerattributes = [];
 if ($PAGE->user_is_editing()) {
     require_once($CFG->dirroot . '/backup/util/helper/async_helper.class.php');

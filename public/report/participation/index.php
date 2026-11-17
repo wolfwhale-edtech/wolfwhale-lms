@@ -27,7 +27,6 @@ use core\report_helper;
 
 require('../../config.php');
 require_once($CFG->dirroot.'/lib/tablelib.php');
-require_once($CFG->dirroot.'/notes/lib.php');
 require_once($CFG->dirroot.'/report/participation/locallib.php');
 
 $participantsperpage = intval(get_config('moodlecourse', 'participantsperpage'));

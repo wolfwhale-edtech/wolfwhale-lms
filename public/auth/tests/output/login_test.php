@@ -176,30 +176,6 @@ final class login_test extends \advanced_testcase {
     }
 
     /**
-     * set_signup_allowed(false) must not clear the unrelated "loginstepsnone" instructions
-     * shown when the 'none' authentication method is enabled, even though that text is also
-     * auto-generated.
-     */
-    public function test_set_signup_allowed_false_preserves_loginstepsnone_instructions(): void {
-        global $CFG;
-
-        $this->resetAfterTest();
-
-        $CFG->auth = 'none';
-        $CFG->registerauth = 'email';
-        $CFG->auth_instructions = '';
-
-        $login = new login([]);
-
-        $this->assertSame(get_string('loginstepsnone'), $login->instructions);
-
-        $login->set_signup_allowed(false);
-
-        $this->assertFalse($login->cansignup);
-        $this->assertSame(get_string('loginstepsnone'), $login->instructions);
-    }
-
-    /**
      * set_signup_allowed(true) must never touch the instructions text, regardless of how it
      * was populated.
      */

@@ -148,7 +148,7 @@ final class exporters_content_item_test extends \advanced_testcase {
             icon: '',
             help: '',
             archetype: MOD_ARCHETYPE_OTHER,
-            componentname: 'mod_bigbluebuttonbn',
+            componentname: 'mod_forum',
             purpose: MOD_PURPOSE_COMMUNICATION,
             disabled: true,
             disabledreason: 'Server not configured.',

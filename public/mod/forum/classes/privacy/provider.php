@@ -913,16 +913,6 @@ class provider implements
 
             // Store all tags against this post as the tag belongs to the user.
             \core_tag\privacy\provider::export_item_tags($userid, $context, $postarea, 'mod_forum', 'forum_posts', $post->id);
-
-            // Export all user data stored for this post from the plagiarism API.
-            $coursecontext = $context->get_course_context();
-            \core_plagiarism\privacy\provider::export_plagiarism_user_data($userid, $context, $postarea, [
-                    'cmid' => $context->instanceid,
-                    'course' => $coursecontext->instanceid,
-                    'forum' => $post->forumid,
-                    'discussionid' => $post->discussion,
-                    'postid' => $post->id,
-                ]);
         }
 
         // Check for any ratings that the user has made on this post.

@@ -277,7 +277,6 @@ class cmactions extends baseactions {
 
         require_once($CFG->libdir . '/gradelib.php');
         require_once($CFG->libdir . '/questionlib.php');
-        require_once($CFG->dirroot . '/blog/lib.php');
         require_once($CFG->dirroot . '/calendar/lib.php');
 
         if (!$cm = $DB->get_record('course_modules', ['id' => $cmid])) {
@@ -346,9 +345,6 @@ class cmactions extends baseactions {
 
         // Delete scale-less outcome module associations for this course module.
         $DB->delete_records('grade_outcomes_modules', ['cmid' => $cm->id]);
-
-        // Delete associated blogs and blog tag instances.
-        blog_remove_associations_for_module($modcontext->id);
 
         // Delete completion and availability data; it is better to do this even if the
         // features are not turned on, in case they were turned on previously (these will be

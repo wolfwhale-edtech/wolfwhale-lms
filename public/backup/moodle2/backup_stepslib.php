@@ -427,10 +427,6 @@ class backup_module_structure_step extends backup_structure_step {
         // Attach report plugin structure to $module element, multiple allowed.
         $this->add_plugin_structure('report', $module, true);
 
-        // attach plagiarism plugin structure to $module element, there can be potentially
-        // many plagiarism plugins storing information about this course
-        $this->add_plugin_structure('plagiarism', $module, true);
-
         // attach local plugin structure to $module, multiple allowed
         $this->add_plugin_structure('local', $module, true);
 
@@ -576,10 +572,6 @@ class backup_course_structure_step extends backup_structure_step {
         // attach course report plugin structure to $course element; multiple
         // course reports can save course data if required
         $this->add_plugin_structure('coursereport', $course, true);
-
-        // attach plagiarism plugin structure to $course element, there can be potentially
-        // many plagiarism plugins storing information about this course
-        $this->add_plugin_structure('plagiarism', $course, true);
 
         // attach local plugin structure to $course element; multiple local plugins
         // can save course data if required

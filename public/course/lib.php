@@ -3115,10 +3115,6 @@ function course_get_user_navigation_options($context, $course = null) {
         $options->grades = $grades;
     }
 
-    if (\core_communication\api::is_available()) {
-        $options->communication = has_capability('moodle/course:configurecoursecommunication', $context);
-    }
-
     if (\core_competency\api::is_enabled()) {
         $capabilities = array('moodle/competency:coursecompetencyview', 'moodle/competency:coursecompetencymanage');
         $options->competencies = has_any_capability($capabilities, $context);
@@ -4254,44 +4250,6 @@ function course_get_courseimage(\stdClass $course): ?stored_file {
         }
     }
     return null;
-}
-
-/**
- * Get course specific data for configuring a communication instance.
- *
- * @param int $courseid The course id.
- * @return array Returns course data, context and heading.
- */
-function course_get_communication_instance_data(int $courseid): array {
-    // Do some checks and prepare instance specific data.
-    $course = get_course($courseid);
-    require_login($course);
-    $context = context_course::instance($course->id);
-    require_capability('moodle/course:configurecoursecommunication', $context);
-
-    $heading = $course->fullname;
-    $returnurl = new moodle_url('/course/view.php', ['id' => $courseid]);
-
-    return [$course, $context, $heading, $returnurl];
-}
-
-/**
- * Update a course using communication configuration data.
- *
- * @param stdClass $data The data to update the course with.
- */
-function course_update_communication_instance_data(stdClass $data): void {
-    $data->id = $data->instanceid; // For correct use in update_course.
-    // If the room name is set to empty, then set it course name.
-    $provider = $data->selectedcommunication ?? null;
-    $roomnameidentifier = $provider . 'roomname';
-    if ($provider && empty($data->$roomnameidentifier)) {
-        $data->$roomnameidentifier = $data->fullname ?? get_course($data->id)->fullname;
-    }
-    core_communication\helper::update_course_communication_instance(
-        course: $data,
-        changesincoursecat: false,
-    );
 }
 
 /**

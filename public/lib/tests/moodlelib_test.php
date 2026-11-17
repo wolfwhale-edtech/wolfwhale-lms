@@ -3449,17 +3449,17 @@ EOF;
      * TODO Add asserts to verify other data related to course is deleted as well.
      */
     public function test_remove_course_contents(): void {
+        global $DB;
 
         $this->resetAfterTest();
 
         $course = $this->getDataGenerator()->create_course();
-        $user = $this->getDataGenerator()->create_user();
-        $gen = $this->getDataGenerator()->get_plugin_generator('core_notes');
-        $note = $gen->create_instance(array('courseid' => $course->id, 'userid' => $user->id));
+        $page = $this->getDataGenerator()->create_module('page', ['course' => $course->id]);
+        $cm = get_coursemodule_from_instance('page', $page->id);
 
-        $this->assertNotEquals(false, note_load($note->id));
+        $this->assertNotFalse($DB->get_record('course_modules', ['id' => $cm->id]));
         remove_course_contents($course->id, false);
-        $this->assertFalse(note_load($note->id));
+        $this->assertFalse($DB->get_record('course_modules', ['id' => $cm->id]));
     }
 
     /**
@@ -5608,118 +5608,95 @@ EOT;
      * @return array
      */
     public static function provider_plugin_supports_purpose(): array {
-        return [
-            'assign' => [
+        return [            'assign' => [
                 'modname' => 'assign',
                 'purpose' => MOD_PURPOSE_ASSESSMENT,
                 'otherpurpose' => null,
-            ],
-            'bigbluebuttonbn' => [
+            ],            'bigbluebuttonbn' => [
                 'modname' => 'bigbluebuttonbn',
                 'purpose' => MOD_PURPOSE_COMMUNICATION,
                 'otherpurpose' => null,
-            ],
-            'book' => [
+            ],            'book' => [
                 'modname' => 'book',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'choice' => [
+            ],            'choice' => [
                 'modname' => 'choice',
                 'purpose' => MOD_PURPOSE_COMMUNICATION,
                 'otherpurpose' => MOD_PURPOSE_COLLABORATION,
-            ],
-            'data' => [
+            ],            'data' => [
                 'modname' => 'data',
                 'purpose' => MOD_PURPOSE_COLLABORATION,
                 'otherpurpose' => null,
-            ],
-            'feedback' => [
+            ],            'feedback' => [
                 'modname' => 'feedback',
                 'purpose' => MOD_PURPOSE_COMMUNICATION,
                 'otherpurpose' => null,
-            ],
-            'folder' => [
+            ],            'folder' => [
                 'modname' => 'folder',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'forum' => [
+            ],            'forum' => [
                 'modname' => 'forum',
                 'purpose' => MOD_PURPOSE_COLLABORATION,
                 'otherpurpose' => MOD_PURPOSE_COMMUNICATION,
-            ],
-            'glossary' => [
+            ],            'glossary' => [
                 'modname' => 'glossary',
                 'purpose' => MOD_PURPOSE_COLLABORATION,
                 'otherpurpose' => MOD_PURPOSE_CONTENT,
-            ],
-            'h5pactivity' => [
+            ],            'h5pactivity' => [
                 'modname' => 'h5pactivity',
                 'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
                 'otherpurpose' => MOD_PURPOSE_ASSESSMENT,
-            ],
-            'imscp' => [
+            ],            'imscp' => [
                 'modname' => 'imscp',
                 'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
                 'otherpurpose' => MOD_PURPOSE_CONTENT,
-            ],
-            'label' => [
+            ],            'label' => [
                 'modname' => 'label',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'lesson' => [
+            ],            'lesson' => [
                 'modname' => 'lesson',
                 'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
                 'otherpurpose' => MOD_PURPOSE_ASSESSMENT,
-            ],
-            'lti' => [
+            ],            'lti' => [
                 'modname' => 'lti',
                 'purpose' => MOD_PURPOSE_OTHER,
                 'otherpurpose' => null,
-            ],
-            'page' => [
+            ],            'page' => [
                 'modname' => 'page',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'qbank' => [
+            ],            'qbank' => [
                 'modname' => 'qbank',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'quiz' => [
+            ],            'quiz' => [
                 'modname' => 'quiz',
                 'purpose' => MOD_PURPOSE_ASSESSMENT,
                 'otherpurpose' => null,
-            ],
-            'resource' => [
+            ],            'resource' => [
                 'modname' => 'resource',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'scorm' => [
+            ],            'scorm' => [
                 'modname' => 'scorm',
                 'purpose' => MOD_PURPOSE_INTERACTIVECONTENT,
                 'otherpurpose' => MOD_PURPOSE_CONTENT,
-            ],
-            'subsection' => [
+            ],            'subsection' => [
                 'modname' => 'subsection',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'url' => [
+            ],            'url' => [
                 'modname' => 'url',
                 'purpose' => MOD_PURPOSE_CONTENT,
                 'otherpurpose' => null,
-            ],
-            'wiki' => [
+            ],            'wiki' => [
                 'modname' => 'wiki',
                 'purpose' => MOD_PURPOSE_COLLABORATION,
                 'otherpurpose' => null,
-            ],
-            'workshop' => [
+            ],            'workshop' => [
                 'modname' => 'workshop',
                 'purpose' => MOD_PURPOSE_ASSESSMENT,
                 'otherpurpose' => MOD_PURPOSE_COLLABORATION,

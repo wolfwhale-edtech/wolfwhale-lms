@@ -4104,10 +4104,7 @@ EOD;
      * @return bool
      */
     public function has_communication_links(): bool {
-        if (during_initial_install() || !\core_communication\api::is_available()) {
-            return false;
-        }
-        return !empty($this->communication_link());
+        return false;
     }
 
     /**
@@ -4146,8 +4143,7 @@ EOD;
      * @return string
      */
     public function communication_url(): string {
-        global $COURSE;
-        return \core_communication\helper::get_course_communication_url($COURSE);
+        return '';
     }
 
     /**

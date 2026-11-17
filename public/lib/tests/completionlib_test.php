@@ -784,15 +784,13 @@ final class completionlib_test extends advanced_testcase {
         $this->setup_data();
         $user = $this->user;
 
-        $choicegenerator = $this->getDataGenerator()->get_plugin_generator('mod_choice');
-        $choice = $choicegenerator->create_instance([
+        $page = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            'completionview' => true,
-            'completionsubmit' => true,
+            'completionview' => 1,
         ]);
 
-        $cm = get_coursemodule_from_instance('choice', $choice->id);
+        $cm = get_coursemodule_from_instance('page', $page->id);
 
         // Let's manually create a course completion record instead of going through the hoops to complete an activity.
         if ($hasrecord) {
@@ -852,15 +850,13 @@ final class completionlib_test extends advanced_testcase {
         $this->setup_data();
         $this->setUser($this->user);
 
-        $choicegenerator = $this->getDataGenerator()->get_plugin_generator('mod_choice');
-        $choice = $choicegenerator->create_instance([
+        $page = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            'completionview' => true,
-            'completionsubmit' => true,
+            'completionview' => 1,
         ]);
 
-        $cm = get_coursemodule_from_instance('choice', $choice->id);
+        $cm = get_coursemodule_from_instance('page', $page->id);
 
         // Let's manually create a course completion record instead of going through the hoops to complete an activity.
         $cmcompletionrecord = (object) [
@@ -917,14 +913,12 @@ final class completionlib_test extends advanced_testcase {
     public function test_get_completion_data(): void {
         $this->setAdminUser();
         $this->setup_data();
-        $choicegenerator = $this->getDataGenerator()->get_plugin_generator('mod_choice');
-        $choice = $choicegenerator->create_instance([
+        $page = $this->getDataGenerator()->create_module('page', [
             'course' => $this->course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
-            'completionview' => true,
-            'completionsubmit' => true,
+            'completionview' => 1,
         ]);
-        $cm = get_coursemodule_from_instance('choice', $choice->id);
+        $cm = get_coursemodule_from_instance('page', $page->id);
 
         // Mock other completion data.
         $completioninfo = new completion_info($this->course);

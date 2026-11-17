@@ -812,24 +812,24 @@ final class filterlib_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $this->assertFileExists("$CFG->dirroot/filter/emailprotect"); // Any standard filter.
-        $this->assertFileExists("$CFG->dirroot/filter/glossary");         // Any standard filter.
+        $this->assertFileExists("$CFG->dirroot/filter/urltolink");         // Any standard filter.
         $this->assertFileDoesNotExist("$CFG->dirroot/filter/grgrggr");   // Any non-existent filter.
 
         // Setup fixture.
         set_config('filterall', 0);
         set_config('stringfilters', '');
         // Exercise SUT.
-        filter_set_applies_to_strings('glossary', true);
+        filter_set_applies_to_strings('urltolink', true);
         // Validate.
-        $this->assertEquals('glossary', $CFG->stringfilters);
+        $this->assertEquals('urltolink', $CFG->stringfilters);
         $this->assertEquals(1, $CFG->filterall);
 
         filter_set_applies_to_strings('grgrggr', true);
-        $this->assertEquals('glossary', $CFG->stringfilters);
+        $this->assertEquals('urltolink', $CFG->stringfilters);
         $this->assertEquals(1, $CFG->filterall);
 
         filter_set_applies_to_strings('emailprotect', true);
-        $this->assertEquals('glossary,emailprotect', $CFG->stringfilters);
+        $this->assertEquals('urltolink,emailprotect', $CFG->stringfilters);
         $this->assertEquals(1, $CFG->filterall);
     }
 
@@ -837,13 +837,13 @@ final class filterlib_test extends \advanced_testcase {
         global $CFG;
         $this->resetAfterTest();
 
-        $this->assertFileExists("$CFG->dirroot/filter/glossary"); // Any standard filter.
+        $this->assertFileExists("$CFG->dirroot/filter/urltolink"); // Any standard filter.
 
         // Setup fixture.
         set_config('filterall', 1);
-        set_config('stringfilters', 'glossary');
+        set_config('stringfilters', 'urltolink');
         // Exercise SUT.
-        filter_set_applies_to_strings('glossary', false);
+        filter_set_applies_to_strings('urltolink', false);
         // Validate.
         $this->assertEquals('', $CFG->stringfilters);
         $this->assertEquals('', $CFG->filterall);
@@ -854,14 +854,14 @@ final class filterlib_test extends \advanced_testcase {
         $this->resetAfterTest();
 
         $this->assertFileExists("$CFG->dirroot/filter/emailprotect"); // Any standard filter.
-        $this->assertFileExists("$CFG->dirroot/filter/glossary");         // Any standard filter.
+        $this->assertFileExists("$CFG->dirroot/filter/urltolink");         // Any standard filter.
         $this->assertFileExists("$CFG->dirroot/filter/multilang");    // Any standard filter.
 
         // Setup fixture.
         set_config('filterall', 1);
-        set_config('stringfilters', 'emailprotect,glossary,multilang');
+        set_config('stringfilters', 'emailprotect,urltolink,multilang');
         // Exercise SUT.
-        filter_set_applies_to_strings('glossary', false);
+        filter_set_applies_to_strings('urltolink', false);
         // Validate.
         $this->assertEquals('emailprotect,multilang', $CFG->stringfilters);
         $this->assertEquals(1, $CFG->filterall);
@@ -886,69 +886,69 @@ final class filterlib_test extends \advanced_testcase {
     public function test_filter_get_active_state_contextid_parameter(): void {
         $this->resetAfterTest();
 
-        filter_set_global_state('glossary', TEXTFILTER_ON);
+        filter_set_global_state('urltolink', TEXTFILTER_ON);
         // Using system context by default.
-        $active = filter_get_active_state('glossary');
+        $active = filter_get_active_state('urltolink');
         $this->assertEquals($active, TEXTFILTER_ON);
 
         $systemcontext = \context_system::instance();
         // Passing $systemcontext object.
-        $active = filter_get_active_state('glossary', $systemcontext);
+        $active = filter_get_active_state('urltolink', $systemcontext);
         $this->assertEquals($active, TEXTFILTER_ON);
 
         // Passing $systemcontext id.
-        $active = filter_get_active_state('glossary', $systemcontext->id);
+        $active = filter_get_active_state('urltolink', $systemcontext->id);
         $this->assertEquals($active, TEXTFILTER_ON);
 
         // Not system context.
-        filter_set_local_state('glossary', '123', TEXTFILTER_ON);
-        $active = filter_get_active_state('glossary', '123');
+        filter_set_local_state('urltolink', '123', TEXTFILTER_ON);
+        $active = filter_get_active_state('urltolink', '123');
         $this->assertEquals($active, TEXTFILTER_ON);
     }
 
     public function test_filter_get_active_state_filtername_parameter(): void {
         $this->resetAfterTest();
 
-        filter_set_global_state('glossary', TEXTFILTER_ON);
+        filter_set_global_state('urltolink', TEXTFILTER_ON);
         // Using full filtername.
-        $active = filter_get_active_state('filter/glossary');
+        $active = filter_get_active_state('filter/urltolink');
         $this->assertEquals($active, TEXTFILTER_ON);
 
         // Wrong filtername.
         $this->expectException('coding_exception');
-        $active = filter_get_active_state('mod/glossary');
+        $active = filter_get_active_state('mod/urltolink');
     }
 
     public function test_filter_get_active_state_after_change(): void {
         $this->resetAfterTest();
 
-        filter_set_global_state('glossary', TEXTFILTER_ON);
+        filter_set_global_state('urltolink', TEXTFILTER_ON);
         $systemcontextid = \context_system::instance()->id;
-        $active = filter_get_active_state('glossary', $systemcontextid);
+        $active = filter_get_active_state('urltolink', $systemcontextid);
         $this->assertEquals($active, TEXTFILTER_ON);
 
-        filter_set_global_state('glossary', TEXTFILTER_OFF);
+        filter_set_global_state('urltolink', TEXTFILTER_OFF);
         $systemcontextid = \context_system::instance()->id;
-        $active = filter_get_active_state('glossary', $systemcontextid);
+        $active = filter_get_active_state('urltolink', $systemcontextid);
         $this->assertEquals($active, TEXTFILTER_OFF);
 
-        filter_set_global_state('glossary', TEXTFILTER_DISABLED);
+        filter_set_global_state('urltolink', TEXTFILTER_DISABLED);
         $systemcontextid = \context_system::instance()->id;
-        $active = filter_get_active_state('glossary', $systemcontextid);
+        $active = filter_get_active_state('urltolink', $systemcontextid);
         $this->assertEquals($active, TEXTFILTER_DISABLED);
     }
 
     public function test_filter_get_globally_enabled_default(): void {
         $this->resetAfterTest();
         $enabledfilters = filter_get_globally_enabled();
-        $this->assertArrayNotHasKey('glossary', $enabledfilters);
+        $this->assertArrayNotHasKey('algebra', $enabledfilters);
     }
 
     public function test_filter_get_globally_enabled_after_change(): void {
         $this->resetAfterTest();
-        filter_set_global_state('glossary', TEXTFILTER_ON);
+        filter_set_global_state('urltolink', TEXTFILTER_ON);
         $enabledfilters = filter_get_globally_enabled();
-        $this->assertArrayHasKey('glossary', $enabledfilters);
+        $this->assertArrayHasKey('urltolink', $enabledfilters);
     }
 
     public function test_filter_get_globally_enabled_filters_with_config(): void {

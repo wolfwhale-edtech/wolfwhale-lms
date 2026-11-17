@@ -55,7 +55,6 @@ if ($hassiteconfig || has_any_capability($capabilities, $systemcontext)) { // Sp
         $choices['auth'] = new lang_string('authentication');
         $choices['idnumber'] = new lang_string('idnumber');
         $choices['lastip'] = new lang_string('lastip');
-        $choices['mnethostid'] = new lang_string('mnetidprovider', 'mnet');
         $temp->add(new admin_setting_configmultiselect('userfiltersdefault', new lang_string('userfiltersdefault', 'admin'),
             new lang_string('userfiltersdefault_desc', 'admin'), array('realname'), $choices));
     }
@@ -117,17 +116,6 @@ if ($hassiteconfig || has_any_capability($capabilities, $systemcontext)) { // Sp
             ['moodle/cohort:configurecustomfields']
         )
     );
-    $ADMIN->add(
-        'accounts',
-        new admin_externalpage(
-            'manageusersnotes',
-            new lang_string('manageusersnotes', 'notes'),
-            "$CFG->wwwroot/notes/index.php?filtertype=course&filterselect=0",
-            'moodle/notes:view',
-            empty($CFG->enablenotes)
-        )
-    );
-
     // Stuff under the "roles" subcategory.
 
     // User policies settingpage.

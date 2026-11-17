@@ -168,34 +168,7 @@ $tasks = array(
         'month' => '*'
     ),
     array(
-        'classname' => 'core\task\portfolio_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'core\task\plagiarism_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
         'classname' => 'core\task\calendar_cron_task',
-        'blocking' => 0,
-        'minute' => '*',
-        'hour' => '*',
-        'day' => '*',
-        'dayofweek' => '*',
-        'month' => '*'
-    ),
-    array(
-        'classname' => 'core\task\blog_cron_task',
         'blocking' => 0,
         'minute' => '*',
         'hour' => '*',
@@ -465,15 +438,6 @@ $tasks = array(
         'dayofweek' => '*',
         'month' => '*',
         'disabled' => true,
-    ],
-    [
-        'classname' => 'core_communication\task\synchronise_providers_task',
-        'blocking' => 0,
-        'minute' => 'R',
-        'hour' => 'R',
-        'day' => '*',
-        'dayofweek' => 'R',
-        'month' => '*',
     ],
     [
         'classname' => 'core\task\automated_backup_report_task',

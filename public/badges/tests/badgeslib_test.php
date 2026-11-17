@@ -37,6 +37,11 @@ use core\task\manager;
 #[\PHPUnit\Framework\Attributes\CoversFunction('badges_change_sortorder_backpacks')]
 #[\PHPUnit\Framework\Attributes\CoversFunction('badge_get_tagged_badges')]
 final class badgeslib_test extends badges_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        set_config('usetags', 1);
+    }
+
     protected $badgeid;
     protected $course;
     protected $user;

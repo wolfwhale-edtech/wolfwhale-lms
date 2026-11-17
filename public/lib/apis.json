@@ -14,16 +14,6 @@
         "allowedlevel2": true,
         "allowedspread": false
     },
-    "aiactions": {
-        "component": "core_ai",
-        "allowedlevel2": true,
-        "allowedspread": false
-    },
-    "aimodel": {
-        "component": "core_ai",
-        "allowedlevel2": true,
-        "allowedspread": false
-    },
     "analytics": {
         "component": "core_analytics",
         "allowedlevel2": true,
@@ -209,21 +199,6 @@
         "allowedlevel2": false,
         "allowedspread": false
     },
-    "payment": {
-        "component": "core_payment",
-        "allowedlevel2": true,
-        "allowedspread": true
-    },
-    "plagiarism": {
-        "component": "core_plagiarism",
-        "allowedlevel2": false,
-        "allowedspread": false
-    },
-    "portfolio": {
-        "component": "core_portfolio",
-        "allowedlevel2": false,
-        "allowedspread": false
-    },
     "preference": {
         "component": "core",
         "allowedlevel2": false,
@@ -263,11 +238,6 @@
         "component": "core",
         "allowedlevel2": true,
         "allowedspread": true
-    },
-    "rss": {
-        "component": "core_rss",
-        "allowedlevel2": false,
-        "allowedspread": false
     },
     "search": {
         "component": "core_search",
