@@ -181,6 +181,41 @@ final class home_test extends \advanced_testcase {
     }
 
     /**
+     * An ampersand in a real name is still one ampersand after the page is drawn.
+     */
+    public function test_ampersand_in_a_name_is_not_escaped_twice(): void {
+        global $OUTPUT;
+
+        $this->resetAfterTest();
+        set_config('enablebadges', 1);
+        $student = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['fullname' => 'Arts & Music']);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Essay & notes',
+            'duedate' => time() + DAYSECS,
+        ]);
+        $this->setAdminUser();
+        $badge = $this->getDataGenerator()->get_plugin_generator('core_badges')->create_badge([
+            'name' => 'Star & Stripe',
+        ]);
+        $badge->issue($student->id, true);
+
+        $this->setUser($student);
+        $tiles = $this->tiles_by_id(home::get_tiles());
+        $this->assertSame('Essay & notes', $tiles['today']['fact']);
+        $this->assertSame('Arts & Music', $tiles['courses']['fact']);
+        $this->assertSame('Star & Stripe', $tiles['badges']['fact']);
+        $this->assertStringContainsString('Essay & notes', $tiles['today']['speech']);
+
+        $html = $OUTPUT->render_from_template('local_wolfwhale/home', home::export());
+        $this->assertStringContainsString('Arts &amp; Music', $html);
+        $this->assertStringNotContainsString('&amp;amp;', $html);
+        $this->assertStringContainsString('Today. Essay &amp; notes', $html);
+    }
+
+    /**
      * Two courses show a count and open the course list.
      */
     public function test_several_courses_show_a_count(): void {

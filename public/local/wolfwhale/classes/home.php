@@ -202,7 +202,7 @@ class home {
         }
         if ($count === 1) {
             $badge = reset($badges);
-            return self::tile('badges', $word, format_string($badge->name), false, $url);
+            return self::tile('badges', $word, self::plain_name($badge->name), false, $url);
         }
         return self::tile('badges', $word, (string) $count, false, $url);
     }
@@ -243,7 +243,7 @@ class home {
         if ($count === 1) {
             $course = reset($courses);
             $url = (new \moodle_url('/course/view.php', ['id' => $course->id]))->out(false);
-            return self::tile('courses', $word, format_string($course->fullname), false, $url);
+            return self::tile('courses', $word, self::plain_name($course->fullname), false, $url);
         }
         $url = (new \moodle_url('/my/courses.php'))->out(false);
         return self::tile('courses', $word, (string) $count, false, $url);
@@ -371,7 +371,21 @@ class home {
         if ($label === '') {
             $label = trim((string) ($event->name ?? ''));
         }
-        return trim(format_string($label));
+        return self::plain_name($label);
+    }
+
+    /**
+     * A name for a tile and for speech, with no HTML and no encoded ampersand.
+     *
+     * The template escapes this again when it is drawn.
+     *
+     * @param string $value Stored name.
+     * @return string
+     */
+    private static function plain_name(string $value): string {
+        $text = format_string($value, true, ['escape' => false, 'filter' => false]);
+        $text = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return trim($text);
     }
 
     /**
