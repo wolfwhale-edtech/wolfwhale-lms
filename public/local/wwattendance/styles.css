@@ -1,0 +1,134 @@
+/* Attendance. One course, large choices. */
+
+#page-local-wwattendance-take #page-header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+#page-local-wwattendance-take #region-main,
+#page-local-wwattendance-take #region-main-box {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.ww-attend {
+    margin: 0 auto;
+    max-width: 48rem;
+}
+
+.ww-attend-course,
+.ww-attend-none,
+.ww-person-name {
+    color: #16324a;
+    font-weight: 700;
+    text-align: center;
+}
+
+.ww-attend-course {
+    margin: 0 0 1.25rem;
+    font-size: 2.4rem;
+    line-height: 1.1;
+}
+
+.ww-attend-none {
+    font-size: 1.8rem;
+}
+
+.ww-person {
+    margin: 0 0 1rem;
+    padding: 1rem 1rem 1.1rem;
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 1.5rem;
+    background-color: rgba(255, 255, 255, .78);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, .95) 0%, rgba(186, 230, 255, .72) 100%);
+    box-shadow: 0 1rem 2rem rgba(47, 93, 138, .14), inset 0 1px 0 #fff;
+}
+
+.ww-person-name {
+    float: none;
+    width: 100%;
+    margin: 0 0 .75rem;
+    padding: 0;
+    font-size: 1.6rem;
+    line-height: 1.2;
+}
+
+.ww-choices {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .6rem;
+    clear: both;
+}
+
+.ww-choice {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.25rem;
+    margin: 0;
+    color: #16324a;
+    font-size: 1.45rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, .85);
+    border: 3px solid transparent;
+    border-radius: 1rem;
+}
+
+.ww-choice input {
+    position: absolute;
+    opacity: 0;
+}
+
+.ww-choice.is-on,
+.ww-choice:has(input:checked) {
+    color: #fff;
+}
+
+.ww-present.is-on,
+.ww-present:has(input:checked) {
+    background: #149a9a;
+}
+
+.ww-absent.is-on,
+.ww-absent:has(input:checked) {
+    background: #d64545;
+}
+
+.ww-late.is-on,
+.ww-late:has(input:checked) {
+    background: #e6b325;
+    color: #16324a;
+}
+
+.ww-choice:focus-within {
+    outline: 3px solid #145a7a;
+    outline-offset: 3px;
+}
+
+.ww-save {
+    display: block;
+    width: 100%;
+    min-height: 4.5rem;
+    margin-top: .4rem;
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: #2f5d8a;
+    border: 0;
+    border-radius: 1.4rem;
+}
+
+@media (min-width: 40rem) {
+    .ww-choices {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}

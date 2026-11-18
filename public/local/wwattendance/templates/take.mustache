@@ -1,0 +1,55 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwattendance/take
+
+    One course, one day. Each person has Present, Absent, and Late.
+}}
+<div class="ww-attend">
+    <h1 class="ww-attend-course">{{course}}</h1>
+    {{#empty}}
+    <p class="ww-attend-none">{{none}}</p>
+    {{/empty}}
+    {{^empty}}
+    <form method="post" action="{{action}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="courseid" value="{{courseid}}">
+        {{#students}}
+        <fieldset class="ww-person">
+            <legend class="ww-person-name">{{name}}</legend>
+            <div class="ww-choices">
+                <label class="ww-choice ww-present{{#ispresent}} is-on{{/ispresent}}">
+                    <input type="radio" name="status[{{id}}]" value="present"{{#ispresent}} checked{{/ispresent}}>
+                    <span>{{present}}</span>
+                </label>
+                <label class="ww-choice ww-absent{{#isabsent}} is-on{{/isabsent}}">
+                    <input type="radio" name="status[{{id}}]" value="absent"{{#isabsent}} checked{{/isabsent}}>
+                    <span>{{absent}}</span>
+                </label>
+                <label class="ww-choice ww-late{{#islate}} is-on{{/islate}}">
+                    <input type="radio" name="status[{{id}}]" value="late"{{#islate}} checked{{/islate}}>
+                    <span>{{late}}</span>
+                </label>
+            </div>
+        </fieldset>
+        {{/students}}
+        {{#hassave}}
+        <button type="submit" class="ww-save">{{save}}</button>
+        {{/hassave}}
+    </form>
+    {{/empty}}
+</div>
