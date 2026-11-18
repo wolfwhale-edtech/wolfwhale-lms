@@ -1,0 +1,228 @@
+/* WolfWhale student home. Glass tiles on the theme's sky. */
+
+#page-local-wolfwhale-index #page-header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+#page-local-wolfwhale-index #region-main,
+#page-local-wolfwhale-index #region-main-box {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.ww-home {
+    margin: 0 auto;
+    max-width: 72rem;
+}
+
+.ww-read:not([hidden]) {
+    display: inline-flex;
+    align-items: center;
+    gap: .7rem;
+    min-height: 4.25rem;
+    min-width: 8.5rem;
+    margin: 0 0 1rem auto;
+    padding: .75rem 1.4rem;
+    color: #9c2f2f;
+    font-size: 1.5rem;
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, .82);
+    background-image: linear-gradient(to bottom, #fff 0%, #ffd6d6 55%, #f3a3a3 100%);
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 1.4rem;
+    box-shadow:
+        0 .75rem 1.5rem rgba(47, 93, 138, .12),
+        inset 0 1px 0 #fff;
+}
+
+.ww-home-tiles {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.ww-tile {
+    position: relative;
+    border-radius: 1.75rem;
+    background-color: rgba(255, 255, 255, .78);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, .95) 0%, rgba(186, 230, 255, .72) 100%);
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-top: 8px solid #8fd4f5;
+    box-shadow:
+        0 1rem 2rem rgba(47, 93, 138, .14),
+        inset 0 1px 0 rgba(255, 255, 255, .95);
+}
+
+.ww-tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0) 46%);
+    pointer-events: none;
+}
+
+.ww-tile-due {
+    border-top-color: #e6b325;
+}
+
+.ww-tile-badges {
+    border-top-color: #149a9a;
+}
+
+.ww-tile-messages {
+    border-top-color: #3d4db8;
+}
+
+.ww-tile-link {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    min-height: 13rem;
+    padding: 2.6rem 1.25rem 1.4rem;
+    color: #16324a;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 1.75rem;
+}
+
+.ww-tile-link:hover,
+.ww-tile-link:focus {
+    color: #16324a;
+    text-decoration: none;
+}
+
+.ww-tile-link:focus-visible,
+.ww-speak:focus-visible {
+    outline: 3px solid #145a7a;
+    outline-offset: 3px;
+}
+
+.ww-tile-icon svg {
+    display: block;
+    width: 5.5rem;
+    height: 5.5rem;
+}
+
+.ww-tile-today .ww-tile-icon {
+    color: #145a7a;
+}
+
+.ww-tile-due .ww-tile-icon {
+    color: #e6b325;
+}
+
+.ww-tile-badges .ww-tile-icon {
+    color: #149a9a;
+}
+
+.ww-tile-messages .ww-tile-icon {
+    color: #3d4db8;
+}
+
+.ww-tile-courses .ww-tile-icon {
+    color: #1a7aa3;
+}
+
+.ww-tile-word {
+    font-size: 2.15rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.ww-tile-fact {
+    max-width: 16rem;
+    font-size: 1.35rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.ww-tile.is-empty {
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, .7) 0%, rgba(214, 236, 246, .55) 100%);
+}
+
+.ww-tile.is-empty .ww-tile-icon {
+    opacity: .45;
+}
+
+.ww-tile.is-empty .ww-tile-fact {
+    color: #4d6a80;
+}
+
+.ww-speak:not([hidden]) {
+    position: absolute;
+    z-index: 2;
+    top: .7rem;
+    right: .7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    padding: 0;
+    color: #d64545;
+    background-color: rgba(255, 255, 255, .9);
+    background-image: linear-gradient(to bottom, #fff 0%, #ffd8d8 100%);
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 999px;
+    box-shadow: inset 0 1px 0 #fff, 0 .35rem .8rem rgba(47, 93, 138, .16);
+}
+
+.ww-speak svg,
+.ww-speak-icon {
+    width: 1.7rem;
+    height: 1.7rem;
+}
+
+.ww-read:not([hidden]) {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: auto;
+    height: auto;
+}
+
+@media (min-width: 40rem) {
+    .ww-home-tiles {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ww-tile-link {
+        min-height: 16rem;
+    }
+}
+
+@media (min-width: 64rem) {
+    .ww-home-tiles {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .ww-tile-icon svg {
+        width: 6.5rem;
+        height: 6.5rem;
+    }
+}
+
+@media (max-width: 39.99rem) {
+    .ww-read:not([hidden]) {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .ww-tile-word {
+        font-size: 1.85rem;
+    }
+}
