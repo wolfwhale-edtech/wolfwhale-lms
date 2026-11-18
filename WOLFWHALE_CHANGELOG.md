@@ -92,3 +92,20 @@ Each later change gets its own entry with:
   - The old networking row stored in the database still has the display name Moodle. The networking screens are already gone.
   - A server running PHP older than 8.1 prints "Moodle 4.4" and stops. The site cannot run on that PHP.
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/3
+
+## WW-LMS-004 — Student home
+
+- Date: 2026-11-18
+- Summary: A person who is only a student now lands on a home of large picture tiles instead of the usual dashboard. The tiles are Today, Due, Badges, Messages, and Courses. Each tile uses that person's own courses, calendar, badges, and messages. The bar link that used to say Dashboard says Home for a student and opens this page. A teacher, a manager, a course creator, or an administrator still gets the usual dashboard. Points, levels, avatars, a library, and maps are not on the page, because those parts are not built yet.
+- How a student is recognised: they are signed in, they are not a guest, they are not a site administrator, and they do not hold a teacher, editing-teacher, manager, or course-creator role anywhere on the site. A student who also teaches another class keeps the dashboard.
+- What each tile shows, and where one tap goes:
+  - Today: the next activity on their calendar. The tap opens that activity. If nothing is coming up, the tile says "Nothing today" and opens the calendar.
+  - Due: how many assignments and quizzes are still ahead. One item opens that activity. More than one opens the upcoming calendar. If there are none, the tile says "Nothing due".
+  - Badges: badges they have earned. One badge shows its name. More than one shows the count. The tap opens their badges. If badges are switched off, the tile is not there.
+  - Messages: the number of unread conversations, the same number Moodle already uses. The tap opens messages. If messaging is switched off, the tile is not there.
+  - Courses: one course shows its name and opens it. More than one shows the count and opens the course list. No courses says "None".
+- Read aloud: each tile has a speaker button, and there is one button that reads the whole screen. Both use the browser's own speech, which does not need the internet. If the browser cannot speak, the buttons are not shown.
+- Look: glossy sky-blue glass tiles with rounded corners, matching the WolfWhale theme. Messages uses the indigo accent, Badges the teal accent, Due the yellow accent, and the speaker buttons the red accent. The icons are original drawings stored in the page. Nothing is loaded from another site.
+- The page does not store any personal data. It only reads what Moodle already stores for the signed-in person.
+- Folders touched: `public/local/wolfwhale/` (new), `NOTICE.md`, `WOLFWHALE_CHANGELOG.md`.
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/4

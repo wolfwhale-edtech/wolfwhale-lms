@@ -7,3 +7,7 @@ WolfWhale LMS stays licensed under GPL v3. The upstream license is in `COPYING.t
 "Moodle" is a trademark of Moodle Pty Ltd. The Moodle name is not used in WolfWhale branding.
 
 This baseline is Moodle v5.3.1, commit `cfe123f26fc7071981fe949cb16cd5a08a8234f1`, from https://github.com/moodle/moodle/releases/tag/v5.3.1.
+
+## Student home icons
+
+The icons on the student home (`public/local/wolfwhale/templates/home.mustache`) are original drawings by WolfWhale EdTech: a sun, a clock, a medal, a speech bubble, a book, and a speaker. They are part of WolfWhale LMS and are licensed under GPL v3 with the rest of the project. No icon font or icon service is used.
