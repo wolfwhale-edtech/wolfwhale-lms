@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['absent'] = 'Absent';
+$string['cannotview'] = 'This page is closed';
 $string['invalidstatus'] = 'Unknown status';
 $string['late'] = 'Late';
 $string['none'] = 'None';

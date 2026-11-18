@@ -159,3 +159,56 @@ Each later change gets its own entry with:
     - `styles.css`
     - `tests/attendance_test.php`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/5
+
+## WW-LMS-006 — Parent home
+
+- Date: 2026-11-18
+- Summary: A parent lands on a home of large picture tiles for one linked child. The tiles are Marks, Attendance, Due, Badges, Messages, and Report. Each tile uses that child's own courses, grades, attendance, assignments, and badges. If the parent is linked to more than one child, the children's names are buttons and one tap switches the whole screen. A parent who is also a teacher still lands on the teacher home. A child still lands on the student home.
+- How a parent is linked: an administrator or a teacher opens Parents and types the parent's username, then picks a child. That stores the parent role in the child's user context, which is the usual way one person is attached to another person. A teacher can link a student in a course they teach. A teacher cannot link a student in someone else's course. An administrator can link any real person. Unlink removes that same role assignment.
+- How a parent is recognised: they are signed in, they are not a guest, they are not a site administrator, and they hold the parent role in at least one other person's user context. A teacher is sent to the teacher home first.
+- What each tile shows, and where one tap goes:
+  - Marks: the course total when there is one course, or the count when there are several. The tap opens the courses and totals. A hidden mark is not shown. A course with grades switched off is not listed. Another child in the same course is not listed.
+  - Attendance: present, absent, or late from the attendance register when that plugin is installed. One mark shows the word. More than one shows the count. The tap opens the list. The plugin's take page is still only for a teacher. If the plugin is not installed, the tile is not there.
+  - Due: how many of the child's assignments are still ahead or overdue. A submitted assignment is not overdue. A hidden assignment the child cannot see is not listed. The tap opens the list.
+  - Badges: badges the child has earned that are visible to someone else. One badge shows its name. More than one shows the count. A badge the child has hidden is not listed. If badges are switched off, the tile is not there.
+  - Messages: how many of the child's teachers this parent can write to. The tap opens those teachers. Each name opens the site's own message screen. Nothing is sent from the home. If a teacher has blocked the parent, that teacher is not listed. If messaging is switched off, the tile is not there. When the site would otherwise refuse because the parent and the teacher share no course, the parent is added as that teacher's contact so the existing message rules allow the conversation. That contact is stored by the message system.
+  - Report: the current term. Term 1 is January through June. Term 2 is July through December. The tap opens a printable page for that term: the child's name, each course total, and the present, absent, and late counts for days inside the term. Print uses the browser's own print.
+- Read aloud: the parent home uses the same speaker buttons as the student home. They use the browser's own speech. If the browser cannot speak, the buttons are not shown. When there are several children, the read-aloud starts with the selected child's name.
+- Look: the same glossy sky-blue glass tiles. Marks uses the yellow accent, Attendance and Badges the teal accent, Due the yellow accent, Messages the indigo accent, Report the sky-blue accent, and the speaker buttons the red accent. The icons are original drawings stored in the page. Nothing is loaded from another site.
+- Weekly summary, email, and text updates are not built. No message of that kind is sent. A text provider has not been chosen, so there is no preference switch for one.
+- The parent pages do not add a table. The link is a role assignment, which the site already stores. Attendance marks stay in the attendance plugin. Message contacts stay in the message system.
+- This change is based on the teacher-home branch because the attendance tile reads `local_wwattendance`. It does not copy that plugin.
+- What was checked: PHPUnit for the parent data and the family separation, together with the student-home tests and the attendance tests, 27 tests and 210 assertions. The teacher-home tests were run as well, 13 tests and 127 assertions. A local site was installed and opened in a browser with made-up names. One parent has two children. Another parent has a different child. The first parent saw one child's mark, attendance, due count, badge, and term, then the other child's different mark, attendance, due count, and badge. The report showed that child's course total and attendance counts. The teacher link screen listed only that teacher's students.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the parent-home icons
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wolfwhale/version.php` — version raised to 2026111803
+  - `public/local/wolfwhale/index.php` — a parent who opens the student home is sent to the parent home
+  - `public/local/wolfwhale/classes/home.php` — a parent is not treated as a student
+  - `public/local/wolfwhale/classes/hook_callbacks.php` — login, dashboard, the bar link, and the Parents link
+  - `public/local/wolfwhale/classes/privacy/provider.php` — still no table of its own
+  - `public/local/wolfwhale/classes/teacher.php` — a parent who opens a teacher page is sent to the parent home
+  - `public/local/wolfwhale/classes/parents.php` — new, the parent-home data and the link rules
+  - `public/local/wolfwhale/db/access.php` — link a parent, for a manager and a teacher in a course
+  - `public/local/wolfwhale/db/install.php` — create the parent role
+  - `public/local/wolfwhale/db/upgrade.php` — the same role on an existing site
+  - `public/local/wolfwhale/parent.php` — the parent home
+  - `public/local/wolfwhale/parentmarks.php` — course totals
+  - `public/local/wolfwhale/parentattendance.php` — one child's attendance
+  - `public/local/wolfwhale/parentdue.php` — upcoming and overdue assignments
+  - `public/local/wolfwhale/parentbadges.php` — earned badges
+  - `public/local/wolfwhale/parentmessages.php` — the child's teachers
+  - `public/local/wolfwhale/reportcard.php` — the printable term summary
+  - `public/local/wolfwhale/linkparent.php` — link and unlink
+  - `public/local/wolfwhale/lang/en/local_wolfwhale.php` — the new words
+  - `public/local/wolfwhale/styles.css` — child buttons, the report, and the link screen
+  - `public/local/wolfwhale/templates/parent.mustache` — the parent home
+  - `public/local/wolfwhale/templates/children.mustache` — the child names
+  - `public/local/wolfwhale/templates/reportcard.mustache` — the report
+  - `public/local/wolfwhale/templates/link.mustache` — the link screen
+  - `public/local/wolfwhale/templates/list.mustache` — a row can be text when there is no address, and the child names can sit above a list
+  - `public/local/wolfwhale/tests/parents_test.php` — family separation and link rules
+  - `public/local/wwattendance/version.php` — version raised to 2026111801
+  - `public/local/wwattendance/classes/attendance.php` — a read of one person's marks, refused without the parent capability in that person's user context
+  - `public/local/wwattendance/lang/en/local_wwattendance.php` — the closed-page word
+  - `public/local/wwattendance/tests/attendance_test.php` — a teacher cannot use that read

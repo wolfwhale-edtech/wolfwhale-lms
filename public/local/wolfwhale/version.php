@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * WolfWhale home for students and teachers.
+ * WolfWhale home for students, teachers, and parents.
  *
  * @package    local_wolfwhale
  * @copyright  2026 WolfWhale EdTech
@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026111802;
+$plugin->version   = 2026111803;
 $plugin->requires  = 2026100200;
 $plugin->component = 'local_wolfwhale';

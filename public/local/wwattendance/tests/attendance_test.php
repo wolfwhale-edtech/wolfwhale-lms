@@ -285,4 +285,21 @@ final class attendance_test extends \advanced_testcase {
         $this->assertSame('0', (string) $session->takenby);
         $this->assertSame(1, $DB->count_records('local_wwattendance_log', ['sessionid' => $session->id]));
     }
+
+    /**
+     * A teacher can take attendance and still cannot use the single-person read.
+     */
+    public function test_parent_style_read_is_not_the_take_list(): void {
+        $this->resetAfterTest();
+        $teacher = $this->getDataGenerator()->create_user();
+        $student = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $this->setUser($teacher);
+        attendance::save((int) $course->id, [$student->id => attendance::PRESENT], 1700000000);
+        $this->assertFalse(attendance::can_view_user((int) $student->id));
+        $this->expectException(\moodle_exception::class);
+        attendance::records_for_user((int) $student->id);
+    }
 }

@@ -1,0 +1,59 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wolfwhale/link
+
+    Link a parent account to a child.
+}}
+<div class="ww-home ww-link">
+    {{#error}}
+    <p class="ww-row-word ww-row">{{error}}</p>
+    {{/error}}
+    {{#haschildren}}
+    <form method="post" action="">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <label class="ww-field">
+            <span class="ww-field-word">{{parent}}</span>
+            <input type="text" name="parentusername" autocomplete="off" required>
+        </label>
+        <label class="ww-field">
+            <span class="ww-field-word">{{child}}</span>
+            <select name="childid" required>
+                {{#children}}
+                <option value="{{id}}">{{name}}</option>
+                {{/children}}
+            </select>
+        </label>
+        <button type="submit" class="ww-submit" name="link" value="1">{{link}}</button>
+    </form>
+    {{/haschildren}}
+    {{^haschildren}}
+    <p class="ww-row-word ww-row ww-row-empty">{{none}}</p>
+    {{/haschildren}}
+    <div class="ww-list">
+        {{#links}}
+        <form method="post" action="" class="ww-link-row">
+            <input type="hidden" name="sesskey" value="{{sesskey}}">
+            <input type="hidden" name="parentid" value="{{parentid}}">
+            <input type="hidden" name="childid" value="{{childid}}">
+            <span class="ww-row-word">{{childname}}</span>
+            <span class="ww-row-fact">{{parentname}}</span>
+            <button type="submit" class="ww-submit ww-unlink" name="unlink" value="1">{{unlink}}</button>
+        </form>
+        {{/links}}
+    </div>
+</div>

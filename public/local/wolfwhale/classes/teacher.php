@@ -103,6 +103,9 @@ class teacher {
         global $USER;
 
         if (isguestuser() || !self::is_teacher((int) $USER->id)) {
+            if (parents::is_parent((int) $USER->id)) {
+                redirect(parents::url());
+            }
             if (home::is_student((int) $USER->id)) {
                 redirect(home::url());
             }

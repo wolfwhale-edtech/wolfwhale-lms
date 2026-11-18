@@ -41,6 +41,9 @@ class home {
         if ($userid <= 0 || isguestuser($userid) || is_siteadmin($userid)) {
             return false;
         }
+        if (parents::is_parent($userid)) {
+            return false;
+        }
 
         [$insql, $params] = $DB->get_in_or_equal(self::STAFF_ARCHETYPES, SQL_PARAMS_NAMED);
         $params['userid'] = $userid;

@@ -30,6 +30,9 @@ if (isguestuser() || !\local_wolfwhale\home::is_student((int) $USER->id)) {
     if (\local_wolfwhale\teacher::is_teacher((int) $USER->id)) {
         redirect(\local_wolfwhale\teacher::url());
     }
+    if (\local_wolfwhale\parents::is_parent((int) $USER->id)) {
+        redirect(\local_wolfwhale\parents::url());
+    }
     redirect(new moodle_url('/my/'));
 }
 

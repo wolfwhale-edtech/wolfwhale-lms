@@ -247,6 +247,62 @@ class attendance {
     }
 
     /**
+     * Whether the logged-in person may read this one person's attendance.
+     *
+     * The parent role is assigned in the person's own user context. That is the
+     * check. A course role is not enough, so a teacher still uses the take page.
+     *
+     * @param int $userid
+     * @return bool
+     */
+    public static function can_view_user(int $userid): bool {
+        if ($userid <= 0 || isguestuser($userid)) {
+            return false;
+        }
+        $context = \context_user::instance($userid, IGNORE_MISSING);
+        if (!$context) {
+            return false;
+        }
+        // grade:viewall is held by a manager everywhere, so it is not used here.
+        return has_capability('moodle/user:viewuseractivitiesreport', $context);
+    }
+
+    /**
+     * This person's marks, newest first.
+     *
+     * @param int $userid
+     * @param int|null $from Inclusive start, or null for no lower bound.
+     * @param int|null $until Inclusive end, or null for no upper bound.
+     * @return \stdClass[]
+     */
+    public static function records_for_user(int $userid, ?int $from = null, ?int $until = null): array {
+        global $DB;
+
+        if (!self::can_view_user($userid)) {
+            throw new \moodle_exception('cannotview', 'local_wwattendance');
+        }
+        $params = ['userid' => $userid];
+        $where = 'l.userid = :userid';
+        if ($from !== null) {
+            $where .= ' AND s.sessdate >= :fromtime';
+            $params['fromtime'] = $from;
+        }
+        if ($until !== null) {
+            $where .= ' AND s.sessdate <= :untiltime';
+            $params['untiltime'] = $until;
+        }
+        return $DB->get_records_sql(
+            "SELECT l.id, l.status, s.sessdate, s.courseid, c.fullname
+               FROM {local_wwattendance_log} l
+               JOIN {local_wwattendance_session} s ON s.id = l.sessionid
+               JOIN {course} c ON c.id = s.courseid
+              WHERE {$where}
+           ORDER BY s.sessdate DESC, c.fullname ASC",
+            $params
+        );
+    }
+
+    /**
      * Enrolled students without a permission check. Callers must already have checked.
      *
      * @param int $courseid
