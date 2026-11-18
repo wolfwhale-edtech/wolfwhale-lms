@@ -251,6 +251,112 @@ final class parents_test extends \advanced_testcase {
     }
 
     /**
+     * A due date override and a submitted team assignment are not left overdue.
+     */
+    public function test_due_follows_the_childs_override_and_team_submission(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        parents::install_role();
+        $parent = $this->getDataGenerator()->create_user();
+        $child = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($child->id, $course->id, 'student');
+        $past = time() - DAYSECS;
+        $future = time() + WEEKSECS;
+        $moved = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Moved essay',
+            'duedate' => $past,
+        ]);
+        $onlyoverride = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Override only',
+            'duedate' => 0,
+        ]);
+        $team = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Team essay',
+            'duedate' => $past,
+            'teamsubmission' => 1,
+        ]);
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $group->id, 'userid' => $child->id]);
+        $DB->insert_record('assign_overrides', (object) [
+            'assignid' => $moved->id,
+            'userid' => $child->id,
+            'sortorder' => 1,
+            'duedate' => $future,
+            'reasonformat' => FORMAT_PLAIN,
+        ]);
+        $DB->insert_record('assign_overrides', (object) [
+            'assignid' => $onlyoverride->id,
+            'userid' => $child->id,
+            'sortorder' => 1,
+            'duedate' => $future,
+            'reasonformat' => FORMAT_PLAIN,
+        ]);
+        $DB->insert_record('assign_submission', (object) [
+            'assignment' => $team->id,
+            'userid' => 0,
+            'groupid' => $group->id,
+            'timecreated' => $past,
+            'timemodified' => $past,
+            'status' => 'submitted',
+            'attemptnumber' => 0,
+            'latest' => 1,
+        ]);
+        parents::link((int) $parent->id, (int) $child->id);
+
+        $this->setUser($parent);
+        $due = json_encode(parents::due_rows((int) $child->id));
+        $this->assertStringContainsString('Moved essay', $due);
+        $this->assertStringContainsString('Override only', $due);
+        $this->assertStringNotContainsString('Overdue', $due);
+        $this->assertStringNotContainsString('Team essay', $due);
+    }
+
+    /**
+     * A course total that includes a hidden mark is not shown as the raw sum.
+     */
+    public function test_hidden_marks_are_left_out_of_the_course_total(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        parents::install_role();
+        set_config('grade_report_overview_showtotalsifcontainhidden', GRADE_REPORT_HIDE_TOTAL_IF_CONTAINS_HIDDEN);
+        $parent = $this->getDataGenerator()->create_user();
+        $child = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['showgrades' => 1]);
+        $this->getDataGenerator()->enrol_user($child->id, $course->id, 'student');
+        $shown = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Shown essay',
+        ]);
+        $secret = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'Secret essay',
+        ]);
+        $this->give_grade((int) $course->id, (int) $shown->id, (int) $child->id, 40);
+        $this->give_grade((int) $course->id, (int) $secret->id, (int) $child->id, 50);
+        $hidden = \grade_item::fetch([
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $secret->id,
+            'courseid' => $course->id,
+        ]);
+        $hidden->set_hidden(1);
+        grade_regrade_final_grades($course->id);
+        parents::link((int) $parent->id, (int) $child->id);
+
+        $this->setUser($parent);
+        $marks = json_encode(parents::marks_rows((int) $child->id));
+        $this->assertStringContainsString('None', $marks);
+        $this->assertStringNotContainsString('90', $marks);
+        $this->assertStringNotContainsString('50', $marks);
+    }
+
+    /**
      * Two families, a shared sibling pair, and one child in another course.
      *
      * @return array

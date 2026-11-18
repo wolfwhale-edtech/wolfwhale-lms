@@ -315,62 +315,47 @@ class parents {
     /**
      * Upcoming and overdue assignments for one linked child.
      *
+     * The date is the child's own date: a user or group override, then an
+     * extension when that is later. A team assignment is submitted when the
+     * group's submission is submitted.
+     *
      * @param int $childid
      * @return array[]
      */
     public static function due_rows(int $childid): array {
-        global $DB;
+        global $CFG;
 
         $courses = self::child_courses($childid);
         if (!$courses) {
             return [];
         }
-        $courseids = [];
-        $names = [];
-        foreach ($courses as $course) {
-            $courseids[] = (int) $course->id;
-            $names[(int) $course->id] = self::plain($course->fullname);
-        }
-        [$insql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
-        $params['child1'] = $childid;
-        $params['child2'] = $childid;
-        $assigns = $DB->get_records_sql(
-            "SELECT a.id, a.name, a.duedate, a.course, cm.id AS cmid,
-                    uf.extensionduedate, sub.status AS submissionstatus
-               FROM {assign} a
-               JOIN {course_modules} cm ON cm.instance = a.id AND cm.course = a.course
-               JOIN {modules} m ON m.id = cm.module AND m.name = 'assign'
-               LEFT JOIN {assign_user_flags} uf ON uf.assignment = a.id AND uf.userid = :child1
-               LEFT JOIN {assign_submission} sub
-                      ON sub.assignment = a.id AND sub.userid = :child2 AND sub.latest = 1
-              WHERE a.course {$insql}
-                AND cm.deletioninprogress = 0
-                AND a.duedate > 0",
-            $params
-        );
-        $bycourse = [];
-        foreach ($assigns as $assign) {
-            $bycourse[(int) $assign->course][] = $assign;
-        }
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
         $items = [];
         $now = time();
-        foreach ($bycourse as $courseid => $courseassigns) {
-            $modinfo = get_fast_modinfo($courseid, $childid);
-            foreach ($courseassigns as $assign) {
-                try {
-                    $cm = $modinfo->get_cm((int) $assign->cmid);
-                } catch (\moodle_exception $e) {
+        foreach ($courses as $course) {
+            $modinfo = get_fast_modinfo($course->id, $childid);
+            foreach ($modinfo->get_instances_of('assign') as $cm) {
+                if (!$cm->uservisible || !empty($cm->deletioninprogress)) {
                     continue;
                 }
-                if (!$cm->uservisible) {
+                $context = \context_module::instance($cm->id);
+                $assign = new \assign($context, $cm, $course);
+                $assign->update_effective_access($childid);
+                $instance = $assign->get_instance($childid);
+                $due = (int) $instance->duedate;
+                $flags = $assign->get_user_flags($childid, false);
+                if ($flags && !empty($flags->extensionduedate) && (int) $flags->extensionduedate > $due) {
+                    $due = (int) $flags->extensionduedate;
+                }
+                if ($due <= 0) {
                     continue;
                 }
-                $due = (int) $assign->duedate;
-                $extension = (int) ($assign->extensionduedate ?? 0);
-                if ($extension > $due) {
-                    $due = $extension;
+                if (!empty($instance->teamsubmission)) {
+                    $submission = $assign->get_group_submission($childid, 0, false);
+                } else {
+                    $submission = $assign->get_user_submission($childid, false);
                 }
-                $submitted = (string) ($assign->submissionstatus ?? '') === 'submitted';
+                $submitted = $submission && $submission->status === ASSIGN_SUBMISSION_STATUS_SUBMITTED;
                 if ($due >= $now) {
                     $overdue = false;
                     $fact = userdate($due, get_string('strftimedateshort', 'langconfig'));
@@ -384,9 +369,9 @@ class parents {
                     'overdue' => $overdue,
                     'due' => $due,
                     'row' => self::row(
-                        self::plain($assign->name),
+                        self::plain($cm->name),
                         self::plain($fact),
-                        $names[$courseid] ?? '',
+                        self::plain($course->fullname),
                         ''
                     ),
                 ];
@@ -975,20 +960,47 @@ class parents {
         if (!\grade_report_overview::check_access($system, $coursecontext, $personal, $course, $childid)) {
             return null;
         }
-        grade_regrade_final_grades($course->id);
-        $item = \grade_item::fetch_course_item($course->id);
-        if (!$item) {
+        $grades = self::overview_course_grades($childid);
+        if (!isset($grades[$course->id]) || $grades[$course->id]['finalgrade'] === null) {
             return get_string('none', 'local_wolfwhale');
         }
-        $grade = \grade_grade::fetch(['itemid' => $item->id, 'userid' => $childid]);
-        if (!$grade || $grade->finalgrade === null) {
-            return get_string('none', 'local_wolfwhale');
-        }
-        if ($grade->is_hidden() && !has_capability('moodle/grade:viewhidden', $coursecontext)) {
-            return get_string('none', 'local_wolfwhale');
-        }
-        $text = self::plain(grade_format_gradevalue((float) $grade->finalgrade, $item, true, GRADE_DISPLAY_TYPE_REAL));
+        $item = $grades[$course->id]['courseitem'];
+        $text = self::plain(grade_format_gradevalue(
+            (float) $grades[$course->id]['finalgrade'],
+            $item,
+            true,
+            GRADE_DISPLAY_TYPE_REAL
+        ));
         return $text === '' ? get_string('none', 'local_wolfwhale') : $text;
+    }
+
+    /**
+     * Course totals for one child, after the grade report has removed hidden parts.
+     *
+     * The overview report blanks a total that contains a hidden mark, or rebuilds
+     * it without those marks, using the course's own setting.
+     *
+     * @param int $childid
+     * @return array
+     */
+    private static function overview_course_grades(int $childid): array {
+        global $COURSE;
+
+        if (empty($COURSE->id)) {
+            $COURSE = get_course(SITEID);
+        }
+        $gpr = new \grade_plugin_return([
+            'type' => 'report',
+            'plugin' => 'overview',
+            'courseid' => SITEID,
+            'userid' => $childid,
+            'groupid' => 0,
+        ]);
+        $report = new \grade_report_overview($childid, $gpr, \context_course::instance(SITEID));
+        foreach ($report->courses as $course) {
+            grade_regrade_final_grades($course->id);
+        }
+        return $report->setup_courses_data(true);
     }
 
     /**
