@@ -108,4 +108,4 @@ Each later change gets its own entry with:
 - Look: glossy sky-blue glass tiles with rounded corners, matching the WolfWhale theme. Messages uses the indigo accent, Badges the teal accent, Due the yellow accent, and the speaker buttons the red accent. The icons are original drawings stored in the page. Nothing is loaded from another site.
 - The page does not store any personal data. It only reads what Moodle already stores for the signed-in person.
 - Folders touched: `public/local/wolfwhale/` (new), `NOTICE.md`, `WOLFWHALE_CHANGELOG.md`.
-- Pull request: opened with this change.
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/4
