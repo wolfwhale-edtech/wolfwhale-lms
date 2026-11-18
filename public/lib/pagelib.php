@@ -1448,8 +1448,8 @@ class moodle_page {
             }
             $site = get_site();
             if (empty(trim($site->{$sitenamedisplay} ?? ''))) {
-                // If for some reason the site name is not yet set, fall back to 'Moodle'.
-                $title .= self::TITLE_SEPARATOR . 'Moodle';
+                // If for some reason the site name is not yet set, fall back to the product name.
+                $title .= self::TITLE_SEPARATOR . 'WolfWhale';
             } else {
                 $title .= self::TITLE_SEPARATOR . format_string($site->{$sitenamedisplay});
             }

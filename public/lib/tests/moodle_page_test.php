@@ -380,7 +380,7 @@ final class moodle_page_test extends \advanced_testcase {
                 // Simulate site fullname and shortname being empty for any reason.
                 $SITE->fullname = null;
                 $SITE->shortname = null;
-                $expectedtitle = $title . moodle_page::TITLE_SEPARATOR . 'Moodle';
+                $expectedtitle = $title . moodle_page::TITLE_SEPARATOR . 'WolfWhale';
             }
         } else {
             $expectedtitle = $title;

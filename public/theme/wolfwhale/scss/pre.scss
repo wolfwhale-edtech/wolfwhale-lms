@@ -1,0 +1,13 @@
+// WolfWhale tokens, set before Boost's preset so $primary wins over its !default.
+
+// Sky blue used for the main action. Dark enough for white text if a later rule does not restyle the button.
+$primary: #145a7a;
+
+// Wordmark colour from the WolfWhale brief.
+$ww-wordmark: #2f5d8a;
+
+// Foundation accents. Exposed as variables and not painted across the page.
+$ww-accent-accessibility: #d64545;
+$ww-accent-communication: #3d4db8;
+$ww-accent-gamification: #149a9a;
+$ww-accent-sovereignty: #e6b325;
