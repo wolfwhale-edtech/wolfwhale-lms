@@ -41,9 +41,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $CFG->enablecompletion = true;
         $user = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
                                                              array('completion' => 1));
-        $cm = get_coursemodule_from_id('data', $data->cmid);
+        $cm = get_coursemodule_from_id('page', $data->cmid);
 
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
@@ -94,7 +94,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                                                                     'groupmodeforce' => 1));
         \availability_completion\condition::wipe_static_cache();
 
-        $data = $this->getDataGenerator()->create_module('data',
+        $data = $this->getDataGenerator()->create_module('page',
             ['course' => $course->id],
             ['completion' => COMPLETION_TRACKING_MANUAL],
         );
@@ -123,7 +123,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $page = $this->getDataGenerator()->create_module('page',  array('course' => $course->id),
                                                             array('completion' => 1, 'visible' => 0));
 
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
         $cmforum = get_coursemodule_from_id('forum', $forum->cmid);
         $cmforumautocompletion = get_coursemodule_from_id('forum', $forumautocompletion->cmid);
 
@@ -206,7 +206,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                     $this->assertEquals($name, $details[$index]['rulename']);
                     $this->assertEquals(0, $details[$index]['rulevalue']['status']);
                 }
-            } else if ($status['cmid'] == $data->cmid and $status['modname'] == 'data' and $status['instance'] == $data->id) {
+            } else if ($status['cmid'] == $data->cmid and $status['modname'] == 'page' and $status['instance'] == $data->id) {
                 $activitiesfound++;
                 $this->assertEquals(COMPLETION_INCOMPLETE, $status['state']);
                 $this->assertEquals(COMPLETION_TRACKING_MANUAL, $status['tracking']);
@@ -324,10 +324,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
 
         // Create 2 activities, one with manual completion (data), one with automatic completion triggered by viewing it (forum).
-        $data    = $this->getDataGenerator()->create_module('data', ['course' => $course->id], ['completion' => 1]);
+        $data    = $this->getDataGenerator()->create_module('page', ['course' => $course->id], ['completion' => 1]);
         $forum   = $this->getDataGenerator()->create_module('forum',  ['course' => $course->id],
                                                             ['completion' => 2, 'completionview' => 1]);
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
         $cmforum = get_coursemodule_from_id('forum', $forum->cmid);
 
         // Manually complete the data activity as the student.
@@ -612,13 +612,13 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                                                                     'groupmode' => SEPARATEGROUPS,
                                                                     'groupmodeforce' => 1));
 
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $course->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $course->id),
                                                              array('completion' => 1));
         $forum = $this->getDataGenerator()->create_module('forum',  array('course' => $course->id),
                                                              array('completion' => 1));
         $assign = $this->getDataGenerator()->create_module('assign',  array('course' => $course->id));
 
-        $cmdata = get_coursemodule_from_id('data', $data->cmid);
+        $cmdata = get_coursemodule_from_id('page', $data->cmid);
         $cmforum = get_coursemodule_from_id('forum', $forum->cmid);
 
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));

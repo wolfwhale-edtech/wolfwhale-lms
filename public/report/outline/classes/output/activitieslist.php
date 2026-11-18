@@ -34,7 +34,6 @@ class activitieslist extends coursestructure {
      * @param array $views Views information for activity and users.
      * @param bool $showlastaccess Whether the last access should be shown or not.
      * @param int $minlog The minimum log time is computed.
-     * @param bool $showblogs Whether related blog entries should be shown or not.
      */
     public function __construct(
             course_modinfo $modinfo,
@@ -44,8 +43,6 @@ class activitieslist extends coursestructure {
             protected bool $showlastaccess = true,
             /** @var int $minlog The minimum log time is computed. */
             protected int $minlog = 0,
-            /** @var bool $showblogs Whether related blog entries should be shown or not. */
-            protected bool $showblogs = true,
     ) {
         $this->modinfo = $modinfo;
     }
@@ -77,10 +74,6 @@ class activitieslist extends coursestructure {
         $headers = parent::export_headers($output);
         $headers[] = get_string('views');
 
-        if ($this->showblogs) {
-            $headers[] = get_string('relatedblogentries', 'blog');
-        }
-
         if ($this->showlastaccess) {
             $headers[] = get_string('lastaccess');
         }
@@ -97,8 +90,6 @@ class activitieslist extends coursestructure {
      * @return array
      */
     public function export_activity_data(\renderer_base $output, \cm_info $cm, bool $indelegated = false): array {
-        global $CFG;
-
         $data = parent::export_activity_data($output, $cm, $indelegated);
         if (empty($data) || !in_array('cells', $data)) {
             return [];
@@ -114,18 +105,6 @@ class activitieslist extends coursestructure {
             'activityclass' => 'numviews',
             'text' => $numviewscell,
         ];
-
-        if ($this->showblogs) {
-            $cell = ['activityclass' => 'blog'];
-            require_once($CFG->dirroot.'/blog/lib.php');
-            if ($blogcount = blog_get_associated_count($cm->get_course()->id, $cm->id)) {
-                $blogurl = new \moodle_url('/blog/index.php', ['modid' => $cm->id]);
-                $cell['link']  = new \action_link($blogurl, $blogcount);
-            } else {
-                $cell['text'] = '-';
-            }
-            $data['cells'][] = $cell;
-        }
 
         if ($this->showlastaccess) {
             if (isset($this->views[$cm->id]->lasttime)) {

@@ -40,6 +40,7 @@ final class custom_report_details_exporter_test extends advanced_testcase {
         global $PAGE;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         /** @var core_customfield_generator $generator */

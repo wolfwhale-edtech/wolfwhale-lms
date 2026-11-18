@@ -17,14 +17,12 @@ Feature: Restrict activities availability
     And the following "activities" exist:
       | activity | course | name             |
       | assign   | C1     | Test assign name |
-    And I enable "bigbluebuttonbn" "mod" plugin
-
   Scenario: Activities can be added with the default permissions
     Given I log in as "teacher1"
-    When I add a glossary activity to course "Course 1" section "1" and I fill the form with:
-      | Name | Test glossary name |
-      | Description | Test glossary description |
-    Then I should see "Test glossary name"
+    When I add a page activity to course "Course 1" section "1" and I fill the form with:
+      | Name | Test page name |
+      | Description | Test page description |
+    Then I should see "Test page name"
     And I should see "Test assign name"
 
   @javascript
@@ -40,22 +38,12 @@ Feature: Restrict activities availability
     Examples:
       | activityrole                    | activitytype         |
       | mod/assign:addinstance          | Assignment           |
-      | mod/bigbluebuttonbn:addinstance | BigBlueButton        |
       | mod/book:addinstance            | Book                 |
-      | mod/choice:addinstance          | Choice               |
-      | mod/data:addinstance            | Database             |
-      | mod/feedback:addinstance        | Feedback             |
       | mod/folder:addinstance          | Folder               |
       | mod/forum:addinstance           | Forum                |
-      | mod/glossary:addinstance        | Glossary             |
       | mod/h5pactivity:addinstance     | H5P                  |
-      | mod/imscp:addinstance           | IMS content package |
       | mod/label:addinstance           | Text and media area  |
-      | mod/lesson:addinstance          | Lesson               |
       | mod/page:addinstance            | Page                 |
       | mod/quiz:addinstance            | Quiz                 |
       | mod/resource:addinstance        | File                 |
-      | mod/scorm:addinstance           | SCORM package        |
       | mod/url:addinstance             | URL                  |
-      | mod/wiki:addinstance            | Wiki                 |
-      | mod/workshop:addinstance        | Workshop             |

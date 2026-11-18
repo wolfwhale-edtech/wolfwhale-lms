@@ -228,6 +228,7 @@ final class cmactions_test extends \advanced_testcase {
         global $DB, $USER;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         // Generate an assignment with due date (will generate a course event).
@@ -241,23 +242,6 @@ final class cmactions_test extends \advanced_testcase {
         $cm = $DB->get_record('course_modules', ['id' => $module->cmid]);
         $this->assertInstanceOf('context_module', $modcontext);
         $this->assertEquals(1, $DB->count_records('event', ['instance' => $module->id, 'modulename' => 'assign']));
-
-        // Create blog entry associated to the module.
-        /** @var \core_blog_generator $blogsgenerator */
-        $blogsgenerator = $this->getDataGenerator()->get_plugin_generator('core_blog');
-        $user = $this->getDataGenerator()->create_and_enrol($course, 'student');
-        $blogentry = $blogsgenerator->create_entry([
-            'publishstate' => 'site',
-            'userid' => $user->id,
-            'subject' => 'My blog',
-            'summary' => 'Animals',
-            'tags' => ['cat', 'fish'],
-            'courseid' => $course->id,
-        ]);
-        $blogentry->add_association($modcontext->id);
-        $this->assertEquals(1, $DB->count_records('post', ['id' => $blogentry->id]));
-        $this->assertEquals(1, $DB->count_records('blog_association', ['contextid' => $modcontext->id]));
-        $this->assertEquals(2, $DB->count_records('tag_instance', ['itemid' => $blogentry->id]));
 
         // Completion data.
         $completion = new \completion_info($course);
@@ -287,15 +271,6 @@ final class cmactions_test extends \advanced_testcase {
 
         // Verify the course_modules_completion record has been deleted.
         $this->assertEmpty($DB->count_records('course_modules_completion', ['coursemoduleid' => $module->cmid]));
-
-        // Verify the blog_association record has been deleted.
-        $this->assertEmpty($DB->count_records('blog_association', ['contextid' => $modcontext->id]));
-
-        // Verify the blog post record has been deleted.
-        $this->assertEmpty($DB->count_records('post', ['id' => $blogentry->id]));
-
-        // Verify the tag instance record has been deleted.
-        $this->assertEmpty($DB->count_records('tag_instance', ['itemid' => $blogentry->id]));
 
         // Verify events have been removed.
         $this->assertEmpty($DB->count_records('event', ['instance' => $module->id, 'modulename' => 'assign']));

@@ -562,11 +562,10 @@ final class event_vault_test extends \advanced_testcase {
         $user2 = $this->getDataGenerator()->create_user();
         $course = $this->getDataGenerator()->create_course();
         $this->setAdminuser();
-        $lesson = $this->getDataGenerator()->create_module('lesson', [
+        $lesson = $this->getDataGenerator()->create_module('assign', [
                 'name' => 'Lesson 1',
                 'course' => $course->id,
-                'available' => time(),
-                'deadline' => (time() + (60 * 60 * 24 * 5))
+                'duedate' => (time() + (60 * 60 * 24 * 5)),
             ]
         );
         $this->getDataGenerator()->enrol_user($user1->id, $course->id, null, 'manual', 0, 0, ENROL_USER_SUSPENDED);
@@ -580,7 +579,7 @@ final class event_vault_test extends \advanced_testcase {
         $this->assertEmpty($user1events);
         $user2events = $vault->get_action_events_by_timesort($user2, null, null, null, 20, true);
         $this->assertCount(1, $user2events);
-        $this->assertEquals('Lesson 1 closes', $user2events[0]->get_name());
+        $this->assertEquals('Lesson 1 is due', $user2events[0]->get_name());
     }
 
     /**

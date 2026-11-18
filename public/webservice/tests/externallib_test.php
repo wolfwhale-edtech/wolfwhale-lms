@@ -124,7 +124,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->assertEquals(1, $siteinfo['downloadfiles']);
         $this->assertEquals(1, $siteinfo['uploadfiles']);
 
-        $this->assertCount(12, $siteinfo['advancedfeatures']);
+        $this->assertCount(10, $siteinfo['advancedfeatures']);
         foreach ($siteinfo['advancedfeatures'] as $feature) {
             if ($feature['name'] == 'mnet_dispatcher_mode') {
                 if ($CFG->mnet_dispatcher_mode == 'off') {

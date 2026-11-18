@@ -51,7 +51,7 @@ final class lib_test extends \advanced_testcase {
         $this->getDataGenerator()->enrol_user($user->id, $course->id);
 
         $sink = $this->redirectEvents();
-        groups_add_member($group->id, $user->id, 'mod_workshop', '123');
+        groups_add_member($group->id, $user->id, 'mod_assign', '123');
         $events = $sink->get_events();
         $this->assertCount(1, $events);
         $event = reset($events);

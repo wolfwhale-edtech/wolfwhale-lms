@@ -535,26 +535,8 @@ function set_moduleinfo_defaults($moduleinfo) {
         $moduleinfo->section = 0;
     }
 
-    // Enable AI tools by default.
     if (!isset($moduleinfo->enableaitools)) {
         $moduleinfo->enableaitools = null;
-    }
-
-    $enabledaiactions = [];
-    // Get and check for enabled AI actions in enabled placements.
-    $aiactions = \core_ai\manager::get_placement_actions_available($PAGE->context, false);
-    foreach ($aiactions as $action) {
-        $value = 0;
-        $actionname = "action-" . $action['action'];
-        if (!empty($moduleinfo->{$actionname})) {
-            $value = 1;
-        }
-        $enabledaiactions[$action['action']] = $value;
-    }
-
-    // Set enabledaiactions for the activity.
-    if (!empty($enabledaiactions)) {
-        $moduleinfo->enabledaiactions = json_encode($enabledaiactions);
     }
 
     return $moduleinfo;

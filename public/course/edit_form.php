@@ -415,18 +415,6 @@ class course_edit_form extends moodleform {
                     array('itemtype' => 'course', 'component' => 'core'));
         }
 
-        // Add AI tools section when an AI placement is available.
-        $aimanager = \core\di::get(core_ai\manager::class);
-        $providerenabled = $aimanager->get_provider_instances(['enabled' => 1]);
-        $placements = $coursecontext ? $aimanager::get_placements_available_in_context($coursecontext) :
-            $aimanager::get_enabled_placements();
-        if ($placements && $providerenabled) {
-            $mform->addElement('header', 'aitoolshdr', get_string('aitools', 'ai'));
-            $mform->addElement('selectyesno', 'enableaitools', get_string('enableaitoolsincourse', 'ai'));
-            $mform->setDefault('enableaitools', $course->enableaitools ?? 1);
-            $mform->addElement('static', 'aitoolsincoursedesc', '', get_string('aitoolsincoursedesc', 'ai'));
-        }
-
         // Add custom fields to the form.
         $handler = core_course\customfield\course_handler::create();
         $handler->set_parent_context($categorycontext); // For course handler only.
@@ -449,16 +437,6 @@ class course_edit_form extends moodleform {
 
         $mform->addElement('hidden', 'id', null);
         $mform->setType('id', PARAM_INT);
-
-        // Communication api call to set the communication data in the form for handling actions for group feature changes.
-        // We only need to set the data for courses already created.
-        if (!empty($course->id)) {
-            $communication = core_communication\helper::load_by_course(
-                courseid: $course->id,
-                context: $coursecontext,
-            );
-            $communication->set_data($course);
-        }
 
         // Prepare custom fields data.
         $handler->instance_form_before_set_data($course);

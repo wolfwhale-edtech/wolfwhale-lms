@@ -43,6 +43,7 @@ final class users_test extends core_reportbuilder_testcase {
      */
     public function test_datasource_default(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $user = $this->getDataGenerator()->create_user(['firstname' => 'Zoe', 'lastname' => 'Zebra']);
 
@@ -87,6 +88,7 @@ final class users_test extends core_reportbuilder_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $course = $this->getDataGenerator()->create_course();
         $user = $this->getDataGenerator()->create_and_enrol($course, 'student', ['firstname' => 'Zoe', 'lastname' => 'Zebra']);
@@ -313,6 +315,7 @@ final class users_test extends core_reportbuilder_testcase {
     #[\PHPUnit\Framework\Attributes\DataProvider('datasource_filters_provider')]
     public function test_datasource_filters(string $filtername, array $filtervalues, bool $expectmatch): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $course = $this->getDataGenerator()->create_course(['fullname' => 'Course 1']);
         $user = $this->getDataGenerator()->create_and_enrol($course, 'student', ['firstname' => 'Zoe', 'lastname' => 'Zebra']);

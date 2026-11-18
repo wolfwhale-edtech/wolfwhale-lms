@@ -197,19 +197,19 @@ final class outputrequirementslib_test extends \advanced_testcase {
                 $wwwroot . '/lib/javascript.php?rev=1&jsfile=%2Fh5p%2Fjs%2Fembed.js'
             ],
             'A custom Moodle CSS Handler' => [
-                new \moodle_url('/mod/data/css.php?d=1234567890'),
+                new \moodle_url('/mod/forum/view.php?d=1234567890'),
                 1,
-                $wwwroot . '/mod/data/css.php?d=1234567890'
+                $wwwroot . '/mod/forum/view.php?d=1234567890'
             ],
             'A custom Moodle JS Handler (slasharguments on)' => [
-                new \moodle_url('/mod/data/js.php?d=1234567890'),
+                new \moodle_url('/mod/forum/index.php?d=1234567890'),
                 1,
-                $wwwroot . '/mod/data/js.php?d=1234567890'
+                $wwwroot . '/mod/forum/index.php?d=1234567890'
             ],
             'A custom Moodle JS Handler (slasharguments off)' => [
-                new \moodle_url('/mod/data/js.php?d=1234567890'),
+                new \moodle_url('/mod/forum/index.php?d=1234567890'),
                 0,
-                $wwwroot . '/mod/data/js.php?d=1234567890'
+                $wwwroot . '/mod/forum/index.php?d=1234567890'
             ],
         ];
     }
@@ -257,19 +257,19 @@ final class outputrequirementslib_test extends \advanced_testcase {
                 $wwwroot . $admin . 'environment.xml'
             ],
             'Data JS' => [
-                '/mod/data/data.js',
+                '/mod/forum/amd/src/selectors.js',
                 1,
-                $wwwroot . '/lib/javascript.php/1/mod/data/data.js'
+                $wwwroot . '/lib/javascript.php/1/mod/forum/amd/src/selectors.js'
             ],
             'SCORM Request JS' => [
-                '/mod/scorm/request.js',
+                '/mod/forum/amd/src/repository.js',
                 1,
-                $wwwroot . '/lib/javascript.php/1/mod/scorm/request.js'
+                $wwwroot . '/lib/javascript.php/1/mod/forum/amd/src/repository.js'
             ],
             'Wiki Editors Buttons JS' => [
-                '/mod/wiki/editors/wiki/buttons.js',
+                '/mod/forum/amd/src/posts_list.js',
                 1,
-                $wwwroot . '/lib/javascript.php/1/mod/wiki/editors/wiki/buttons.js'
+                $wwwroot . '/lib/javascript.php/1/mod/forum/amd/src/posts_list.js'
             ],
             'A non-JS internal resource' => [
                 '/theme/boost/pix/favicon.ico',
@@ -277,19 +277,19 @@ final class outputrequirementslib_test extends \advanced_testcase {
                 $wwwroot . '/theme/boost/pix/favicon.ico'
             ],
             'A custom Moodle CSS Handler' => [
-                '/mod/data/css.php?d=1234567890',
+                '/mod/forum/view.php?d=1234567890',
                 1,
-                $wwwroot . '/mod/data/css.php?d=1234567890'
+                $wwwroot . '/mod/forum/view.php?d=1234567890'
             ],
             'A custom Moodle JS Handler (slasharguments on)' => [
-                '/mod/data/js.php?d=1234567890',
+                '/mod/forum/index.php?d=1234567890',
                 1,
-                $wwwroot . '/mod/data/js.php?d=1234567890'
+                $wwwroot . '/mod/forum/index.php?d=1234567890'
             ],
             'A custom Moodle JS Handler (slasharguments off)' => [
-                '/mod/data/js.php?d=1234567890',
+                '/mod/forum/index.php?d=1234567890',
                 0,
-                $wwwroot . '/mod/data/js.php?d=1234567890'
+                $wwwroot . '/mod/forum/index.php?d=1234567890'
             ],
         ];
     }

@@ -792,7 +792,7 @@ final class plugin_manager_test extends \advanced_testcase {
         return [
             [
                 'mod',
-                ['forum', 'assign', 'book', 'choice'],
+                ['forum', 'assign', 'book', 'page'],
             ],
             [
                 'block',

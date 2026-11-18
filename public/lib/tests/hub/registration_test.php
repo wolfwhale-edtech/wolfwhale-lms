@@ -102,7 +102,7 @@ final class registration_test extends \advanced_testcase {
         $generator->create_block('online_users');
 
         // Disabled a plugin.
-        $DB->set_field('modules', 'visible', 0, ['name' => 'feedback']);
+        $DB->set_field('modules', 'visible', 0, ['name' => 'page']);
         \core_plugin_manager::reset_caches();
 
         // Check our plugin usage counts and enabled states are correct.
@@ -110,7 +110,7 @@ final class registration_test extends \advanced_testcase {
         $this->assertEquals(3, $pluginusage['mod']['assign']['count']);
         $this->assertEquals(2, $pluginusage['mod']['quiz']['count']);
         $this->assertEquals(4, $pluginusage['block']['online_users']['count']);
-        $this->assertEquals(0, $pluginusage['mod']['feedback']['enabled']);
+        $this->assertEquals(0, $pluginusage['mod']['page']['enabled']);
         $this->assertEquals(1, $pluginusage['mod']['assign']['enabled']);
     }
 
@@ -120,29 +120,8 @@ final class registration_test extends \advanced_testcase {
     public function test_get_ai_usage(): void {
         $this->resetAfterTest();
 
-        $clock = $this->mock_clock_with_frozen(1700000000);
-        $this->generate_ai_usage_data();
-
-        // Get our site info and check the expected calculations are correct.
         $siteinfo = registration::get_site_info();
-        $aisuage = json_decode($siteinfo['aiusage']);
-        // Check generated text.
-        $this->assertEquals(1, $aisuage->aiprovider_openai->generate_text->success_count);
-        $this->assertEquals(0, $aisuage->aiprovider_openai->generate_text->fail_count);
-        // Check generated images.
-        $this->assertEquals(2, $aisuage->aiprovider_openai->generate_image->success_count);
-        $this->assertEquals(3, $aisuage->aiprovider_openai->generate_image->fail_count);
-        $this->assertEquals(15, $aisuage->aiprovider_openai->generate_image->average_time);
-        $this->assertEquals(403, $aisuage->aiprovider_openai->generate_image->predominant_error);
-        // Check time range is set correctly.
-        $this->assertEquals($clock->time() - WEEKSECS, $aisuage->time_range->timefrom);
-        $this->assertEquals($clock->time(), $aisuage->time_range->timeto);
-        // Check model counts.
-        $gpt4omodel = 'gpt-4o';
-        $dalle3model = 'dall-e-3';
-        $this->assertEquals(1, $aisuage->aiprovider_openai->generate_text->models->{$gpt4omodel}->count);
-        $this->assertEquals(2, $aisuage->aiprovider_openai->generate_image->models->{$dalle3model}->count);
-        $this->assertEquals(3, $aisuage->aiprovider_openai->generate_image->models->unknown->count);
+        $this->assertSame('', $siteinfo['aiusage']);
     }
 
     /**
@@ -198,31 +177,8 @@ final class registration_test extends \advanced_testcase {
     public function test_show_ai_usage(): void {
         $this->resetAfterTest();
 
-        // Init the registration class.
         $registration = new registration();
-
-        // There should be no data to show yet.
-        $aisuagedata = $registration->show_ai_usage();
-        $this->assertTrue(empty($aisuagedata));
-
-        // After generating some data, there should now be some data to show.
-        $this->generate_ai_usage_data();
-        $aisuagedata = $registration->show_ai_usage();
-        $this->assertTrue(!empty($aisuagedata));
-
-        foreach ($aisuagedata['providers'] as $provider) {
-            $this->assertEquals('OpenAI API provider', $provider['providername']);
-            $this->assertTrue(!empty($provider['aiactions']));
-
-            foreach ($provider['aiactions'] as $action) {
-                $actionname = $action['actionname'];
-                $this->assertTrue(!empty($actionname));
-            }
-        }
-
-        $timerange = $aisuagedata['timerange'];
-        $this->assertEquals(get_string('time_range', 'hub'), $timerange['label']);
-        $this->assertTrue(!empty($timerange['values']));
+        $this->assertSame([], $registration->show_ai_usage());
     }
 
     /**

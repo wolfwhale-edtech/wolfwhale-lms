@@ -38,6 +38,12 @@ require_once("{$CFG->dirroot}/reportbuilder/lib.php");
 #[\PHPUnit\Framework\Attributes\CoversFunction('core_reportbuilder_get_tagged_reports')]
 final class lib_test extends advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test getting tagged reports
      */

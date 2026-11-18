@@ -380,16 +380,8 @@ class discussion {
      * @return  string|null
      */
     private function get_export_discussion_html(stdClass $user): ?string {
-        global $CFG;
-
-        if (!$this->capabilitymanager->can_export_discussions($user)) {
-            return null;
-        }
-
-        $button = new \portfolio_add_button();
-        $button->set_callback_options('forum_portfolio_caller', ['discussionid' => $this->discussion->get_id()], 'mod_forum');
-        $button = $button->to_html(PORTFOLIO_ADD_FULL_FORM, get_string('exportdiscussion', 'mod_forum'));
-        return $button ?: null;
+        // Portfolios are not installed, so a discussion has no export button.
+        return null;
     }
 
     /**

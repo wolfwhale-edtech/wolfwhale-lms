@@ -35,6 +35,11 @@ use core_badges_generator;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_badges\achievement_credential::class)]
 final class achievement_credential_test extends \advanced_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test the achievement_credential::instance() method.
      */

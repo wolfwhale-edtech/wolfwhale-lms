@@ -49,11 +49,8 @@ final class export_test extends \advanced_testcase {
         // Initialise some settings (to compare their values have been exported as expected).
         set_config('recaptchapublickey', 'abcde');
         set_config('enablebadges', '0');
-        set_config('mediawidth', '900', 'mod_lesson');
-        set_config('maxanswers', '2', 'mod_lesson');
-        set_config('maxanswers_adv', '0', 'mod_lesson');
-        set_config('defaultfeedback', '0', 'mod_lesson');
-        set_config('defaultfeedback_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '3');
+        set_config('forum_manydiscussions', '10');
 
         // Get the data we are submitting for the form and mock submitting it.
         $formdata = [
@@ -99,23 +96,13 @@ final class export_test extends \advanced_testcase {
             $setting = $DB->get_record('adminpresets_it', $params);
             $this->assertEquals('0', $setting->value);
 
-            $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'mediawidth'];
+            $params = ['adminpresetid' => $presetid, 'plugin' => 'none', 'name' => 'forum_maxattachments'];
             $setting = $DB->get_record('adminpresets_it', $params);
-            $this->assertEquals('900', $setting->value);
+            $this->assertEquals('3', $setting->value);
 
-            $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'maxanswers'];
+            $params = ['adminpresetid' => $presetid, 'plugin' => 'none', 'name' => 'forum_manydiscussions'];
             $setting = $DB->get_record('adminpresets_it', $params);
-            $this->assertEquals('2', $setting->value);
-            $params = ['itemid' => $setting->id, 'name' => 'maxanswers_adv'];
-            $setting = $DB->get_record('adminpresets_it_a', $params);
-            $this->assertEquals('0', $setting->value);
-
-            $params = ['adminpresetid' => $presetid, 'plugin' => 'mod_lesson', 'name' => 'defaultfeedback'];
-            $setting = $DB->get_record('adminpresets_it', $params);
-            $this->assertEquals('0', $setting->value);
-            $params = ['itemid' => $setting->id, 'name' => 'defaultfeedback_adv'];
-            $setting = $DB->get_record('adminpresets_it_a', $params);
-            $this->assertEquals('1', $setting->value);
+            $this->assertEquals('10', $setting->value);
 
             // Check plugins have been created with the expected values.
             $manager = \core_plugin_manager::instance();

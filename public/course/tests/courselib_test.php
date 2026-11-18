@@ -19,7 +19,6 @@ namespace core_course;
 use advanced_testcase;
 use backup_controller;
 use backup;
-use blog_entry;
 use cache;
 use calendar_event;
 use coding_exception;
@@ -362,50 +361,6 @@ final class courselib_test extends advanced_testcase {
         $modulerunasserts = $modulename.'_create_run_asserts';
         $this->$modulerunasserts($moduleinfo, $dbmodinstance);
         return $moduleinfo;
-    }
-
-    /**
-     * Create module associated blog and tags.
-     *
-     * @param object $course Course.
-     * @param object $modulecontext The context of the module.
-     */
-    private function create_module_asscociated_blog($course, $modulecontext) {
-        global $DB, $CFG;
-
-        // Create default group.
-        $group = new stdClass();
-        $group->courseid = $course->id;
-        $group->name = 'Group';
-        $group->id = $DB->insert_record('groups', $group);
-
-        // Create default user.
-        $user = $this->getDataGenerator()->create_user(array(
-            'username' => 'testuser',
-            'firstname' => 'Firsname',
-            'lastname' => 'Lastname'
-        ));
-
-        // Create default post.
-        $post = new stdClass();
-        $post->userid = $user->id;
-        $post->groupid = $group->id;
-        $post->content = 'test post content text';
-        $post->module = 'blog';
-        $post->id = $DB->insert_record('post', $post);
-
-        // Create default tag.
-        $tag = $this->getDataGenerator()->create_tag(array('userid' => $user->id,
-            'rawname' => 'Testtagname', 'isstandard' => 1));
-        // Apply the tag to the blog.
-        $DB->insert_record('tag_instance', array('tagid' => $tag->id, 'itemtype' => 'user',
-            'component' => 'core', 'itemid' => $post->id, 'ordering' => 0));
-
-        require_once($CFG->dirroot . '/blog/locallib.php');
-        $blog = new blog_entry($post->id);
-        $blog->add_association($modulecontext->id);
-
-        return $blog;
     }
 
     /**
@@ -3425,6 +3380,7 @@ final class courselib_test extends advanced_testcase {
     public function test_course_get_tagged_course_modules(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $course3 = $this->getDataGenerator()->create_course();
         $course2 = $this->getDataGenerator()->create_course();
         $course1 = $this->getDataGenerator()->create_course();
@@ -3543,11 +3499,11 @@ final class courselib_test extends advanced_testcase {
         $this->setAdminUser();
 
         $navoptions = course_get_user_navigation_options($context, $course);
-        $this->assertTrue($navoptions->blogs);
-        $this->assertTrue($navoptions->notes);
+        $this->assertFalse($navoptions->blogs);
+        $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertTrue($navoptions->badges);
-        $this->assertTrue($navoptions->tags);
+        $this->assertFalse($navoptions->tags);
         $this->assertFalse($navoptions->search);
         $this->assertTrue($navoptions->competencies);
 
@@ -3567,11 +3523,11 @@ final class courselib_test extends advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
         $navoptions = course_get_user_navigation_options($context, $course);
-        $this->assertTrue($navoptions->blogs);
+        $this->assertFalse($navoptions->blogs);
         $this->assertFalse($navoptions->notes);
         $this->assertFalse($navoptions->participants);
         $this->assertTrue($navoptions->badges);
-        $this->assertTrue($navoptions->tags);
+        $this->assertFalse($navoptions->tags);
         $this->assertTrue($navoptions->search);
     }
 
@@ -3586,8 +3542,8 @@ final class courselib_test extends advanced_testcase {
         $this->setAdminUser();
 
         $navoptions = course_get_user_navigation_options($context);
-        $this->assertTrue($navoptions->blogs);
-        $this->assertTrue($navoptions->notes);
+        $this->assertFalse($navoptions->blogs);
+        $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertTrue($navoptions->badges);
     }
@@ -3608,7 +3564,7 @@ final class courselib_test extends advanced_testcase {
         $this->setUser($user);
 
         $navoptions = course_get_user_navigation_options($context);
-        $this->assertTrue($navoptions->blogs);
+        $this->assertFalse($navoptions->blogs);
         $this->assertFalse($navoptions->notes);
         $this->assertTrue($navoptions->participants);
         $this->assertFalse($navoptions->badges);
@@ -3683,7 +3639,7 @@ final class courselib_test extends advanced_testcase {
         $this->assertTrue($adminoptions->backup);
         $this->assertTrue($adminoptions->restore);
         $this->assertFalse($adminoptions->files);
-        $this->assertTrue($adminoptions->tags);
+        $this->assertFalse($adminoptions->tags);
         $this->assertTrue($adminoptions->gradebook);
         $this->assertFalse($adminoptions->outcomes);
         $this->assertTrue($adminoptions->badges);
@@ -3831,7 +3787,7 @@ final class courselib_test extends advanced_testcase {
         $coursecriteria->insert();
 
         $activitycompletiondate = $startdate + DAYSECS;
-        $data = $this->getDataGenerator()->create_module('data', array('course' => $originalcourse->id),
+        $data = $this->getDataGenerator()->create_module('page', array('course' => $originalcourse->id),
                         array('completion' => 1, 'completionexpected' => $activitycompletiondate));
 
         $resetdata = new stdClass();
@@ -4000,10 +3956,10 @@ final class courselib_test extends advanced_testcase {
      * Test that the course reset throws an exception if it takes too long.
      */
     public function test_course_reset_timeout(): void {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/notes/lib.php');
+        global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
 
@@ -4020,56 +3976,55 @@ final class courselib_test extends advanced_testcase {
         $resetdata->reset_start_date = $course->startdate;
         $resetdata->reset_end_date = $course->enddate;
         $resetdata->reset_end_date_old = $course->enddate;
-        $resetdata->reset_notes = true;
+        $resetdata->reset_events = true;
 
-        // Create a note that will be deleted by the reset.
-        $note = (object) ['content' => 'Note 1', 'courseid' => $course->id];
-        note_save($note);
-
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me',
+        ]);
+        $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset once with a long timeout that won't be exceeded.
         $timeout = new reset_timeout($course->shortname, time() + 10);
         reset_course_userdata($resetdata, $timeout);
 
         // Verify the course has been reset.
-        $this->assertFalse($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $this->assertFalse($DB->record_exists('event', ['id' => $event->id]));
 
-        $note = (object) ['content' => 'Note 2', 'courseid' => $course->id];
-        note_save($note);
-
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me again',
+        ]);
+        $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         // Call the reset with a timeout that will be exceeded. Confirm an exception is thrown.
         $timeout = new reset_timeout($course->shortname, time() - 1);
         $this->expectExceptionObject($timeout);
         reset_course_userdata($resetdata, $timeout);
-
-        // Verify the course has not been reset.
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
     }
 
     public function test_course_check_module_updates_since(): void {
         global $CFG, $DB, $USER;
-        require_once($CFG->dirroot . '/mod/glossary/lib.php');
+        require_once($CFG->dirroot . '/mod/forum/lib.php');
         require_once($CFG->dirroot . '/rating/lib.php');
 
         $this->resetAfterTest(true);
 
         $CFG->enablecompletion = true;
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $glossary = $this->getDataGenerator()->create_module('glossary', array(
+        $forum = $this->getDataGenerator()->create_module('forum', array(
             'course' => $course->id,
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionview' => 1,
-            'allowcomments' => 1,
             'assessed' => RATING_AGGREGATE_AVERAGE,
-            'scale' => 100
+            'scale' => 100,
         ));
-        $glossarygenerator = $this->getDataGenerator()->get_plugin_generator('mod_glossary');
-        $context = context_module::instance($glossary->cmid);
+        $forumgenerator = $this->getDataGenerator()->get_plugin_generator('mod_forum');
+        $context = context_module::instance($forum->cmid);
         $modinfo = get_fast_modinfo($course);
-        $cm = $modinfo->get_cm($glossary->cmid);
+        $cm = $modinfo->get_cm($forum->cmid);
         $user = $this->getDataGenerator()->create_user();
         $studentrole = $DB->get_record('role', array('shortname' => 'student'));
         $this->getDataGenerator()->enrol_user($user->id, $course->id, $studentrole->id);
@@ -4079,58 +4034,41 @@ final class courselib_test extends advanced_testcase {
         $teacherrole = $DB->get_record('role', array('shortname' => 'teacher'));
         $this->getDataGenerator()->enrol_user($teacher->id, $course->id, $teacherrole->id);
 
-        assign_capability('mod/glossary:viewanyrating', CAP_ALLOW, $studentrole->id, $context->id, true);
+        assign_capability('mod/forum:viewanyrating', CAP_ALLOW, $studentrole->id, $context->id, true);
 
         // Check nothing changed right now.
         $updates = course_check_module_updates_since($cm, $from);
         $this->assertFalse($updates->configuration->updated);
         $this->assertFalse($updates->completion->updated);
         $this->assertFalse($updates->gradeitems->updated);
-        $this->assertFalse($updates->comments->updated);
         $this->assertFalse($updates->ratings->updated);
         $this->assertFalse($updates->introfiles->updated);
         $this->assertFalse($updates->outcomes->updated);
 
         $this->waitForSecond();
 
-        // Do some changes.
         $this->setUser($user);
-        $entry = $glossarygenerator->create_content($glossary);
+        $discussion = $forumgenerator->create_discussion([
+            'course' => $course->id,
+            'forum' => $forum->id,
+            'userid' => $user->id,
+        ]);
 
         $this->setUser($teacher);
-        // Name.
-        set_coursemodule_name($glossary->cmid, 'New name');
+        set_coursemodule_name($forum->cmid, 'New name');
 
-        // Add some ratings.
         $rm = new rating_manager();
-        $result = $rm->add_rating($cm, $context, 'mod_glossary', 'entry', $entry->id, 100, 50, $user->id, RATING_AGGREGATE_AVERAGE);
-
-        // Change grades.
-        $glossary->cmidnumber = $glossary->cmid;
-        glossary_update_grades($glossary, $user->id);
+        $rm->add_rating($cm, $context, 'mod_forum', 'post', $discussion->firstpost, 100, 50, $user->id, RATING_AGGREGATE_AVERAGE);
+        $forum->cmidnumber = $forum->cmid;
+        forum_update_grades($forum, $user->id);
 
         $this->setUser($user);
-        // Completion status.
-        glossary_view($glossary, $course, $cm, $context, 'letter');
+        forum_view($forum, $course, $cm, $context);
 
-        // Add one comment.
-        $args = new stdClass;
-        $args->context   = $context;
-        $args->course    = $course;
-        $args->cm        = $cm;
-        $args->area      = 'glossary_entry';
-        $args->itemid    = $entry->id;
-        $args->client_id = 1;
-        $args->component = 'mod_glossary';
-        $manager = new \core_comment\manager($args);
-        $manager->add('blah blah blah');
-
-        // Check upgrade status.
         $updates = course_check_module_updates_since($cm, $from);
         $this->assertTrue($updates->configuration->updated);
         $this->assertTrue($updates->completion->updated);
         $this->assertTrue($updates->gradeitems->updated);
-        $this->assertTrue($updates->comments->updated);
         $this->assertTrue($updates->ratings->updated);
         $this->assertFalse($updates->introfiles->updated);
         $this->assertFalse($updates->outcomes->updated);
@@ -7564,38 +7502,6 @@ final class courselib_test extends advanced_testcase {
             $file->get_id(),
             $image->get_id(),
         );
-    }
-
-    /**
-     * Test the course_get_communication_instance_data() function.
-     */
-    public function test_course_get_communication_instance_data(): void {
-        $this->resetAfterTest();
-        $course = $this->getDataGenerator()->create_course();
-
-        // Set admin user as a valid enrolment will be checked in the callback function.
-        $this->setAdminUser();
-
-        // Use the callback function and return the data.
-        list($instance, $context, $heading, $returnurl) = component_callback(
-            'core_course',
-            'get_communication_instance_data',
-            [$course->id]
-        );
-
-        // Check the url is as expected.
-        $expectedreturnurl = new moodle_url('/course/view.php', ['id' => $course->id]);
-        $this->assertEquals($expectedreturnurl, $returnurl);
-
-        // Check the context is as expected.
-        $expectedcontext = context_course::instance($course->id);
-        $this->assertEquals($expectedcontext, $context);
-
-        // Check the instance id is as expected.
-        $this->assertEquals($course->id, $instance->id);
-
-        // Check the heading is as expected.
-        $this->assertEquals($course->fullname, $heading);
     }
 
     /**

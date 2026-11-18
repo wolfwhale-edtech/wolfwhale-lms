@@ -27,6 +27,12 @@ namespace core;
 #[\PHPUnit\Framework\Attributes\CoversClass(\testing_data_generator::class)]
 #[\PHPUnit\Framework\Attributes\CoversFunction('create_course')]
 final class testing_generator_test extends \advanced_testcase {
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
     public function test_get_plugin_generator_good_case(): void {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_question');
         $this->assertInstanceOf('core_question_generator', $generator);
@@ -311,7 +317,7 @@ final class testing_generator_test extends \advanced_testcase {
         $m1 = $generator->create_module('assign',
             array('course' => $course->id) +
             $optionsgeneral);
-        $m2 = $generator->create_module('data',
+        $m2 = $generator->create_module('forum',
             array('course' => $course->id) +
             $featurecompletionmanual +
             $featurerate);
@@ -348,8 +354,8 @@ final class testing_generator_test extends \advanced_testcase {
         $this->assertEquals($featurecompletionmanual['completion'], $cm2->completion);
         $this->assertEquals($featurecompletionmanual['completionexpected'], $cm2->completionexpected);
         $this->assertEquals(null, $cm2->completiongradeitemnumber);
-        // Rating info is stored in the module's table (in our test {data}).
-        $data = $DB->get_record('data', array('id' => $m2->id));
+        // Rating info is stored in the module's table (in our test {forum}).
+        $data = $DB->get_record('forum', array('id' => $m2->id));
         $this->assertEquals($featurerate['assessed'], $data->assessed);
         $this->assertEquals($featurerate['scale'], $data->scale);
         $this->assertEquals($featurerate['assesstimestart'], $data->assesstimestart);

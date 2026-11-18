@@ -122,9 +122,9 @@ class mod_page_mod_form extends moodleform_mod {
     public function data_preprocessing(&$defaultvalues) {
         if ($this->current->instance) {
             $draftitemid = file_get_submitted_draft_itemid('page');
-            $defaultvalues['page']['format'] = $defaultvalues['contentformat'];
+            $defaultvalues['page']['format'] = $defaultvalues['contentformat'] ?? FORMAT_HTML;
             $defaultvalues['page']['text']   = file_prepare_draft_area($draftitemid, $this->context->id, 'mod_page',
-                    'content', 0, page_get_editor_options($this->context), $defaultvalues['content']);
+                    'content', 0, page_get_editor_options($this->context), $defaultvalues['content'] ?? '');
             $defaultvalues['page']['itemid'] = $draftitemid;
         }
         if (!empty($defaultvalues['displayoptions'])) {

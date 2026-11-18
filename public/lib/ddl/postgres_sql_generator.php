@@ -104,6 +104,23 @@ class postgres_sql_generator extends sql_generator {
     }
 
     /**
+     * Drop a temporary table even if a rolled-back transaction already removed it.
+     *
+     * PostgreSQL drops temporary tables when the transaction that created them rolls back,
+     * but Moodle still has the table registered. A plain DROP then fails and poisons later backups.
+     *
+     * @param xmldb_table $xmldb_table
+     * @return array
+     */
+    public function getDropTableSQL($xmldb_table) {
+        if ($this->temptables->is_temptable($xmldb_table->getName())) {
+            $drop = 'DROP TABLE IF EXISTS ' . $this->getTableName($xmldb_table);
+            return array_merge([$drop], $this->getDropTableExtraSQL($xmldb_table));
+        }
+        return parent::getDropTableSQL($xmldb_table);
+    }
+
+    /**
      * Given one correct xmldb_index, returns the SQL statements
      * needed to create it (in array).
      *

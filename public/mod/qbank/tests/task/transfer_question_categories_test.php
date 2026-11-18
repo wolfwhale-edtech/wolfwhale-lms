@@ -342,6 +342,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_setup_pre_install_data(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         $sitecontext = context_system::instance();
@@ -463,6 +464,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_qbank_install(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         $task = new transfer_question_categories();
@@ -744,6 +746,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
 
     public function test_fix_wrong_parents(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         // Create a second course.
@@ -810,6 +813,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_fix_wrong_parents_conflicting_indexes(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         // Create a second course.
@@ -900,6 +904,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_transfer_questions(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         // We should still ahve all the tags in the course context.
@@ -1070,6 +1075,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_transfer_questions_with_duplicate_tags(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         // Create a second course.
         $course = self::getDataGenerator()->create_course();
@@ -1130,6 +1136,7 @@ final class transfer_question_categories_test extends \advanced_testcase {
     public function test_qbank_install_resilience(): void {
         global $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setup_pre_install_data();
 
         $sitecontext = context_system::instance();

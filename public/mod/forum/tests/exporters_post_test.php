@@ -57,6 +57,7 @@ final class exporters_post_test extends \advanced_testcase {
     public function test_export_post($istimed = false, $addtime = 0): void {
         global $CFG, $PAGE;
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $CFG->enableportfolios = true;
         $filestorage = get_file_storage();

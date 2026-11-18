@@ -99,9 +99,8 @@ final class load_test extends \advanced_testcase {
         // Set the config values (to confirm they change after applying the preset).
         set_config('enablebadges', 1);
         set_config('allowemojipicker', 1);
-        set_config('mediawidth', '640', 'mod_lesson');
-        set_config('maxanswers', '5', 'mod_lesson');
-        set_config('maxanswers_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
+        set_config('forum_manydiscussions', '5');
         set_config('enablecompletion', 1);
         set_config('usecomments', 0);
 
@@ -127,7 +126,7 @@ final class load_test extends \advanced_testcase {
         // Applied items: enablebadges@none, mediawitdh@mod_lesson and maxanswers@@mod_lesson.
         $this->assertCount($currentappitems + 3, $DB->get_records('adminpresets_app_it'));
         // Applied advanced items: maxanswers_adv@mod_lesson.
-        $this->assertCount($currentappadvitems + 1, $DB->get_records('adminpresets_app_it_a'));
+        $this->assertCount($currentappadvitems, $DB->get_records('adminpresets_app_it_a'));
         // Applied plugins: enrol_guest and mod_glossary.
         $this->assertCount($currentappplugins + 2, $DB->get_records('adminpresets_app_plug'));
         // Check no new preset has been created.
@@ -138,9 +137,8 @@ final class load_test extends \advanced_testcase {
 
         // Check the setting values have changed accordingly with the ones defined in the preset.
         $this->assertEquals(0, get_config('core', 'enablebadges'));
-        $this->assertEquals(900, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(2, get_config('mod_lesson', 'maxanswers'));
-        $this->assertEquals(0, get_config('mod_lesson', 'maxanswers_adv'));
+        $this->assertEquals(3, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(10, get_config('core', 'forum_manydiscussions'));
 
         // These settings will never change.
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
@@ -152,7 +150,7 @@ final class load_test extends \advanced_testcase {
         $this->assertArrayNotHasKey('guest', $enabledplugins);
         $this->assertArrayHasKey('manual', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayNotHasKey('glossary', $enabledplugins);
+        $this->assertArrayNotHasKey('page', $enabledplugins);
         $this->assertArrayHasKey('assign', $enabledplugins);
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);

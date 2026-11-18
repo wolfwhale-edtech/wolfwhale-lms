@@ -36,8 +36,8 @@ final class querylib_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         $course = $this->getDataGenerator()->create_course();
-        $data1 = $this->getDataGenerator()->create_module('data', array('assessed'=>1, 'scale'=>100, 'course'=>$course->id));
-        $data2 = $this->getDataGenerator()->create_module('data', array('assessed'=>0, 'course'=>$course->id));
+        $data1 = $this->getDataGenerator()->create_module('assign', array('course'=>$course->id));
+        $data2 = $this->getDataGenerator()->create_module('page', array('course'=>$course->id));
         $forum1 = $this->getDataGenerator()->create_module('forum', array('assessed'=>1, 'scale'=>100, 'course'=>$course->id));
         $forum2 = $this->getDataGenerator()->create_module('forum', array('assessed'=>0, 'course'=>$course->id));
 

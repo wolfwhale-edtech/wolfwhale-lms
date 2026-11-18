@@ -49,11 +49,11 @@ Feature: To be able to see and save user message preferences as admin
     And I set the following fields to these values:
       | mod_assign_assign_notification_enabled[popup] | 1 |
       | mod_assign_assign_notification_enabled[email] | 0 |
-      | mod_feedback_submission_enabled[popup]        | 0 |
-      | mod_feedback_submission_locked[popup]         | 1 |
-      | mod_feedback_submission_enabled[email]        | 1 |
-      | mod_feedback_submission_locked[email]         | 1 |
-      | mod_feedback_message_disable                  | 0 |
+      | mod_forum_posts_enabled[popup]        | 0 |
+      | mod_forum_posts_locked[popup]         | 1 |
+      | mod_forum_posts_enabled[email]        | 1 |
+      | mod_forum_posts_locked[email]         | 1 |
+      | mod_forum_digests_disable             | 1 |
     And the "region-main" "region" should meet accessibility standards with "best-practice" extra tests
     And I log in as "student1"
     And I follow "Preferences" in the user menu
@@ -66,8 +66,8 @@ Feature: To be able to see and save user message preferences as admin
     And I click on "message_provider_mod_assign_assign_notification_email" "checkbox"
     And the field "message_provider_mod_assign_assign_notification_popup" matches value "0"
     And the field "message_provider_mod_assign_assign_notification_email" matches value "1"
-    # Feedback submission notifications are locked off for web and locked on for email.
-    And "Feedback notifications" row "Web" column of "preference-table" table should contain "Locked off"
-    And "Feedback notifications" row "Requires configuration Email" column of "preference-table" table should contain "Locked on"
-    # Feedback reminder is disabled.
-    And I should not see "Feedback reminder"
+    # Forum post notifications are locked off for web and locked on for email.
+    And "Subscribed forum posts" row "Web" column of "preference-table" table should contain "Locked off"
+    And "Subscribed forum posts" row "Requires configuration Email" column of "preference-table" table should contain "Locked on"
+    # Forum digests are disabled.
+    And I should not see "Subscribed forum digests"

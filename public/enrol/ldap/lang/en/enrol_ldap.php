@@ -131,3 +131,7 @@ $string['user_type_key'] = 'User type';
 $string['version'] = 'The version of the LDAP protocol your server is using';
 $string['version_key'] = 'Version';
 $string['privacy:metadata'] = 'The LDAP enrolments plugin does not store any personal data.';
+$string['start_tls_key'] = 'Use TLS';
+$string['start_tls'] = 'Use TLS encryption when connecting to the LDAP server.';
+$string['pagesize_key'] = 'Page size';
+$string['pagesize'] = 'How many LDAP entries to fetch in each request.';

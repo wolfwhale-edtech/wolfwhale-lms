@@ -37,6 +37,12 @@ use core_user\reportbuilder\datasource\users;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_reportbuilder_generator::class)]
 final class generator_test extends advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Test creating a report
      */

@@ -242,7 +242,7 @@ final class userlib_test extends \advanced_testcase {
 
         // Now, with valid user data.
         $user->username = 'johndoe321';
-        $user->auth = 'shibboleth';
+        $user->auth = 'manual';
         $user->country = 'AU';
         $user->lang = 'en';
         $user->theme = 'boost';
@@ -323,7 +323,7 @@ final class userlib_test extends \advanced_testcase {
 
         // Now, with valid user data.
         $user['username'] = 'johndoe321';
-        $user['auth'] = 'shibboleth';
+        $user['auth'] = 'manual';
         $user['country'] = 'AU';
         $user['lang'] = 'en';
         $user['theme'] = 'boost';

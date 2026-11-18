@@ -197,10 +197,9 @@ final class manager_test extends \advanced_testcase {
 
         $models = \core_analytics\manager::load_default_models_for_all_components();
 
-        $this->assertTrue(is_array($models['core']));
-        $this->assertNotEmpty($models['core']);
-        $this->assertNotEmpty($models['core'][0]['target']);
-        $this->assertNotEmpty($models['core'][0]['indicators']);
+        $this->assertIsArray($models);
+        // Shipped prediction models were removed with the machine-learning backend.
+        $this->assertEmpty($models['core'] ?? []);
     }
 
     /**
@@ -377,45 +376,9 @@ final class manager_test extends \advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminuser();
 
-        $noteaching = \core_analytics\manager::get_target('\core_course\analytics\target\no_teaching');
-        $dropout = \core_analytics\manager::get_target('\core_course\analytics\target\course_dropout');
-        $upcomingactivities = \core_analytics\manager::get_target('\core_user\analytics\target\upcoming_activities_due');
-        $norecentaccesses = \core_analytics\manager::get_target('\core_course\analytics\target\no_recent_accesses');
-        $noaccesssincestart = \core_analytics\manager::get_target('\core_course\analytics\target\no_access_since_course_start');
-
-        $this->assertTrue(\core_analytics\model::exists($noteaching));
-        $this->assertTrue(\core_analytics\model::exists($dropout));
-        $this->assertTrue(\core_analytics\model::exists($upcomingactivities));
-        $this->assertTrue(\core_analytics\model::exists($norecentaccesses));
-        $this->assertTrue(\core_analytics\model::exists($noaccesssincestart));
-
-        foreach (\core_analytics\manager::get_all_models() as $model) {
-            $model->delete();
-        }
-
-        $this->assertFalse(\core_analytics\model::exists($noteaching));
-        $this->assertFalse(\core_analytics\model::exists($dropout));
-        $this->assertFalse(\core_analytics\model::exists($upcomingactivities));
-        $this->assertFalse(\core_analytics\model::exists($norecentaccesses));
-        $this->assertFalse(\core_analytics\model::exists($noaccesssincestart));
-
+        // Shipped models were removed, so refreshing defaults creates nothing.
         $updated = \core_analytics\manager::update_default_models_for_component('moodle');
-
-        $this->assertEquals(5, count($updated));
-        $this->assertTrue(array_pop($updated) instanceof \core_analytics\model);
-        $this->assertTrue(array_pop($updated) instanceof \core_analytics\model);
-        $this->assertTrue(array_pop($updated) instanceof \core_analytics\model);
-        $this->assertTrue(array_pop($updated) instanceof \core_analytics\model);
-        $this->assertTrue(array_pop($updated) instanceof \core_analytics\model);
-        $this->assertTrue(\core_analytics\model::exists($noteaching));
-        $this->assertTrue(\core_analytics\model::exists($dropout));
-        $this->assertTrue(\core_analytics\model::exists($upcomingactivities));
-        $this->assertTrue(\core_analytics\model::exists($norecentaccesses));
-        $this->assertTrue(\core_analytics\model::exists($noaccesssincestart));
-
-        $repeated = \core_analytics\manager::update_default_models_for_component('moodle');
-
-        $this->assertSame([], $repeated);
+        $this->assertSame([], $updated);
     }
 
     /**

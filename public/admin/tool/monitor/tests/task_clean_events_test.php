@@ -132,7 +132,7 @@ final class task_clean_events_test extends \advanced_testcase {
         );
         for ($i = 0; $i < 5; $i++) {
             \mod_quiz\event\course_module_instance_list_viewed::create($eventparams)->trigger();
-            \mod_scorm\event\course_module_instance_list_viewed::create($eventparams)->trigger();
+            \mod_forum\event\course_module_instance_list_viewed::create($eventparams)->trigger();
         }
 
         // We do not store events that have no subscriptions - so there will be only 4 events.

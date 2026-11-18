@@ -3609,6 +3609,7 @@ final class lib_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         // Setup test data.

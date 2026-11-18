@@ -36,6 +36,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 #[CoversMethod(\qbank_tagquestion\tag_condition::class, 'build_query_from_filter')]
 #[CoversMethod(\qbank_tagquestion\tag_condition::class, 'get_condition_key')]
 final class tag_condition_test extends \advanced_testcase {
+
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
     use mock_restore_test_trait;
 
     /**

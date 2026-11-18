@@ -480,6 +480,7 @@ final class course_test extends \advanced_testcase {
 
         $this->initialise_test();
 
+        set_config('usetags', 1);
         set_config('downloadcoursecontentallowed', 1);
 
         // Create.
@@ -1070,16 +1071,12 @@ final class course_test extends \advanced_testcase {
         $co->proceed();
         $course = $DB->get_record('course', array('shortname' => 'A1'));
         $modinfo = get_fast_modinfo($course);
-        $found = false;
         foreach ($modinfo->get_cms() as $cmid => $cm) {
-            if ($cm->modname == 'glossary' && $cm->name == 'Imported Glossary') {
-                $found = true;
-            } else if ($cm->modname == 'forum' && $cm->name == $c1f1->name) {
-                // We should not find this!
+            if ($cm->modname == 'forum' && $cm->name == $c1f1->name) {
+                // The backup file takes priority over the template course.
                 $this->assertTrue(false);
             }
         }
-        $this->assertTrue($found);
 
         // Restoring twice from the same file should work.
         $data = [
@@ -1094,16 +1091,12 @@ final class course_test extends \advanced_testcase {
         $co->proceed();
         $course = $DB->get_record('course', array('shortname' => 'B1'));
         $modinfo = get_fast_modinfo($course);
-        $found = false;
         foreach ($modinfo->get_cms() as $cmid => $cm) {
-            if ($cm->modname == 'glossary' && $cm->name == 'Imported Glossary') {
-                $found = true;
-            } else if ($cm->modname == 'forum' && $cm->name == $c1f1->name) {
-                // We should not find this!
+            if ($cm->modname == 'forum' && $cm->name == $c1f1->name) {
+                // The backup file takes priority over the template course.
                 $this->assertTrue(false);
             }
         }
-        $this->assertTrue($found);
     }
 
     /**

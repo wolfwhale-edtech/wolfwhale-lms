@@ -56,7 +56,7 @@ final class lib_test extends \advanced_testcase {
         $course = $generator->create_course();
         $assigngenerator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
         $assigninstance = $assigngenerator->create_instance(['course' => $course->id]);
-        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_lesson');
+        $lessongenerator = $this->getDataGenerator()->get_plugin_generator('mod_page');
         $lessoninstance = $lessongenerator->create_instance(['course' => $course->id]);
         $student = $generator->create_user();
         $generator->enrol_user($student->id, $course->id, 'student');
@@ -84,7 +84,7 @@ final class lib_test extends \advanced_testcase {
                 'courseid' => $course->id,
                 'groupid' => 0,
                 'userid' => 2,
-                'modulename' => 'lesson',
+                'modulename' => 'page',
                 'instance' => $lessoninstance->id,
                 'eventtype' => 'end',
                 'timestart' => time(),
@@ -101,7 +101,7 @@ final class lib_test extends \advanced_testcase {
         $events = calendar_get_events($timestart, $timeend, true, 0, true);
         $this->assertCount(2, $events);
         // Disable the lesson module.
-        $modulerecord = $DB->get_record('modules', ['name' => 'lesson']);
+        $modulerecord = $DB->get_record('modules', ['name' => 'page']);
         $modulerecord->visible = 0;
         $DB->update_record('modules', $modulerecord);
         // Check that we only return the assign event.

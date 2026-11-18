@@ -18,10 +18,6 @@ namespace tool_monitor;
 
 defined('MOODLE_INTERNAL') || die();
 
-global $CFG;
-require_once($CFG->dirroot . '/blog/locallib.php');
-require_once($CFG->dirroot . '/blog/lib.php');
-
 /**
  * Unit tests for event observers.
  *
@@ -137,7 +133,7 @@ final class eventobservers_test extends \advanced_testcase {
         for ($i = 0; $i < 5; $i++) {
             \core\event\course_viewed::create($eventparams)->trigger();
             \mod_quiz\event\course_module_instance_list_viewed::create($eventparams)->trigger();
-            \mod_scorm\event\course_module_instance_list_viewed::create($eventparams)->trigger();
+            \mod_forum\event\course_module_instance_list_viewed::create($eventparams)->trigger();
         }
 
         // Confirm that nothing was stored in the tool_monitor_events table
@@ -162,7 +158,7 @@ final class eventobservers_test extends \advanced_testcase {
         for ($i = 0; $i < 5; $i++) {
             \core\event\course_viewed::create($eventparams)->trigger();
             \mod_quiz\event\course_module_instance_list_viewed::create($eventparams)->trigger();
-            \mod_scorm\event\course_module_instance_list_viewed::create($eventparams)->trigger();
+            \mod_forum\event\course_module_instance_list_viewed::create($eventparams)->trigger();
         }
 
         // Fire the event we want to capture.
@@ -326,7 +322,7 @@ final class eventobservers_test extends \advanced_testcase {
         $DB->delete_records('tool_monitor_events');
 
         // Now let us create a rule at site level.
-        $rulerecord->eventname = '\core\event\blog_entry_created';
+        $rulerecord->eventname = '\core\event\user_created';
         $rulerecord->courseid = 0;
         $rule = $toolgenerator->create_rule($rulerecord);
         $subrecord->courseid = 0;
@@ -334,14 +330,8 @@ final class eventobservers_test extends \advanced_testcase {
         $toolgenerator->create_subscription($subrecord);
 
         // Let us trigger events.
-        $blog = new \blog_entry();
-        $blog->subject = "Subject of blog";
-        $blog->userid = $USER->id;
-        $states = \blog_entry::get_applicable_publish_states();
-        $blog->publishstate = reset($states);
         for ($i = 0; $i < 5; $i++) {
-            $newblog = fullclone($blog);
-            $newblog->add();
+            $this->getDataGenerator()->create_user();
             if ($i != 4) {
                 $this->verify_message_not_sent_yet($msgsink);
             }

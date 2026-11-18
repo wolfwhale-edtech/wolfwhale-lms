@@ -57,10 +57,10 @@ final class reset_course_test extends \advanced_testcase {
      * Reset a course.
      */
     public function test_execute(): void {
-        global $DB, $CFG;
-        require_once($CFG->dirroot . '/notes/lib.php');
+        global $DB;
 
         $this->resetAfterTest();
+        $this->setAdminUser();
 
         $generator = $this->getDataGenerator();
 
@@ -77,24 +77,24 @@ final class reset_course_test extends \advanced_testcase {
         $resetdata->reset_start_date = $course->startdate;
         $resetdata->reset_end_date = $course->enddate;
         $resetdata->reset_end_date_old = $course->enddate;
-        $resetdata->reset_notes = true;
+        $resetdata->reset_events = true;
         $task = reset_course::create($resetdata);
 
-        // Create a note that will be deleted by the reset.
-        $note = (object) ['content' => 'Note 1', 'courseid' => $course->id];
-        note_save($note);
-
-        $this->assertTrue($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $event = $generator->create_event([
+            'courseid' => $course->id,
+            'eventtype' => 'course',
+            'name' => 'Reset me',
+        ]);
+        $this->assertTrue($DB->record_exists('event', ['id' => $event->id]));
 
         $this->expectOutputRegex("~Resetting course ID {$course->id}~");
         $this->expectOutputRegex("~Found course {$course->shortname}. Starting reset.~");
-        $this->expectOutputRegex("~Delete notes~");
+        $this->expectOutputRegex('~' . preg_quote(get_string('deleteevents', 'calendar'), '~') . '~');
         $this->expectOutputRegex("~Reset complete~");
         // Run the task.
         $task->execute();
 
-        // Verify the course has been reset.
-        $this->assertFalse($DB->record_exists('post', ['module' => 'notes', 'courseid' => $course->id]));
+        $this->assertFalse($DB->record_exists('event', ['id' => $event->id]));
     }
 
     /**

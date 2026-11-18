@@ -2453,5 +2453,27 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2026100500.07);
     }
 
+    if ($oldversion < 2026100501.01) {
+        // Drop tables that belonged to subsystems removed from this install.
+        $tables = [
+            'communication_user', 'communication', 'post',
+            'mnet_log', 'mnet_session',
+            'portfolio_log', 'portfolio_tempdata', 'portfolio_instance_user',
+            'portfolio_instance_config', 'portfolio_instance',
+            'blog_association', 'blog_external',
+            'payments', 'payment_gateways', 'payment_accounts',
+            'ai_action_explain_text', 'ai_action_summarise_text', 'ai_action_generate_text',
+            'ai_action_generate_image', 'ai_action_register', 'ai_policy_register', 'ai_providers',
+        ];
+        foreach ($tables as $tablename) {
+            $table = new xmldb_table($tablename);
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
+        }
+
+        upgrade_main_savepoint(true, 2026100501.01);
+    }
+
     return true;
 }

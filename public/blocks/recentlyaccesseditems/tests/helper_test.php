@@ -40,7 +40,7 @@ final class helper_test extends \advanced_testcase {
 
         // Add an activity to each course.
         $forum = self::getDataGenerator()->create_module('forum', ['course' => $course]);
-        $glossary = self::getDataGenerator()->create_module('glossary', ['course' => $coursetodelete]);
+        $glossary = self::getDataGenerator()->create_module('page', ['course' => $coursetodelete]);
         self::setUser($user);
 
         // Get the user to visit the activities.
@@ -48,7 +48,7 @@ final class helper_test extends \advanced_testcase {
         $event1 = \mod_forum\event\course_module_viewed::create($event1params);
         $event1->trigger();
         $event2params = ['context' => \context_module::instance($glossary->cmid), 'objectid' => $glossary->id];
-        $event2 = \mod_glossary\event\course_module_viewed::create($event2params);
+        $event2 = \mod_page\event\course_module_viewed::create($event2params);
         $event2->trigger();
         $recent1 = helper::get_recent_items();
         self::assertCount(2, $recent1);

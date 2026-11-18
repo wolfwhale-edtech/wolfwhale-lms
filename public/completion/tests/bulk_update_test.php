@@ -42,17 +42,6 @@ final class bulk_update_test extends \advanced_testcase {
             'assign-2' => ['assign', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'book-1' => ['book', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
             'book-2' => ['book', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'choice-1' => ['choice', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionsubmit' => 1]],
-            'choice-2' => ['choice', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'data-1' => ['data', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
-            'data-2' => ['data', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'data-3' => ['data',
-                ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionentries' => 3,
-                    'completionentriesenabled' => 1],
-                ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionentries' => 3]],
-            'feedback-1' => ['feedback', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 0,
-                'completionsubmit' => 1]],
-            'feedback-2' => ['feedback', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'folder-1' => ['folder', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
             'folder-2' => ['folder', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'forum-1' => ['forum',
@@ -60,16 +49,7 @@ final class bulk_update_test extends \advanced_testcase {
                     'completiondiscussionsenabled' => 1],
                 ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completiondiscussions' => 1]],
             'forum-2' => ['forum', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'glossary-1' => ['glossary',
-                ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionentries' => 3,
-                    'completionentriesenabled' => 1],
-                ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionentries' => 3]],
-            'glossary-2' => ['glossary', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'imscp-1' => ['imscp', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
-            'imscp-2' => ['imscp', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'label-1' => ['label', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'lesson-1' => ['lesson', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionendreached' => 1]],
-            'lesson-2' => ['lesson', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'lti-1' => ['lti', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
             'lti-2' => ['lti', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'page-1' => ['page', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
@@ -78,26 +58,8 @@ final class bulk_update_test extends \advanced_testcase {
             'quiz-2' => ['quiz', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'resource-1' => ['resource', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
             'resource-2' => ['resource', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'scorm-1' => ['scorm',
-                [
-                    'completion' => COMPLETION_TRACKING_AUTOMATIC,
-                    'completionscoreenabled' => 1,
-                    'completionscorerequired' => 1,
-                    'completionstatusrequired' => [2 => 'passed'],
-                ],
-                [
-                    'completion' => COMPLETION_TRACKING_AUTOMATIC,
-                    'completionscorerequired' => 1,
-                    'completionstatusrequired' => 2,
-                ],
-            ],
-            'scorm-2' => ['scorm', ['completion' => COMPLETION_TRACKING_MANUAL]],
             'url-1' => ['url', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
             'url-2' => ['url', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'wiki-1' => ['wiki', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
-            'wiki-2' => ['wiki', ['completion' => COMPLETION_TRACKING_MANUAL]],
-            'workshop-1' => ['workshop', ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1]],
-            'workshop-2' => ['workshop', ['completion' => COMPLETION_TRACKING_MANUAL]],
         ];
     }
 
@@ -179,7 +141,7 @@ final class bulk_update_test extends \advanced_testcase {
         return [
             'Several modules with the same module type (choice)' => [
                 [
-                    'modulenames' => ['choice', 'choice', 'choice'],
+                    'modulenames' => ['assign', 'assign', 'assign'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionsubmit' => 1],
                     'validatedata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionsubmit' => 1],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC],
@@ -188,7 +150,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'Several modules with different module type' => [
                 [
-                    'modulenames' => ['choice', 'forum'],
+                    'modulenames' => ['page', 'forum'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],
                     'validatedata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC],
@@ -197,7 +159,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'Setting manual completion (completionview shoud be ignored)' => [
                 [
-                    'modulenames' => ['scorm', 'forum', 'label', 'assign'],
+                    'modulenames' => ['page', 'forum', 'label', 'assign'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_MANUAL, 'completionview' => 1],
                     'validatedata' => [],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_MANUAL, 'completionview' => 0],
@@ -206,7 +168,7 @@ final class bulk_update_test extends \advanced_testcase {
             ],
             'If at least one module does not support completionsubmit it can\'t be set' => [
                 [
-                    'modulenames' => ['assign', 'wiki'],
+                    'modulenames' => ['assign', 'page'],
                     'submitdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1, 'completionsubmit' => 1],
                     'validatedata' => [],
                     'cmdata' => ['completion' => COMPLETION_TRACKING_AUTOMATIC, 'completionview' => 1],

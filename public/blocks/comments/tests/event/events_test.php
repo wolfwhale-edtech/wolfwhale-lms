@@ -46,11 +46,12 @@ final class events_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
+        set_config('usecomments', 1);
         $this->setAdminUser();
 
         // Create course and wiki.
         $this->course = $this->getDataGenerator()->create_course();
-        $this->wiki = $this->getDataGenerator()->create_module('wiki', array('course' => $this->course->id));
+        $this->wiki = $this->getDataGenerator()->create_module('page', array('course' => $this->course->id));
     }
 
     /**
@@ -108,7 +109,7 @@ final class events_test extends \advanced_testcase {
         // Checking that the event contains the expected values.
         $this->assertInstanceOf('\block_comments\event\comment_created', $event);
         $this->assertEquals($context, $event->get_context());
-        $url = new \moodle_url('/mod/wiki/view.php', array('id' => $this->wiki->cmid));
+        $url = new \moodle_url('/mod/page/view.php', array('id' => $this->wiki->cmid));
         $this->assertEquals($url, $event->get_url());
         $this->assertEventContextNotUsed($event);
     }
@@ -170,7 +171,7 @@ final class events_test extends \advanced_testcase {
         // Checking that the event contains the expected values.
         $this->assertInstanceOf('\block_comments\event\comment_deleted', $event);
         $this->assertEquals($context, $event->get_context());
-        $url = new \moodle_url('/mod/wiki/view.php', array('id' => $this->wiki->cmid));
+        $url = new \moodle_url('/mod/page/view.php', array('id' => $this->wiki->cmid));
         $this->assertEquals($url, $event->get_url());
         $this->assertEventContextNotUsed($event);
     }

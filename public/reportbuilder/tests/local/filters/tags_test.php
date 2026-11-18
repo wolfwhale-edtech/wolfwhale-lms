@@ -35,6 +35,12 @@ use core_user\reportbuilder\datasource\users;
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_reportbuilder\local\filters\tags::class)]
 final class tags_test extends advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     /**
      * Data provider for {@see test_get_sql_filter}
      *

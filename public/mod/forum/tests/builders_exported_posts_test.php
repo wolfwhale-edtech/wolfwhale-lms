@@ -380,6 +380,7 @@ final class builders_exported_posts_test extends \advanced_testcase {
      */
     public function test_build_loads_tags(): void {
         $this->resetAfterTest();
+        set_config('usetags', 1);
 
         $datagenerator = $this->getDataGenerator();
         $user1 = $datagenerator->create_user();

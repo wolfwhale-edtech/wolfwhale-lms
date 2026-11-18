@@ -303,19 +303,8 @@ class url {
      * @return moodle_url
      */
     public function get_export_post_url_from_post(post_entity $post): ?moodle_url {
-        global $CFG;
-
-        require_once($CFG->libdir . '/portfoliolib.php');
-        $button = new \portfolio_add_button();
-        $button->set_callback_options('forum_portfolio_caller', ['postid' => $post->get_id()], 'mod_forum');
-        if ($post->has_attachments()) {
-            $button->set_formats(PORTFOLIO_FORMAT_RICHHTML);
-        } else {
-            $button->set_formats(PORTFOLIO_FORMAT_PLAINHTML);
-        }
-
-        $url = $button->to_html(PORTFOLIO_ADD_MOODLE_URL);
-        return $url ?: null;
+        // Portfolios are not installed, so a forum post has no export link.
+        return null;
     }
 
     /**
@@ -376,18 +365,8 @@ class url {
      * @return moodle_url|null
      */
     public function get_export_attachment_url_from_post_and_attachment(post_entity $post, stored_file $attachment): ?moodle_url {
-        global $CFG;
-
-        require_once($CFG->libdir . '/portfoliolib.php');
-        $button = new \portfolio_add_button();
-        $button->set_callback_options(
-            'forum_portfolio_caller',
-            ['postid' => $post->get_id(), 'attachment' => $attachment->get_id()],
-            'mod_forum'
-        );
-        $button->set_format_by_file($attachment);
-        $url = $button->to_html(PORTFOLIO_ADD_MOODLE_URL);
-        return $url ?: null;
+        // Portfolios are not installed, so a forum attachment has no export link.
+        return null;
     }
 
     /**

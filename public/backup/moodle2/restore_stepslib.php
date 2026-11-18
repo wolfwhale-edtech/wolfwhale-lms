@@ -2013,9 +2013,6 @@ class restore_course_structure_step extends restore_structure_step {
         // Apply for 'course report' plugins optional paths at course level.
         $this->add_plugin_structure('coursereport', $course);
 
-        // Apply for plagiarism plugins optional paths at course level.
-        $this->add_plugin_structure('plagiarism', $course);
-
         // Apply for local plugins optional paths at course level.
         $this->add_plugin_structure('local', $course);
 
@@ -4751,9 +4748,6 @@ class restore_module_structure_step extends restore_structure_step {
 
         // Apply for 'report' plugins optional paths at module level.
         $this->add_plugin_structure('report', $module);
-
-        // Apply for 'plagiarism' plugins optional paths at module level
-        $this->add_plugin_structure('plagiarism', $module);
 
         // Apply for 'local' plugins optional paths at module level
         $this->add_plugin_structure('local', $module);

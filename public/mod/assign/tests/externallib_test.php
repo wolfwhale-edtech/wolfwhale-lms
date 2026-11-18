@@ -152,6 +152,7 @@ final class externallib_test extends \mod_assign\externallib_advanced_testcase {
         global $DB, $USER, $CFG;
 
         $this->resetAfterTest(true);
+        set_config('usecomments', 1);
 
         // Enable multilang filter to on content and heading.
         filter_set_global_state('multilang', TEXTFILTER_ON);
@@ -525,6 +526,7 @@ final class externallib_test extends \mod_assign\externallib_advanced_testcase {
         global $DB, $USER;
 
         $this->resetAfterTest(true);
+        set_config('usecomments', 1);
         // Create a course and assignment.
         $coursedata['idnumber'] = 'idnumbercourse1';
         $coursedata['fullname'] = 'Lightwork Course 1';
@@ -2238,6 +2240,7 @@ final class externallib_test extends \mod_assign\externallib_advanced_testcase {
         global $USER;
 
         $this->resetAfterTest(true);
+        set_config('usecomments', 1);
 
         list($assign, $instance, $student1, $student2, $teacher, $g1, $g2) = $this->create_submission_for_testing_status(true);
         $studentsubmission = $assign->get_user_submission($student1->id, true);

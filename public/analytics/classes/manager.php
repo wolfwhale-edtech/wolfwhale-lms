@@ -187,8 +187,10 @@ class manager {
             $predictionclass = self::default_mlbackend();
         }
 
-        if (!class_exists($predictionclass)) {
-            throw new \coding_exception('Invalid predictions processor ' . $predictionclass . '.');
+        if (empty($predictionclass) || !class_exists($predictionclass)) {
+            // No machine-learning backend is installed. Callers that only tidy a model
+            // can continue; callers that need to train or predict check for null.
+            return null;
         }
 
         $interfaces = class_implements($predictionclass);
@@ -259,6 +261,9 @@ class manager {
         foreach ($models as $model) {
             try {
                 $processor = $model->get_predictions_processor();
+                if (!$processor) {
+                    continue;
+                }
                 $noprefixnamespace = ltrim(get_class($processor), '\\');
                 $processorplugin = substr($noprefixnamespace, 0, strpos($noprefixnamespace, '\\'));
                 if ($processorplugin == $plugin) {
@@ -686,7 +691,12 @@ class manager {
      * @return string
      */
     public static function default_mlbackend() {
-        return self::DEFAULT_MLBACKEND;
+        $mlbackends = \core_component::get_plugin_list('mlbackend');
+        if (!$mlbackends) {
+            return null;
+        }
+        $name = array_key_first($mlbackends);
+        return '\\mlbackend_' . $name . '\\processor';
     }
 
     /**

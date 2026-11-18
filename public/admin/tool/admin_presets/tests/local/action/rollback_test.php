@@ -39,9 +39,8 @@ final class rollback_test extends \advanced_testcase {
         // Set the config values (to confirm they change after applying the preset).
         set_config('enablebadges', 1);
         set_config('allowemojipicker', 1);
-        set_config('mediawidth', '640', 'mod_lesson');
-        set_config('maxanswers', '5', 'mod_lesson');
-        set_config('maxanswers_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
+        set_config('forum_manydiscussions', '5');
         set_config('enablecompletion', 1);
         set_config('usecomments', 0);
 
@@ -56,13 +55,13 @@ final class rollback_test extends \advanced_testcase {
         $currentplugins = $DB->count_records('adminpresets_plug');
         $this->assertCount(1, $DB->get_records('adminpresets_app'));
         $this->assertCount(3, $DB->get_records('adminpresets_app_it'));
-        $this->assertCount(1, $DB->get_records('adminpresets_app_it_a'));
+        $this->assertCount(0, $DB->get_records('adminpresets_app_it_a'));
         $this->assertCount(2, $DB->get_records('adminpresets_app_plug'));
 
         // Check the setttings have changed accordingly after applying the preset.
         $this->assertEquals(0, get_config('core', 'enablebadges'));
-        $this->assertEquals(900, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(2, get_config('mod_lesson', 'maxanswers'));
+        $this->assertEquals(3, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(10, get_config('core', 'forum_manydiscussions'));
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
         $this->assertEquals(1, get_config('core', 'enablecompletion'));
         $this->assertEquals(0, get_config('core', 'usecomments'));
@@ -71,7 +70,7 @@ final class rollback_test extends \advanced_testcase {
         $enabledplugins = \core\plugininfo\enrol::get_enabled_plugins();
         $this->assertArrayNotHasKey('guest', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayNotHasKey('glossary', $enabledplugins);
+        $this->assertArrayNotHasKey('page', $enabledplugins);
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);
 
@@ -98,9 +97,8 @@ final class rollback_test extends \advanced_testcase {
 
         // Check the setting values have been reverted accordingly.
         $this->assertEquals(1, get_config('core', 'enablebadges'));
-        $this->assertEquals(640, get_config('mod_lesson', 'mediawidth'));
-        $this->assertEquals(5, get_config('mod_lesson', 'maxanswers'));
-        $this->assertEquals(1, get_config('mod_lesson', 'maxanswers_adv'));
+        $this->assertEquals(1, get_config('core', 'forum_maxattachments'));
+        $this->assertEquals(5, get_config('core', 'forum_manydiscussions'));
         // These settings won't change, regardless if they are posted to the form.
         $this->assertEquals(1, get_config('core', 'allowemojipicker'));
         $this->assertEquals(1, get_config('core', 'enablecompletion'));
@@ -110,7 +108,7 @@ final class rollback_test extends \advanced_testcase {
         $enabledplugins = \core\plugininfo\enrol::get_enabled_plugins();
         $this->assertArrayHasKey('guest', $enabledplugins);
         $enabledplugins = \core\plugininfo\mod::get_enabled_plugins();
-        $this->assertArrayHasKey('glossary', $enabledplugins);
+        $this->assertArrayHasKey('page', $enabledplugins);
         // This plugin won't change (because it had the same value than before the preset was applied).
         $enabledplugins = \core\plugininfo\qtype::get_enabled_plugins();
         $this->assertArrayHasKey('truefalse', $enabledplugins);

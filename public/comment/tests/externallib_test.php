@@ -58,31 +58,14 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->getDataGenerator()->enrol_user($student2->id, $course1->id, $studentrole->id);
         $this->getDataGenerator()->enrol_user($teacher1->id, $course1->id, $teacherrole->id);
 
-        // Create a database module instance.
-        $record = new \stdClass();
-        $record->course = $course1->id;
-        $record->name = "Mod data test";
-        $record->intro = "Some intro of some sort";
-        $record->comments = 1;
+        $module1 = $this->getDataGenerator()->create_module('assign', ['course' => $course1->id]);
+        $cm = get_coursemodule_from_instance('assign', $module1->id);
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
+        $this->setUser($student1);
+        $assignment = new \assign(\context_module::instance($cm->id), $cm, $course1);
+        $submission = $assignment->get_user_submission($student1->id, true);
 
-        $module1 = $this->getDataGenerator()->create_module('data', $record);
-        $field = data_get_field_new('text', $module1);
-
-        $fielddetail = new \stdClass();
-        $fielddetail->name = 'Name';
-        $fielddetail->description = 'Some name';
-
-        $field->define_field($fielddetail);
-        $field->insert_field();
-        $recordid = data_add_record($module1);
-
-        $datacontent = array();
-        $datacontent['fieldid'] = $field->field->id;
-        $datacontent['recordid'] = $recordid;
-        $datacontent['content'] = 'Asterix';
-        $DB->insert_record('data_content', $datacontent);
-
-        return [$module1, $recordid, $teacher1, $student1, $student2];
+        return [$module1, $submission->id, $teacher1, $student1, $student2];
     }
 
     /**
@@ -98,18 +81,18 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ],
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'def',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ];
         $result = core_comment_external::add_comments($inputdata);
@@ -119,9 +102,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         // Verify we can get the comments.
         $contextlevel = 'module';
         $instanceid = $module1->cmid;
-        $component = 'mod_data';
+        $component = 'assignsubmission_comments';
         $itemid = $recordid;
-        $area = 'database_entry';
+        $area = 'submission_comments';
         $page = 0;
         $result = core_comment_external::get_comments($contextlevel, $instanceid, $component, $itemid, $area, $page);
         $result = external_api::clean_returnvalue(core_comment_external::get_comments_returns(), $result);
@@ -176,10 +159,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
     }
@@ -191,8 +174,8 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         global $DB;
         [$module1, $recordid, $teacher1, $student1, $student2] = $this->setup_course_and_users_basic();
 
-        // Disable comments for the module.
-        $DB->set_field('data', 'comments', 0, array('id' => $module1->id));
+        // Disable comments for the site. Assignment comments follow that switch.
+        set_config('usecomments', 0);
 
         // Verify we can't add a comment.
         $this->setUser($student1);
@@ -201,10 +184,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
     }
@@ -221,10 +204,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
         $result = external_api::clean_returnvalue(core_comment_external::add_comments_returns(), $result);
@@ -265,15 +248,15 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ],
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'def',
                 'itemid' => $recordid,
                 'area' => 'badarea'
@@ -295,18 +278,18 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ],
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'def',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ];
         $result = core_comment_external::add_comments($inputdata);
@@ -335,7 +318,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
                 'area' => 'spaghetti'
@@ -368,18 +351,18 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ],
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'def',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
         $result = external_api::clean_returnvalue(core_comment_external::add_comments_returns(), $result);
@@ -405,10 +388,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
         $result = external_api::clean_returnvalue(core_comment_external::add_comments_returns(), $result);
@@ -431,10 +414,10 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             [
                 'contextlevel' => 'module',
                 'instanceid' => $module1->cmid,
-                'component' => 'mod_data',
+                'component' => 'assignsubmission_comments',
                 'content' => 'abc',
                 'itemid' => $recordid,
-                'area' => 'database_entry'
+                'area' => 'submission_comments'
             ]
         ]);
         $result = external_api::clean_returnvalue(core_comment_external::add_comments_returns(), $result);

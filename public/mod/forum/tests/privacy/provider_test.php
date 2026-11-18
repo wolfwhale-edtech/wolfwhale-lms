@@ -60,6 +60,7 @@ final class provider_test extends \core_privacy\tests\provider_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
     }
 
     /**

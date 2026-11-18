@@ -32,19 +32,14 @@ $ADMIN->add('modules', new admin_category('authsettings', new lang_string('authe
 $ADMIN->add('modules', new admin_category('enrolments', new lang_string('enrolments', 'enrol')));
 $ADMIN->add('modules', new admin_category('editorsettings', new lang_string('editors', 'editor')));
 $ADMIN->add('modules', new admin_category('antivirussettings', new lang_string('antiviruses', 'antivirus')));
-$ADMIN->add('modules', new admin_category('mlbackendsettings', new lang_string('mlbackendsettings', 'admin')));
 $ADMIN->add('modules', new admin_category('filtersettings', new lang_string('managefilters')));
 $ADMIN->add('modules', new admin_category('mediaplayers', new lang_string('type_media_plural', 'plugin')));
 $ADMIN->add('modules', new admin_category('fileconverterplugins', new lang_string('type_fileconverter_plural', 'plugin')));
-$ADMIN->add('modules', new admin_category('paymentgateways', new lang_string('type_paygw_plural', 'plugin')));
 $ADMIN->add('modules', new admin_category('dataformatsettings', new lang_string('dataformats')));
-$ADMIN->add('modules', new admin_category('portfoliosettings', new lang_string('portfolios', 'portfolio'),
-    empty($CFG->enableportfolios)));
 $ADMIN->add('modules', new admin_category('repositorysettings', new lang_string('repositories', 'repository')));
 $ADMIN->add('modules', new admin_category('qbanksettings', new lang_string('type_qbank_plural', 'plugin')));
 $ADMIN->add('modules', new admin_category('qbehavioursettings', new lang_string('questionbehaviours', 'admin')));
 $ADMIN->add('modules', new admin_category('qtypesettings', new lang_string('questiontypes', 'admin')));
-$ADMIN->add('modules', new admin_category('plagiarism', new lang_string('plagiarism', 'plagiarism')));
 $ADMIN->add('modules', new admin_category('coursereports', new lang_string('coursereports')));
 $ADMIN->add('modules', new admin_category('reportplugins', new lang_string('reports')));
 $ADMIN->add('modules', new admin_category('searchplugins', new lang_string('search', 'admin')));
@@ -52,7 +47,6 @@ $ADMIN->add('modules', new admin_category('tools', new lang_string('tools', 'adm
 $ADMIN->add('modules', new admin_category('cache', new lang_string('caching', 'cache')));
 $ADMIN->add('cache', new admin_category('cachestores', new lang_string('cachestores', 'cache')));
 $ADMIN->add('modules', new admin_category('calendartype', new lang_string('calendartypes', 'calendar')));
-$ADMIN->add('modules', new admin_category('communicationsettings', new lang_string('communication', 'core_communication')));
 $ADMIN->add('modules', new admin_category('sms', new lang_string('sms', 'core_sms')));
 $ADMIN->add('modules', new admin_category('contentbanksettings', new lang_string('contentbank')));
 $ADMIN->add('modules', new admin_category('localplugins', new lang_string('localplugins')));
@@ -248,12 +242,6 @@ if ($hassiteconfig) {
         $plugin->load_settings($ADMIN, 'antivirussettings', $hassiteconfig);
     }
 
-    // Machine learning backend plugins.
-    $plugins = core_plugin_manager::instance()->get_plugins_of_type('mlbackend');
-    foreach ($plugins as $plugin) {
-        $plugin->load_settings($ADMIN, 'mlbackendsettings', $hassiteconfig);
-    }
-
 /// Filter plugins
 
     $ADMIN->add('filtersettings', new admin_page_managefilters());
@@ -321,24 +309,6 @@ if ($hassiteconfig) {
         $plugin->load_settings($ADMIN, 'mediaplayers', $hassiteconfig);
     }
 
-    // Payment gateway plugins.
-    $temp = new admin_settingpage('managepaymentgateways', new lang_string('type_paygwmanage', 'plugin'));
-    $temp->add(new \core_admin\local\settings\manage_payment_gateway_plugins());
-    $temp->add(new admin_setting_description(
-        'managepaymentgatewayspostfix',
-        '',
-        new lang_string('gotopaymentaccounts', 'payment',
-            html_writer::link(new moodle_url('/payment/accounts.php'), get_string('paymentaccounts', 'payment')))
-    ));
-    $ADMIN->add('paymentgateways', $temp);
-
-    $plugins = core_plugin_manager::instance()->get_plugins_of_type('paygw');
-    core_collator::asort_objects_by_property($plugins, 'displayname');
-    foreach ($plugins as $plugin) {
-        /** @var \core\plugininfo\paygw $plugin */
-        $plugin->load_settings($ADMIN, 'paymentgateways', $hassiteconfig);
-    }
-
     // Data format settings.
     $temp = new admin_settingpage('managedataformats', new lang_string('managedataformats'));
     $temp->add(new admin_setting_managedataformats());
@@ -349,62 +319,6 @@ if ($hassiteconfig) {
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\dataformat $plugin */
         $plugin->load_settings($ADMIN, 'dataformatsettings', $hassiteconfig);
-    }
-
-    //== Portfolio settings ==
-    require_once($CFG->libdir. '/portfoliolib.php');
-    $manage = new lang_string('manageportfolios', 'portfolio');
-    $url = "$CFG->wwwroot/$CFG->admin/portfolio.php";
-
-    // Add manage page (with table)
-    $temp = new admin_page_manageportfolios();
-    $ADMIN->add('portfoliosettings', $temp);
-
-    // Add common settings page
-    $temp = new admin_settingpage('manageportfolioscommon', new lang_string('commonportfoliosettings', 'portfolio'));
-    $temp->add(new admin_setting_heading('manageportfolioscommon', '', new lang_string('commonsettingsdesc', 'portfolio')));
-    $fileinfo = portfolio_filesize_info(); // make sure this is defined in one place since its used inside portfolio too to detect insane settings
-    $fileoptions = $fileinfo['options'];
-    $temp->add(new admin_setting_configselect(
-        'portfolio_moderate_filesize_threshold',
-        new lang_string('moderatefilesizethreshold', 'portfolio'),
-        new lang_string('moderatefilesizethresholddesc', 'portfolio'),
-        $fileinfo['moderate'], $fileoptions));
-    $temp->add(new admin_setting_configselect(
-        'portfolio_high_filesize_threshold',
-        new lang_string('highfilesizethreshold', 'portfolio'),
-        new lang_string('highfilesizethresholddesc', 'portfolio'),
-        $fileinfo['high'], $fileoptions));
-
-    $temp->add(new admin_setting_configtext(
-        'portfolio_moderate_db_threshold',
-        new lang_string('moderatedbsizethreshold', 'portfolio'),
-        new lang_string('moderatedbsizethresholddesc', 'portfolio'),
-        20, PARAM_INT, 3));
-
-    $temp->add(new admin_setting_configtext(
-        'portfolio_high_db_threshold',
-        new lang_string('highdbsizethreshold', 'portfolio'),
-        new lang_string('highdbsizethresholddesc', 'portfolio'),
-        50, PARAM_INT, 3));
-
-    $ADMIN->add('portfoliosettings', $temp);
-    $ADMIN->add('portfoliosettings', new admin_externalpage('portfolionew', new lang_string('addnewportfolio', 'portfolio'), $url, 'moodle/site:config', true));
-    $ADMIN->add('portfoliosettings', new admin_externalpage('portfoliodelete', new lang_string('deleteportfolio', 'portfolio'), $url, 'moodle/site:config', true));
-    $ADMIN->add('portfoliosettings', new admin_externalpage('portfoliocontroller', new lang_string('manageportfolios', 'portfolio'), $url, 'moodle/site:config', true));
-
-    foreach (portfolio_instances(false, false) as $portfolio) {
-        require_once($CFG->dirroot . '/portfolio/' . $portfolio->get('plugin') . '/lib.php');
-        $classname = 'portfolio_plugin_' . $portfolio->get('plugin');
-        $ADMIN->add(
-            'portfoliosettings',
-            new admin_externalpage(
-                'portfoliosettings' . $portfolio->get('id'),
-                $portfolio->get('name'),
-                $url . '?action=edit&pf=' . $portfolio->get('id'),
-                'moodle/site:config'
-            )
-        );
     }
 
     // repository setting
@@ -538,19 +452,6 @@ if ($hassiteconfig || has_capability('moodle/question:config', $systemcontext)) 
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\qtype $plugin */
         $plugin->load_settings($ADMIN, 'qbehavioursettings', $hassiteconfig);
-    }
-}
-
-// Plagiarism plugin settings
-if ($hassiteconfig && !empty($CFG->enableplagiarism)) {
-    $ADMIN->add('plagiarism', new admin_externalpage('manageplagiarismplugins', new lang_string('manageplagiarism', 'plagiarism'),
-        $CFG->wwwroot . '/' . $CFG->admin . '/plagiarism.php'));
-
-    $plugins = core_plugin_manager::instance()->get_plugins_of_type('plagiarism');
-    core_collator::asort_objects_by_property($plugins, 'displayname');
-    foreach ($plugins as $plugin) {
-        /** @var \core\plugininfo\plagiarism $plugin */
-        $plugin->load_settings($ADMIN, 'plagiarism', $hassiteconfig);
     }
 }
 
@@ -787,19 +688,6 @@ if ($hassiteconfig) {
     foreach ($plugins as $plugin) {
         /** @var \core\plugininfo\calendartype $plugin */
         $plugin->load_settings($ADMIN, 'calendartype', $hassiteconfig);
-    }
-}
-
-// Communication plugins.
-if ($hassiteconfig && core_communication\api::is_available()) {
-    $temp = new admin_settingpage('managecommunicationproviders',
-        new lang_string('managecommunicationproviders', 'core_communication'));
-    $temp->add(new \core_communication\admin\manage_communication_providers_page());
-    $ADMIN->add('communicationsettings', $temp);
-    $plugins = core_plugin_manager::instance()->get_plugins_of_type('communication');
-    foreach ($plugins as $plugin) {
-        /** @var \core\plugininfo\communication $plugin */
-        $plugin->load_settings($ADMIN, 'communicationsettings', $hassiteconfig);
     }
 }
 

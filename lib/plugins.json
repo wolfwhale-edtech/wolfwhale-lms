@@ -1,18 +1,5 @@
 {
     "standard": {
-        "aiplacement": [
-            "courseassist",
-            "editor"
-        ],
-        "aiprovider": [
-            "anthropic",
-            "awsbedrock",
-            "azureai",
-            "deepseek",
-            "gemini",
-            "ollama",
-            "openai"
-        ],
         "antivirus": [
             "clamav"
         ],
@@ -30,13 +17,9 @@
         "auth": [
             "db",
             "email",
-            "ldap",
-            "lti",
             "manual",
             "nologin",
-            "none",
             "oauth2",
-            "shibboleth",
             "webservice"
         ],
         "availability": [
@@ -48,22 +31,16 @@
             "profile"
         ],
         "block": [
-            "accessreview",
             "activity_results",
             "admin_bookmarks",
             "badges",
-            "blog_menu",
-            "blog_recent",
-            "blog_tags",
             "calendar_month",
             "calendar_upcoming",
             "comments",
             "completionstatus",
             "course_list",
             "course_summary",
-            "feedback",
             "globalsearch",
-            "glossary_random",
             "html",
             "login",
             "lp",
@@ -77,7 +54,6 @@
             "recent_activity",
             "recentlyaccessedcourses",
             "recentlyaccesseditems",
-            "rss_client",
             "search_forums",
             "selfcompletion",
             "settings",
@@ -106,10 +82,6 @@
         ],
         "calendartype": [
             "gregorian"
-        ],
-        "communication": [
-            "customlink",
-            "matrix"
         ],
         "contenttype": [
             "h5p"
@@ -159,15 +131,12 @@
             "category",
             "cohort",
             "database",
-            "fee",
             "flatfile",
             "guest",
             "imsenterprise",
             "ldap",
-            "lti",
             "manual",
             "meta",
-            "paypal",
             "self"
         ],
         "factor": [
@@ -193,11 +162,9 @@
             "activitynames",
             "algebra",
             "codehighlighter",
-            "data",
             "displayh5p",
             "emailprotect",
             "emoticon",
-            "glossary",
             "mathjaxloader",
             "mediaplugin",
             "multilang",
@@ -269,44 +236,21 @@
             "popup",
             "sms"
         ],
-        "mlbackend": [
-            "php",
-            "python"
-        ],
         "mnetservice": [],
         "mod": [
             "assign",
-            "bigbluebuttonbn",
             "book",
-            "choice",
-            "data",
-            "feedback",
             "folder",
             "forum",
-            "glossary",
             "h5pactivity",
-            "imscp",
             "label",
-            "lesson",
             "lti",
             "page",
             "qbank",
             "quiz",
             "resource",
-            "scorm",
             "subsection",
-            "url",
-            "wiki",
-            "workshop"
-        ],
-        "paygw": [
-            "paypal"
-        ],
-        "plagiarism": [],
-        "portfolio": [
-            "download",
-            "flickr",
-            "googledocs"
+            "url"
         ],
         "profilefield": [
             "checkbox",
@@ -397,7 +341,6 @@
             "timelimit"
         ],
         "report": [
-            "aiusage",
             "backups",
             "competency",
             "completion",
@@ -405,7 +348,6 @@
             "courseoverview",
             "eventlist",
             "infectedfiles",
-            "insights",
             "log",
             "loglive",
             "outline",
@@ -449,8 +391,7 @@
             "objectives"
         ],
         "search": [
-            "simpledb",
-            "solr"
+            "simpledb"
         ],
         "smsgateway": [
             "aws",
@@ -461,7 +402,6 @@
         ],
         "tiny": [
             "accessibilitychecker",
-            "aiplacement",
             "autosave",
             "equation",
             "h5p",
@@ -477,7 +417,6 @@
             "analytics",
             "availabilityconditions",
             "behat",
-            "brickfield",
             "capability",
             "cohortroles",
             "componentlibrary",
@@ -582,7 +521,11 @@
             "nntp",
             "pam",
             "pop3",
-            "radius"
+            "radius",
+            "ldap",
+            "lti",
+            "none",
+            "shibboleth"
         ],
         "block": [
             "activity_modules",
@@ -592,7 +535,14 @@
             "mnet_hosts",
             "participants",
             "quiz_results",
-            "section_links"
+            "section_links",
+            "accessreview",
+            "blog_menu",
+            "blog_recent",
+            "blog_tags",
+            "feedback",
+            "glossary_random",
+            "rss_client"
         ],
         "cachestore": [
             "memcache",
@@ -605,11 +555,16 @@
         ],
         "enrol": [
             "authorize",
-            "mnet"
+            "mnet",
+            "fee",
+            "paypal",
+            "lti"
         ],
         "filter": [
             "censor",
-            "tidy"
+            "tidy",
+            "data",
+            "glossary"
         ],
         "h5plib": [
             "v124",
@@ -631,12 +586,25 @@
         "mod": [
             "assignment",
             "chat",
-            "survey"
+            "survey",
+            "bigbluebuttonbn",
+            "choice",
+            "data",
+            "feedback",
+            "glossary",
+            "imscp",
+            "lesson",
+            "scorm",
+            "wiki",
+            "workshop"
         ],
         "portfolio": [
             "boxnet",
             "mahara",
-            "picasa"
+            "picasa",
+            "download",
+            "flickr",
+            "googledocs"
         ],
         "qformat": [
             "blackboard",
@@ -651,7 +619,9 @@
             "safebrowser"
         ],
         "report": [
-            "search"
+            "search",
+            "insights",
+            "aiusage"
         ],
         "repository": [
             "alfresco",
@@ -706,11 +676,42 @@
             "innodb",
             "moodlenet",
             "qeupgradehelper",
-            "timezoneimport"
+            "timezoneimport",
+            "brickfield"
         ],
         "webservice": [
             "amf",
             "xmlrpc"
+        ],
+        "paygw": [
+            "paypal"
+        ],
+        "aiplacement": [
+            "courseassist",
+            "editor"
+        ],
+        "aiprovider": [
+            "anthropic",
+            "awsbedrock",
+            "azureai",
+            "deepseek",
+            "gemini",
+            "ollama",
+            "openai"
+        ],
+        "search": [
+            "solr"
+        ],
+        "communication": [
+            "customlink",
+            "matrix"
+        ],
+        "mlbackend": [
+            "php",
+            "python"
+        ],
+        "tiny": [
+            "aiplacement"
         ]
     }
 }

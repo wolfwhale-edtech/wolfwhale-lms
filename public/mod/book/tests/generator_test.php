@@ -25,6 +25,12 @@ namespace mod_book;
  */
 final class generator_test extends \advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     public function test_create_instance(): void {
         global $DB;
         $this->resetAfterTest();

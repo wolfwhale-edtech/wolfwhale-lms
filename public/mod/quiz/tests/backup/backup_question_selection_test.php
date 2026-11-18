@@ -55,6 +55,7 @@ final class backup_question_selection_test extends \advanced_testcase {
      * @return array The manager, quiz, questions and course records.
      */
     protected function create_quiz_and_questions() {
+        set_config('usetags', 1);
         $manager = $this->getDataGenerator()->create_user();
         $this->setUser($manager);
         $course = $this->getDataGenerator()->create_course();

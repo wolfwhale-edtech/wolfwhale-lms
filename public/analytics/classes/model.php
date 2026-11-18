@@ -553,7 +553,9 @@ class model {
 
         // Method self::clear is already clearing the current model version.
         $predictor = $this->get_predictions_processor(false);
-        if ($predictor->is_ready() !== true) {
+        if (!$predictor) {
+            // No machine-learning backend is installed, so there is no output directory to remove.
+        } else if ($predictor->is_ready() !== true) {
             $predictorname = \core_analytics\manager::get_predictions_processor_name($predictor);
             debugging('Prediction processor ' . $predictorname . ' is not ready to be used. Model ' .
                 $this->model->id . ' could not be deleted.');
@@ -1785,7 +1787,9 @@ class model {
 
         // Delete current model version stored stuff.
         $predictor = $this->get_predictions_processor(false);
-        if ($predictor->is_ready() !== true) {
+        if (!$predictor) {
+            // No machine-learning backend is installed, so there is nothing to clear there.
+        } else if ($predictor->is_ready() !== true) {
             $predictorname = \core_analytics\manager::get_predictions_processor_name($predictor);
             debugging('Prediction processor ' . $predictorname . ' is not ready to be used. Model ' .
                 $this->model->id . ' could not be cleared.');

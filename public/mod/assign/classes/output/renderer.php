@@ -1402,7 +1402,7 @@ class renderer extends \plugin_renderer_base {
 
         foreach ($dir['files'] as $file) {
             $filename = $file->get_filename();
-            if ($CFG->enableplagiarism) {
+            if (!empty($CFG->enableplagiarism)) {
                 require_once($CFG->libdir.'/plagiarismlib.php');
                 $plagiarismlinks = plagiarism_get_links(array('userid'=>$file->get_userid(),
                                                              'file'=>$file,

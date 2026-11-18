@@ -244,7 +244,7 @@ class capability {
      */
     public function can_export_discussions(stdClass $user): bool {
         global $CFG;
-        return $CFG->enableportfolios && has_capability('mod/forum:exportdiscussion', $this->get_context(), $user);
+        return !empty($CFG->enableportfolios) && has_capability('mod/forum:exportdiscussion', $this->get_context(), $user);
     }
 
     /**
@@ -586,7 +586,7 @@ class capability {
     public function can_export_post(stdClass $user, post_entity $post): bool {
         global $CFG;
         $context = $this->get_context();
-        return $CFG->enableportfolios  && (has_capability('mod/forum:exportpost', $context, $user) ||
+        return !empty($CFG->enableportfolios) && (has_capability('mod/forum:exportpost', $context, $user) ||
             ($post->is_owned_by_user($user) && has_capability('mod/forum:exportownpost', $context, $user)));
     }
 

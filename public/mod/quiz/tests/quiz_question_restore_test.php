@@ -569,6 +569,7 @@ final class quiz_question_restore_test extends \advanced_testcase {
     public function test_pre_4_quiz_restore_for_random_question_tags(): void {
         global $USER, $DB;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $randomtags = [
             '1' => ['first question', 'one', 'number one'],
             '2' => ['first question', 'one', 'number one'],
@@ -620,6 +621,7 @@ final class quiz_question_restore_test extends \advanced_testcase {
     public function test_pre_4_quiz_restore_for_random_question_tags_with_tag_not_in_backup(): void {
         global $DB, $USER;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $collection = \core_tag_collection::create((object) ['name' => 'question']);
         $missingtags = \core_tag_tag::create_if_missing($collection->id, ['name' => 'second question']);
         $missingtag = reset($missingtags);
@@ -695,6 +697,7 @@ final class quiz_question_restore_test extends \advanced_testcase {
     public function test_pre_4_quiz_restore_for_random_question_tags_with_tag_not_in_backup_or_site(): void {
         global $DB, $USER;
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $randomtags = [
             '1' => ['first question', 'one', 'number one'],
             '2' => ['first question', 'one', 'number one'],

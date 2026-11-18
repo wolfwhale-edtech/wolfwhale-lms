@@ -25,7 +25,6 @@
 require_once('../config.php');
 require_once($CFG->dirroot.'/user/lib.php');
 require_once($CFG->dirroot.'/course/lib.php');
-require_once($CFG->dirroot.'/notes/lib.php');
 require_once($CFG->libdir.'/tablelib.php');
 require_once($CFG->libdir.'/filelib.php');
 require_once($CFG->dirroot.'/enrol/locallib.php');
@@ -287,10 +286,9 @@ echo html_writer::tag(
 );
 
 echo '<input type="hidden" name="id" value="' . $course->id . '" />';
-echo '<div class="d-none" data-region="state-help-icon">' . $OUTPUT->help_icon('publishstate', 'notes') . '</div>';
 echo '</div></div></div>';
 
-$bulkoptions->noteStateNames = note_get_state_names();
+$bulkoptions->noteStateNames = [];
 
 echo '</form>';
 

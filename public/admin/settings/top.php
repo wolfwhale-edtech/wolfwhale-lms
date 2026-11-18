@@ -63,7 +63,6 @@ if ($hassiteconfig) {
 $ADMIN->add('root', new category('users', new lang_string('users', 'admin')));
 $ADMIN->add('root', new category('courses', new lang_string('courses', 'admin')));
 $ADMIN->add('root', new category('grades', new lang_string('grades')));
-$ADMIN->add('root', new category('ai', new lang_string('ai', 'ai')));
 $ADMIN->add('root', new category('analytics', new lang_string('analytics', 'analytics')));
 $ADMIN->add('root', new category('competencies', new lang_string('competencies', 'core_competency')));
 $ADMIN->add('root', new category('badges', new lang_string('badges'), empty($CFG->enablebadges)));
@@ -73,17 +72,11 @@ $ADMIN->add('root', new category('location', new lang_string('location', 'admin'
 $ADMIN->add('root', new category('login', new lang_string('login', 'admin')));
 $ADMIN->add('root', new category('language', new lang_string('language')));
 $ADMIN->add('root', new category('messaging', new lang_string('messagingcategory', 'admin')));
-$ADMIN->add('root', new category('payment', new lang_string('payments', 'payment')));
 $ADMIN->add('root', new category('modules', new lang_string('plugins', 'admin')));
 $ADMIN->add('root', new category('security', new lang_string('security', 'admin')));
 $ADMIN->add('root', new category('appearance', new lang_string('appearance', 'admin')));
 $ADMIN->add('root', new category('frontpage', new lang_string('frontpage', 'admin')));
 $ADMIN->add('root', new category('server', new lang_string('server', 'admin')));
-$ADMIN->add('root', new category(
-    'mnet',
-    new lang_string('net', 'mnet'),
-    (isset($CFG->mnet_dispatcher_mode) && $CFG->mnet_dispatcher_mode === 'off')
-));
 $ADMIN->add('root', new category('reports', new lang_string('reports')));
 $ADMIN->add('root', new category('development', new lang_string('development', 'admin')));
 

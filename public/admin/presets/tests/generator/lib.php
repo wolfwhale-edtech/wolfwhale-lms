@@ -35,15 +35,15 @@ class core_adminpresets_generator extends \component_generator_base {
 
     /**
      * Create a preset. This preset will have only 3 settings and 3 plugins.
-     * Settings:
-     *  - none.enablebadges = 0
-     *  - none.allowemojipicker = 1
-     *  - mod_lesson.mediawidth = 900
-     *  - mod_lesson.maxanswers = 2 with advanced disabled.
-     * Plugins:
-     * - enrol_guest = 0
-     * - mod_glossary = 0
-     * - qtype_truefalse = 1
+ * Settings:
+ *  - none.enablebadges = 0
+ *  - none.allowemojipicker = 1
+ *  - none.forum_maxattachments = 3
+ *  - none.forum_manydiscussions = 10
+ * Plugins:
+ * - enrol_guest = 0
+ * - mod_page = 0
+ * - qtype_truefalse = 1
      *
      * @param array $data Preset data. Supported values:
      *   - name. To define the preset name.
@@ -93,15 +93,15 @@ class core_adminpresets_generator extends \component_generator_base {
         helper::add_item($presetid, 'enablebadges', '0');
         // Setting: allowemojipicker = 1.
         helper::add_item($presetid, 'allowemojipicker', '1');
-        // Setting: mediawidth = 900.
-        helper::add_item($presetid, 'mediawidth', '900', 'mod_lesson');
-        // Setting: maxanswers = 2 (with advanced disabled).
-        helper::add_item($presetid, 'maxanswers', '2', 'mod_lesson', 'maxanswers_adv', 0);
+        // Setting: forum_maxattachments = 3.
+        helper::add_item($presetid, 'forum_maxattachments', '3');
+        // Setting: forum_manydiscussions = 10.
+        helper::add_item($presetid, 'forum_manydiscussions', '10');
 
         // Plugin: enrol_guest = 0.
         helper::add_plugin($presetid, 'enrol', 'guest', 0);
-        // Plugin: mod_glossary = 0.
-        helper::add_plugin($presetid, 'mod', 'glossary', 0);
+        // Plugin: mod_page = 0.
+        helper::add_plugin($presetid, 'mod', 'page', 0);
         // Plugin: qtype_truefalse.
         helper::add_plugin($presetid, 'qtype', 'truefalse', 1);
 
@@ -117,12 +117,11 @@ class core_adminpresets_generator extends \component_generator_base {
 
             $this->apply_setting($appid, 'enablebadges', '1', '0');
             // The allowemojipicker setting shouldn't be applied because the value matches the current one.
-            $this->apply_setting($appid, 'mediawidth', '640', '900', 'mod_lesson');
-            $this->apply_setting($appid, 'maxanswers', '5', '2', 'mod_lesson');
-            $this->apply_setting($appid, 'maxanswers_adv', '1', '0', 'mod_lesson', 'maxanswers');
+            $this->apply_setting($appid, 'forum_maxattachments', '1', '3');
+            $this->apply_setting($appid, 'forum_manydiscussions', '5', '10');
 
             $this->apply_plugin($appid, 'enrol', 'guest', 1, 0);
-            $this->apply_plugin($appid, 'mod', 'glossary', 1, 0);
+            $this->apply_plugin($appid, 'mod', 'page', 1, 0);
             // The qtype_truefalse plugin shouldn't be applied because the value matches the current one.
         }
 

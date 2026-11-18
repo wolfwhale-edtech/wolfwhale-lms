@@ -211,6 +211,8 @@ function report_log_userday($userid, $courseid, $daystart, $logreader = '') {
  */
 function report_log_print_mnet_selector_form($hostid, $course, $selecteduser=0, $selecteddate='today',
                                  $modname="", $modid=0, $modaction='', $selectedgroup=-1, $showcourses=0, $showusers=0, $logformat='showashtml') {
+    // Remote Moodle Networking logs are not installed.
+    return;
 
     global $USER, $CFG, $SITE, $DB, $OUTPUT, $SESSION;
     require_once $CFG->dirroot.'/mnet/peer.php';

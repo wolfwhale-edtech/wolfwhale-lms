@@ -27,7 +27,7 @@ use core_reportbuilder\manager;
 use core_reportbuilder\reportbuilder\audience\manual;
 use core_reportbuilder_generator;
 use core_reportbuilder\task\send_schedule;
-use core_notes\reportbuilder\datasource\notes;
+use core_badges\reportbuilder\datasource\badges;
 use core_user\reportbuilder\datasource\users;
 
 /**
@@ -156,7 +156,7 @@ final class message_test extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
 
         // Create a report that won't return any data.
-        $report = $generator->create_report(['name' => 'Notes', 'source' => notes::class]);
+        $report = $generator->create_report(['name' => 'Badges', 'source' => badges::class]);
 
         $audience = $generator->create_audience(['reportid' => $report->get('id'), 'configdata' => []]);
         $schedule = $generator->create_schedule([

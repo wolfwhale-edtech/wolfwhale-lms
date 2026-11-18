@@ -95,22 +95,19 @@ final class generator_test extends \advanced_testcase {
         $expectedsettings = [
             'enablebadges' => 0,
             'allowemojipicker' => 1,
-            'mediawidth' => 900,
-            'maxanswers' => 2,
+            'forum_maxattachments' => 3,
+            'forum_manydiscussions' => 10,
         ];
         foreach ($settings as $setting) {
             $this->assertArrayHasKey($setting->name, $expectedsettings);
             $this->assertEquals($expectedsettings[$setting->name], $setting->value);
         }
 
-        // Check the advanced settings (should be only one).
+        // These settings have no advanced attributes.
         $settingsid = array_keys($settings);
         list($insql, $inparams) = $DB->get_in_or_equal($settingsid);
         $advsettings = $DB->get_records_select('adminpresets_it_a', 'itemid ' . $insql, $inparams);
-        $this->assertCount(1, $advsettings);
-        $advsetting = reset($advsettings);
-        $this->assertEquals('maxanswers_adv', $advsetting->name);
-        $this->assertEquals(0, $advsetting->value);
+        $this->assertCount(0, $advsettings);
 
         // Check the plugins.
         $plugins = $DB->get_records('adminpresets_plug', ['adminpresetid' => $presetid]);
@@ -121,7 +118,7 @@ final class generator_test extends \advanced_testcase {
                 'guest' => 0,
             ],
             'mod' => [
-                'glossary' => 0,
+                'page' => 0,
             ],
             'qtype' => [
                 'truefalse' => 1,
@@ -153,11 +150,7 @@ final class generator_test extends \advanced_testcase {
             }
 
             $appsettings = $DB->get_records('adminpresets_app_it_a', ['adminpresetapplyid' => $app->id]);
-            $this->assertCount(1, $appsettings);
-            $appsetting = reset($appsettings);
-            $configlog = $DB->get_record('config_log', ['id' => $appsetting->configlogid]);
-            $this->assertEquals('maxanswers_adv', $configlog->name);
-            $this->assertEquals(0, $configlog->value);
+            $this->assertCount(0, $appsettings);
 
             // Check the applied plugins.
             $appplugins = $DB->get_records('adminpresets_app_plug', ['adminpresetapplyid' => $app->id]);

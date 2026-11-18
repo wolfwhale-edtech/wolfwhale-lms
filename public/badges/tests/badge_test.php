@@ -34,6 +34,11 @@ require_once("{$CFG->libdir}/badgeslib.php");
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\core_badges\badge::class)]
 final class badge_test extends \advanced_testcase {
+    protected function setUp(): void {
+        parent::setUp();
+        set_config('usetags', 1);
+    }
+
 
     /**
      * Test create_badge.

@@ -537,7 +537,7 @@ final class question_bank_helper_test extends \advanced_testcase {
         $this->assertEquals(question_bank_helper::TYPE_SYSTEM, $modrecord->type);
         // Create module other than a qbank with an ID that isn't used by a qbank yet.
         do {
-            $wiki = self::getDataGenerator()->create_module('wiki', [
+            $wiki = self::getDataGenerator()->create_module('page', [
                 'course' => $course->id,
             ]);
         } while ($DB->record_exists('qbank', ['id' => $wiki->id]));

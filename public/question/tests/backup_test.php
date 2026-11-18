@@ -132,6 +132,7 @@ final class backup_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $this->setAdminUser();
 
         // Create a new course category and a new course in that.

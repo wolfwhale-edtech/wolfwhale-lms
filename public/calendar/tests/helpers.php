@@ -103,8 +103,8 @@ function create_action_event(array $data) {
 
     $isuseroverride = isset($data->priority) && $data->priority == CALENDAR_EVENT_USER_OVERRIDE_PRIORITY;
     if ($isuseroverride) {
-        if (!in_array($data['modulename'], ['assign', 'lesson', 'quiz'])) {
-            throw new coding_exception('Only assign, lesson and quiz modules supports overrides');
+        if (!in_array($data['modulename'], ['assign', 'page', 'quiz'])) {
+            throw new coding_exception('Only assign, page and quiz modules supports overrides');
         }
     }
 

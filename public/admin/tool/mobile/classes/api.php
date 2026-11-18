@@ -492,9 +492,9 @@ class api {
         }
 
         if (empty($section) || $section === 'blog') {
-            $settings->useblogassociations = $CFG->useblogassociations;
-            $settings->bloglevel = $CFG->bloglevel;
-            $settings->blogusecomments = $CFG->blogusecomments;
+            $settings->useblogassociations = 0;
+            $settings->bloglevel = 0;
+            $settings->blogusecomments = 0;
         }
 
         if (empty($section) || $section === 'h5psettings') {

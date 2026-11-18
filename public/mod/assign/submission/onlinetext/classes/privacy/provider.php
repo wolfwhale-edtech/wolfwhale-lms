@@ -120,15 +120,6 @@ class provider implements
                     ->export_data($currentpath, $submissiontext);
 
             // Handle plagiarism data.
-            $coursecontext = $context->get_course_context();
-            $userid = $submission->userid;
-            \core_plagiarism\privacy\provider::export_plagiarism_user_data($userid, $context, $currentpath, [
-                'cmid' => $context->instanceid,
-                'course' => $coursecontext->instanceid,
-                'userid' => $userid,
-                'content' => $editortext,
-                'assignment' => $submission->assignment
-            ]);
         }
     }
 
@@ -139,8 +130,6 @@ class provider implements
      */
     public static function delete_submission_for_context(assign_plugin_request_data $requestdata) {
         global $DB;
-
-        \core_plagiarism\privacy\provider::delete_plagiarism_for_context($requestdata->get_context());
 
         // Delete related files.
         $fs = get_file_storage();
@@ -158,8 +147,6 @@ class provider implements
      */
     public static function delete_submission_for_userid(assign_plugin_request_data $deletedata) {
         global $DB;
-
-        \core_plagiarism\privacy\provider::delete_plagiarism_for_user($deletedata->get_user()->id, $deletedata->get_context());
 
         $submissionid = $deletedata->get_pluginobject()->id;
 
@@ -185,7 +172,6 @@ class provider implements
     public static function delete_submissions(assign_plugin_request_data $deletedata) {
         global $DB;
 
-        \core_plagiarism\privacy\provider::delete_plagiarism_for_users($deletedata->get_userids(), $deletedata->get_context());
         if (empty($deletedata->get_submissionids())) {
             return;
         }

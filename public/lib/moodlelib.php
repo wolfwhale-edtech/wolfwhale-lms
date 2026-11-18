@@ -4600,7 +4600,6 @@ function remove_course_contents($courseid, $showfeedback = true, ?array $options
     require_once($CFG->libdir.'/gradelib.php');
     require_once($CFG->dirroot.'/group/lib.php');
     require_once($CFG->dirroot.'/rating/lib.php');
-    require_once($CFG->dirroot.'/notes/lib.php');
 
     // Handle course badges.
     badges_handle_course_deletion($courseid);
@@ -4778,9 +4777,6 @@ function remove_course_contents($courseid, $showfeedback = true, ?array $options
 
     // Filters be gone!
     filter_delete_all_for_context($coursecontext->id);
-
-    // Notes, you shall not pass!
-    note_delete_all($course->id);
 
     // Die comments!
     \core_comment\manager::delete_comments($coursecontext->id);
@@ -5025,26 +5021,6 @@ function reset_course_userdata($data, ?\core_course\exception\reset_timeout $tim
         $itemstr = get_string('deleteevents', 'calendar');
         $progress->start_progress($itemstr);
         $DB->delete_records('event', array('courseid' => $data->courseid));
-        $status[] = ['component' => $componentstr, 'item' => $itemstr, 'error' => false];
-        $progress->end_progress();
-        \core_course\exception\reset_timeout::throw_if_expired($timeout);
-    }
-
-    if (!empty($data->reset_notes)) {
-        require_once($CFG->dirroot.'/notes/lib.php');
-        $itemstr = get_string('deletenotes', 'notes');
-        $progress->start_progress($itemstr);
-        note_delete_all($data->courseid);
-        $status[] = ['component' => $componentstr, 'item' => $itemstr, 'error' => false];
-        $progress->end_progress();
-        \core_course\exception\reset_timeout::throw_if_expired($timeout);
-    }
-
-    if (!empty($data->delete_blog_associations)) {
-        require_once($CFG->dirroot.'/blog/lib.php');
-        $itemstr = get_string('deleteblogassociations', 'blog');
-        $progress->start_progress($itemstr);
-        blog_remove_associations_for_course($data->courseid);
         $status[] = ['component' => $componentstr, 'item' => $itemstr, 'error' => false];
         $progress->end_progress();
         \core_course\exception\reset_timeout::throw_if_expired($timeout);

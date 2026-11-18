@@ -134,10 +134,6 @@
       <directory suffix="_test.php">@root@public/badges/tests</directory>
       <exclude>@root@public/badges/tests/classes</exclude>
     </testsuite>
-    <testsuite name="core_blog_testsuite">
-      <directory suffix="_test.php">@root@public/blog/tests</directory>
-      <exclude>@root@public/blog/tests/classes</exclude>
-    </testsuite>
     <testsuite name="core_customfield_testsuite">
       <directory suffix="_test.php">@root@public/customfield/tests</directory>
       <exclude>@root@public/customfield/tests/classes</exclude>
@@ -193,11 +189,6 @@
       <exclude>@root@public/message/tests/classes</exclude>
       <exclude>@root@public/message/tests/fixtures</exclude>
     </testsuite>
-    <testsuite name="core_notes_testsuite">
-      <directory suffix="_test.php">@root@public/notes/tests</directory>
-      <exclude>@root@public/notes/tests/classes</exclude>
-      <exclude>@root@public/notes/tests/fixtures</exclude>
-    </testsuite>
     <testsuite name="core_tag_testsuite">
       <directory suffix="_test.php">@root@public/tag/tests</directory>
       <exclude>@root@public/tag/tests/classes</exclude>
@@ -227,11 +218,6 @@
       <directory suffix="_test.php">@root@public/webservice/tests</directory>
       <exclude>@root@public/webservice/tests/classes</exclude>
       <exclude>@root@public/webservice/tests/fixtures</exclude>
-    </testsuite>
-    <testsuite name="core_mnet_testsuite">
-      <directory suffix="_test.php">@root@public/mnet/tests</directory>
-      <exclude>@root@public/mnet/tests/classes</exclude>
-      <exclude>@root@public/mnet/tests/fixtures</exclude>
     </testsuite>
     <testsuite name="core_completion_testsuite">
       <directory suffix="_test.php">@root@public/completion/tests</directory>
@@ -273,25 +259,10 @@
       <exclude>@root@public/login/tests/classes</exclude>
       <exclude>@root@public/login/tests/fixtures</exclude>
     </testsuite>
-    <testsuite name="core_plagiarism_testsuite">
-      <directory suffix="_test.php">@root@public/plagiarism/tests</directory>
-      <exclude>@root@public/plagiarism/tests/classes</exclude>
-      <exclude>@root@public/plagiarism/tests/fixtures</exclude>
-    </testsuite>
-    <testsuite name="core_portfolio_testsuite">
-      <directory suffix="_test.php">@root@public/portfolio/tests</directory>
-      <exclude>@root@public/portfolio/tests/classes</exclude>
-      <exclude>@root@public/portfolio/tests/fixtures</exclude>
-    </testsuite>
     <testsuite name="core_editor_testsuite">
       <directory suffix="_test.php">@root@public/lib/editor/tests</directory>
       <exclude>@root@public/lib/editor/tests/classes</exclude>
       <exclude>@root@public/lib/editor/tests/fixtures</exclude>
-    </testsuite>
-    <testsuite name="core_rss_testsuite">
-      <directory suffix="_test.php">@root@public/rss/tests</directory>
-      <exclude>@root@public/rss/tests/classes</exclude>
-      <exclude>@root@public/rss/tests/fixtures</exclude>
     </testsuite>
     <testsuite name="core_table_testsuite">
       <directory suffix="_test.php">@root@public/lib/table/tests</directory>
@@ -313,11 +284,6 @@
       <exclude>@root@public/contentbank/tests/classes</exclude>
       <exclude>@root@public/contentbank/tests/fixtures</exclude>
     </testsuite>
-    <testsuite name="core_payment_testsuite">
-      <directory suffix="_test.php">@root@public/payment/tests</directory>
-      <exclude>@root@public/payment/tests/classes</exclude>
-      <exclude>@root@public/payment/tests/fixtures</exclude>
-    </testsuite>
     <testsuite name="core_reportbuilder_testsuite">
       <directory suffix="_test.php">@root@public/reportbuilder/tests</directory>
       <exclude>@root@public/reportbuilder/tests/classes</exclude>
@@ -332,16 +298,6 @@
       <directory suffix="_test.php">@root@public/admin/tests</directory>
       <exclude>@root@public/admin/tests/classes</exclude>
       <exclude>@root@public/admin/tests/fixtures</exclude>
-    </testsuite>
-    <testsuite name="core_communication_testsuite">
-      <directory suffix="_test.php">@root@public/communication/tests</directory>
-      <exclude>@root@public/communication/tests/classes</exclude>
-      <exclude>@root@public/communication/tests/fixtures</exclude>
-    </testsuite>
-    <testsuite name="core_ai_testsuite">
-      <directory suffix="_test.php">@root@public/ai/tests</directory>
-      <exclude>@root@public/ai/tests/classes</exclude>
-      <exclude>@root@public/ai/tests/fixtures</exclude>
     </testsuite>
     <testsuite name="core_sms_testsuite">
       <directory suffix="_test.php">@root@public/sms/tests</directory>

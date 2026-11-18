@@ -27,6 +27,12 @@ namespace qbank_comment;
  */
 final class lib_test extends \advanced_testcase {
 
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usecomments', 1);
+    }
+
     /**
      * Test the comment validation callback.
      */

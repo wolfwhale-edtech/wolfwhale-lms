@@ -40,6 +40,12 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(\qformat_xml::class)]
 final class xmlformat_test extends \question_testcase {
+    public function setUp(): void {
+        parent::setUp();
+        $this->resetAfterTest();
+        set_config('usetags', 1);
+    }
+
     public function make_test_question() {
         global $USER;
         $q = new \stdClass();

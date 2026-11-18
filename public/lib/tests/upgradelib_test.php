@@ -1124,20 +1124,21 @@ final class upgradelib_test extends advanced_testcase {
      * Test the functionality of upgrade_calendar_action_events_fix() function.
      */
     public function test_upgrade_calendar_action_events_fix(): void {
-        global $DB;
+        global $CFG, $DB;
 
         $this->resetAfterTest();
         $this->setAdminUser();
+        require_once($CFG->dirroot . '/mod/assign/locallib.php');
 
-        // Create a new course and a choice activity.
+        // Create a new course and an assignment.
         $course = $this->getDataGenerator()->create_course();
-        $choice = $this->getDataGenerator()->create_module('choice', ['course' => $course->id]);
+        $choice = $this->getDataGenerator()->create_module('assign', ['course' => $course->id]);
 
         // Create some action events.
-        create_action_event(['courseid' => $course->id, 'modulename' => 'choice', 'instance' => $choice->id,
-            'eventtype' => CHOICE_EVENT_TYPE_OPEN]);
-        create_action_event(['courseid' => $course->id, 'modulename' => 'choice', 'instance' => $choice->id,
-            'eventtype' => CHOICE_EVENT_TYPE_CLOSE]);
+        create_action_event(['courseid' => $course->id, 'modulename' => 'assign', 'instance' => $choice->id,
+            'eventtype' => ASSIGN_EVENT_TYPE_DUE]);
+        create_action_event(['courseid' => $course->id, 'modulename' => 'assign', 'instance' => $choice->id,
+            'eventtype' => ASSIGN_EVENT_TYPE_GRADINGDUE]);
 
         $eventscount = $DB->count_records('event');
 
@@ -1196,7 +1197,7 @@ final class upgradelib_test extends advanced_testcase {
         $student3 = $generator->create_and_enrol($course, 'student');
 
         // Create some activities and some override events.
-        foreach (['assign', 'lesson', 'quiz'] as $modulename) {
+        foreach (['assign', 'forum', 'quiz'] as $modulename) {
             $instance = $generator->create_module($modulename, ['course' => $course->id]);
             create_user_override_event($modulename, $instance->id, $student1->id);
             create_user_override_event($modulename, $instance->id, $student2->id);
@@ -1256,7 +1257,7 @@ final class upgradelib_test extends advanced_testcase {
         $group3 = $generator->create_group(['courseid' => $course->id]);
 
         // Create some activities and some override events.
-        foreach (['assign', 'lesson', 'quiz'] as $modulename) {
+        foreach (['assign', 'forum', 'quiz'] as $modulename) {
             $instance = $generator->create_module($modulename, ['course' => $course->id]);
             create_group_override_event($modulename, $instance->id, $course->id, $group1->id);
             create_group_override_event($modulename, $instance->id, $course->id, $group2->id);

@@ -86,6 +86,7 @@ final class generator_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
 
         // User that will create the forum.
         $user = self::getDataGenerator()->create_user();
@@ -131,6 +132,7 @@ final class generator_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
 
         // Create a bunch of users.
         $user1 = self::getDataGenerator()->create_user();
@@ -181,6 +183,7 @@ final class generator_test extends \advanced_testcase {
         global $DB;
 
         $this->resetAfterTest(true);
+        set_config('usetags', 1);
 
         // Create a bunch of users.
         $user1 = self::getDataGenerator()->create_user();

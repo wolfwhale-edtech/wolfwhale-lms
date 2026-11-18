@@ -183,6 +183,7 @@ final class quizobj_test extends advanced_testcase {
     public function test_get_all_question_types_used_with_tag(): void {
         $this->setAdminUser();
         $this->resetAfterTest();
+        set_config('usetags', 1);
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $questiongenerator = $generator->get_plugin_generator('core_question');

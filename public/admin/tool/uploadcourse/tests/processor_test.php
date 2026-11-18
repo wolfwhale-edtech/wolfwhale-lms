@@ -121,15 +121,11 @@ final class processor_test extends \advanced_testcase {
         $this->assertFalse($DB->record_exists('course', array('shortname' => 'c1')));
         $p->execute();
         $c1 = $DB->get_record('course', array('shortname' => 'c1'));
+        $this->assertNotFalse($c1);
         $modinfo = get_fast_modinfo($c1);
-        $found = false;
         foreach ($modinfo->get_cms() as $cmid => $cm) {
-            if ($cm->modname == 'glossary' && $cm->name == 'Imported Glossary') {
-                $found = true;
-                break;
-            }
+            $this->assertNotEquals('glossary', $cm->modname);
         }
-        $this->assertTrue($found);
     }
 
     public function test_shortname_template(): void {

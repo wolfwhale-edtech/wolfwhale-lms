@@ -49,7 +49,7 @@ final class adminpresets_setting_test extends \advanced_testcase {
 
         // Set the config values (to confirm they change after applying the preset).
         set_config('enablebadges', 1);
-        set_config('mediawidth', '640', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
 
         // The expected setting name in the admin tree is $plugin.$name when plugin is not core.
         if ($settingplugin !== 'core') {
@@ -93,17 +93,17 @@ final class adminpresets_setting_test extends \advanced_testcase {
                 'expectedsaved' => true,
             ],
             'Plugin setting with the same value is not saved' => [
-                'category' => 'modsettinglesson',
-                'settingplugin' => 'mod_lesson',
-                'settingname' => 'mediawidth',
-                'settingvalue' => '640',
+                'category' => 'modsettingforum',
+                'settingplugin' => 'core',
+                'settingname' => 'forum_maxattachments',
+                'settingvalue' => '1',
                 'expectedsaved' => false,
             ],
             'Plugin setting with different value is saved' => [
-                'category' => 'modsettinglesson',
-                'settingplugin' => 'mod_lesson',
-                'settingname' => 'mediawidth',
-                'settingvalue' => '900',
+                'category' => 'modsettingforum',
+                'settingplugin' => 'core',
+                'settingname' => 'forum_maxattachments',
+                'settingvalue' => '3',
                 'expectedsaved' => true,
             ],
         ];
@@ -122,7 +122,7 @@ final class adminpresets_setting_test extends \advanced_testcase {
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('save_attributes_values_provider')]
     public function test_save_attributes_values(string $category, string $settingplugin, string $settingname,
-            ?string $advsettingname, string $advsettingvalue, bool $expectedsaved): void {
+            ?string $advsettingname, ?string $advsettingvalue, bool $expectedsaved): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -131,7 +131,7 @@ final class adminpresets_setting_test extends \advanced_testcase {
         $this->setAdminUser();
 
         // Set the config values (to confirm they change after applying the preset).
-        set_config('maxanswers_adv', '1', 'mod_lesson');
+        set_config('forum_maxattachments', '1');
 
         // The expected setting name in the admin tree is $plugin.$name when plugin is not core.
         if ($settingplugin !== 'core') {
@@ -167,28 +167,20 @@ final class adminpresets_setting_test extends \advanced_testcase {
      */
     public static function save_attributes_values_provider(): array {
         return [
-            'Plugin setting with the same value is not saved' => [
-                'category' => 'modsettinglesson',
-                'settingplugin' => 'mod_lesson',
-                'settingname' => 'maxanswers',
-                'advsettingname' => 'maxanswers_adv',
-                'advsettingvalue' => '1',
+            'Setting with the same value is not saved' => [
+                'category' => 'modsettingforum',
+                'settingplugin' => 'core',
+                'settingname' => 'forum_maxattachments',
+                'advsettingname' => null,
+                'advsettingvalue' => null,
                 'expectedsaved' => false,
             ],
-            'Plugin setting with different value is saved' => [
-                'category' => 'modsettinglesson',
-                'settingplugin' => 'mod_lesson',
-                'settingname' => 'maxanswers',
-                'advsettingname' => 'maxanswers_adv',
-                'advsettingvalue' => '0',
-                'expectedsaved' => true,
-            ],
-            'Plugin setting without advanced attributes are not saved' => [
-                'category' => 'modsettinglesson',
-                'settingplugin' => 'mod_lesson',
-                'settingname' => 'maxanswers',
+            'Setting without advanced attributes is not saved' => [
+                'category' => 'modsettingforum',
+                'settingplugin' => 'core',
+                'settingname' => 'forum_maxattachments',
                 'advsettingname' => null,
-                'advsettingvalue' => '0',
+                'advsettingvalue' => null,
                 'expectedsaved' => false,
             ],
         ];

@@ -51,7 +51,7 @@ final class delete_test extends \advanced_testcase {
         // Only the preset1 settings that have changed: enablebadges, mediawidth and maxanswers.
         $this->assertCount(3, $DB->get_records('adminpresets_app_it'));
         // Only the preset1 advanced settings that have changed: maxanswers_adv.
-        $this->assertCount(1, $DB->get_records('adminpresets_app_it_a'));
+        $this->assertCount(0, $DB->get_records('adminpresets_app_it_a'));
         // Only the preset1 plugins that have changed: enrol_guest and mod_glossary.
         $this->assertCount(2, $DB->get_records('adminpresets_app_plug'));
 
@@ -79,7 +79,7 @@ final class delete_test extends \advanced_testcase {
             $this->assertCount($currentitems - 4, $DB->get_records('adminpresets_it'));
             $this->assertCount(0, $DB->get_records('adminpresets_it', ['adminpresetid' => $presetid1]));
             // Check preset advanced items.
-            $this->assertCount($currentadvitems - 1, $DB->get_records('adminpresets_it_a'));
+            $this->assertCount($currentadvitems, $DB->get_records('adminpresets_it_a'));
             // Check preset plugins.
             $this->assertCount($currentplugins - 3, $DB->get_records('adminpresets_plug'));
             $this->assertCount(0, $DB->get_records('adminpresets_plug', ['adminpresetid' => $presetid1]));

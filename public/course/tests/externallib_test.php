@@ -990,6 +990,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $this->assertEquals(1, $results['total']);
 
         // Enable coursetag option.
+        set_config('usetags', 1);
         set_config('block_tags_showcoursetags', true);
         // Add tag 'TAG-LABEL ON SECOND COURSE' to Course2.
         core_tag_tag::set_item_tags('core', 'course', $course2->id, context_course::instance($course2->id),
@@ -1110,9 +1111,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $record->userid = 0;
         $record->forum = $forum->id;
         $discussionforce = $this->getDataGenerator()->get_plugin_generator('mod_forum')->create_discussion($record);
-        $data = $this->getDataGenerator()->create_module('data',
-            array('assessed' => 1, 'scale' => 100, 'course' => $course->id, 'completion' => 2, 'completionentries' => 3));
-        $datacm = get_coursemodule_from_instance('data', $data->id);
+        $data = $this->getDataGenerator()->create_module('assign',
+            array('course' => $course->id, 'completion' => 2));
+        $datacm = get_coursemodule_from_instance('assign', $data->id);
         $page = $this->getDataGenerator()->create_module('page', array('course' => $course->id));
         $pagecm = get_coursemodule_from_instance('page', $page->id);
         // This is an stealth page (set by visibleoncoursepage).
@@ -1144,7 +1145,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $context = context_course::instance($course->id);
         $roleid = $this->assignUserCapability('moodle/course:view', $context->id);
         $this->assignUserCapability('moodle/course:update', $context->id, $roleid);
-        $this->assignUserCapability('mod/data:view', $context->id, $roleid);
+        $this->assignUserCapability('mod/assign:view', $context->id, $roleid);
 
         $conditions = array('course' => $course->id, 'section' => 2);
         $DB->set_field('course_sections', 'summary', 'Text with iframe <iframe src="https://moodle.org"></iframe>', $conditions);
@@ -1248,14 +1249,14 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 );
                 $this->assertFalse($module['branded']);
                 $testexecuted = $testexecuted + 1;
-            } else if ($module['id'] == $datacm->id and $module['modname'] == 'data') {
+            } else if ($module['id'] == $datacm->id and $module['modname'] == 'assign') {
                 $this->assertStringContainsString('customcompletionrules', $module['customdata']);
                 $this->assertFalse($module['noviewlink']);
                 $this->assertArrayNotHasKey('description', $module);
                 $this->assertEquals(
                     plugin_supports(
                         'mod',
-                        'data',
+                        'assign',
                         FEATURE_MOD_PURPOSE,
                         MOD_PURPOSE_OTHER
                     ), $module['purpose']
@@ -1833,7 +1834,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $resource = self::getDataGenerator()->create_module('resource', ['course' => $course->id]);
         // Create activities with dates.
         $resource = self::getDataGenerator()->create_module('forum', ['course' => $course->id, 'duedate' => $timenow]);
-        $resource = self::getDataGenerator()->create_module('choice',
+        $resource = self::getDataGenerator()->create_module('quiz',
             ['course' => $course->id, 'timeopen' => $timenow, 'timeclose' => $timenow + DAYSECS]);
         $resource = self::getDataGenerator()->create_module('assign',
             ['course' => $course->id, 'allowsubmissionsfromdate' => $timenow]);
@@ -1848,7 +1849,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 $this->assertCount(1, $module['dates']);
                 $this->assertEquals('duedate', $module['dates'][0]['dataid']);
                 $this->assertEquals($timenow, $module['dates'][0]['timestamp']);
-            } else if ($module['modname'] == 'choice') {
+            } else if ($module['modname'] == 'quiz') {
                 $this->assertCount(2, $module['dates']);
                 $this->assertEquals('timeopen', $module['dates'][0]['dataid']);
                 $this->assertEquals($timenow, $module['dates'][0]['timestamp']);
@@ -1935,9 +1936,9 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $forum = $this->getDataGenerator()->create_module('forum', array('course'=>$course->id));
         $forumcm = get_coursemodule_from_id('forum', $forum->cmid);
         $forumcontext = context_module::instance($forum->cmid);
-        $data = $this->getDataGenerator()->create_module('data', array('assessed'=>1, 'scale'=>100, 'course'=>$course->id));
+        $data = $this->getDataGenerator()->create_module('assign', array('course'=>$course->id));
         $datacontext = context_module::instance($data->cmid);
-        $datacm = get_coursemodule_from_instance('page', $data->id);
+        $datacm = get_coursemodule_from_instance('assign', $data->id);
         $page = $this->getDataGenerator()->create_module('page', array('course'=>$course->id));
         $pagecontext = context_module::instance($page->cmid);
         $pagecm = get_coursemodule_from_instance('page', $page->id);
@@ -2843,11 +2844,11 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
             }
             $this->assertCount(11, $course['options']);
             if ($course['id'] == SITEID) {
-                $this->assertTrue($navoptions->blogs);
+                $this->assertFalse($navoptions->blogs);
                 $this->assertFalse($navoptions->notes);
                 $this->assertFalse($navoptions->participants);
                 $this->assertTrue($navoptions->badges);
-                $this->assertTrue($navoptions->tags);
+                $this->assertFalse($navoptions->tags);
                 $this->assertFalse($navoptions->grades);
                 $this->assertFalse($navoptions->search);
                 $this->assertTrue($navoptions->competencies);
@@ -2855,7 +2856,7 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
                 $this->assertFalse($navoptions->overview);
                 $this->assertFalse($navoptions->learningoutcomes);
             } else {
-                $this->assertTrue($navoptions->blogs);
+                $this->assertFalse($navoptions->blogs);
                 $this->assertFalse($navoptions->notes);
                 $this->assertTrue($navoptions->participants);
                 $this->assertFalse($navoptions->badges);
@@ -3219,52 +3220,6 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         ], reset($course['customfields']));
     }
 
-    /**
-     * Test retrieving courses by field returning communication tools.
-     */
-    public function test_get_courses_by_field_communication(): void {
-        $this->resetAfterTest();
-        $this->setAdminUser();
-
-        // Create communication tool in course.
-        set_config('enablecommunicationsubsystem', 1);
-
-        $roomname = 'Course chat';
-        $telegramlink = 'https://my.telegram.chat/120';
-        $record = [
-            'selectedcommunication' => 'communication_customlink',
-            'communicationroomname' => $roomname,
-            'customlinkurl' => $telegramlink,
-        ];
-        $course = $this->getDataGenerator()->create_course($record);
-        $communication = \core_communication\api::load_by_instance(
-            context: \core\context\course::instance($course->id),
-            component: 'core_course',
-            instancetype: 'coursecommunication',
-            instanceid: $course->id,
-        );
-
-        $result = external_api::clean_returnvalue(
-            core_course_external::get_courses_by_field_returns(),
-            core_course_external::get_courses_by_field('id', $course->id)
-        );
-
-        $course = reset($result['courses']);
-        $this->assertEquals($roomname, $course['communicationroomname']);
-        $this->assertEquals($telegramlink, $course['communicationroomurl']);
-
-        // Course without comm tools.
-        $course = $this->getDataGenerator()->create_course();
-        $result = external_api::clean_returnvalue(
-            core_course_external::get_courses_by_field_returns(),
-            core_course_external::get_courses_by_field('id', $course->id)
-        );
-
-        $course = reset($result['courses']);
-        $this->assertNotContains('communicationroomname', $course);
-        $this->assertNotContains('communicationroomurl', $course);
-    }
-
     public function test_get_courses_by_field_invalid_field(): void {
         $this->expectException('invalid_parameter_exception');
         $result = core_course_external::get_courses_by_field('zyx', 'x');
@@ -3301,20 +3256,14 @@ final class externallib_test extends \core_external\tests\externallib_testcase {
         $tocreate = [
             'assign',
             'book',
-            'choice',
             'folder',
             'forum',
-            'glossary',
-            'imscp',
             'label',
-            'lesson',
             'lti',
             'page',
             'quiz',
             'resource',
-            'scorm',
             'url',
-            'wiki',
         ];
 
         $modules = array();

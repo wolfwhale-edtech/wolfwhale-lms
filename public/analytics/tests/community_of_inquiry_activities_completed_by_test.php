@@ -240,50 +240,13 @@ final class community_of_inquiry_activities_completed_by_test extends advanced_t
 
         // 1 with time close, one without.
         $params = array('course' => $course->id);
-        $choice1 = $this->getDataGenerator()->create_module('choice', $params);
-        $params['timeclose'] = $end;
-        $choice1 = $this->getDataGenerator()->create_module('choice', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
-        $data1 = $this->getDataGenerator()->create_module('data', $params);
-        $params['timeavailableto'] = $end;
-        $data1 = $this->getDataGenerator()->create_module('data', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
-        $feedback1 = $this->getDataGenerator()->create_module('feedback', $params);
-        $params['timeclose'] = $end;
-        $feedback1 = $this->getDataGenerator()->create_module('feedback', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
-        $lesson1 = $this->getDataGenerator()->create_module('lesson', $params);
-        $params['deadline'] = $end;
-        $lesson1 = $this->getDataGenerator()->create_module('lesson', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
         $quiz1 = $this->getDataGenerator()->create_module('quiz', $params);
         $params['timeclose'] = $end;
         $quiz1 = $this->getDataGenerator()->create_module('quiz', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
-        $scorm1 = $this->getDataGenerator()->create_module('scorm', $params);
-        $params['timeclose'] = $end;
-        $scorm1 = $this->getDataGenerator()->create_module('scorm', $params);
-
-        // 1 with time close, one without.
-        $params = array('course' => $course->id);
-        $workshop1 = $this->getDataGenerator()->create_module('workshop', $params);
-        $params['submissionend'] = $end;
-        $workshop1 = $this->getDataGenerator()->create_module('workshop', $params);
 
         $course = new \core_analytics\course($course);
 
-        $activitytypes = array('mod_assign', 'mod_choice', 'mod_data', 'mod_feedback', 'mod_lesson',
-            'mod_quiz', 'mod_scorm', 'mod_workshop');
+        $activitytypes = array('mod_assign', 'mod_quiz');
         foreach ($activitytypes as $activitytype) {
 
             list($indicator, $method) = $this->instantiate_indicator($activitytype, $course);

@@ -136,6 +136,9 @@ function xmldb_main_install() {
         'upgrade_calculatedgradeitemsignored' => 1, // New installs should not run this upgrade step.
         'upgrade_letterboundarycourses' => 1, // New installs should not run this upgrade step.
         'format_plugins_sortorder' => 'topics,weeks,singleactivity,social', // Default order for course format plugins.
+        'enableanalytics' => 0, // Prediction engine stays installed but off.
+        'usecomments' => 0,
+        'usetags' => 0,
     );
     foreach($defaults as $key => $value) {
         set_config($key, $value);

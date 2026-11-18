@@ -48,7 +48,7 @@ final class component_test extends \advanced_testcase {
      * this is defined here to annoy devs that try to add more without any thinking,
      * always verify that it does not collide with any existing add-on modules and subplugins!!!
      */
-    private const SUBSYSTEMCOUNT = 80;
+    private const SUBSYSTEMCOUNT = 73;
 
     public function test_get_core_subsystems(): void {
         global $CFG;
@@ -545,10 +545,10 @@ final class component_test extends \advanced_testcase {
         $this->assertSame(array_keys($feeds), $subplugins['assignfeedback']);
 
         // Any plugin without subtypes is ok here.
-        $this->assertFileExists("$CFG->dirroot/mod/choice");
-        $this->assertFileDoesNotExist("$CFG->dirroot/mod/choice/db/subplugins.json");
+        $this->assertFileExists("$CFG->dirroot/mod/page");
+        $this->assertFileDoesNotExist("$CFG->dirroot/mod/page/db/subplugins.json");
 
-        $this->assertNull(component::get_subplugins('mod_choice'));
+        $this->assertNull(component::get_subplugins('mod_page'));
 
         $this->assertNull(component::get_subplugins('xxxx_yyyy'));
     }

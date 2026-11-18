@@ -326,26 +326,21 @@ final class helper_test extends \advanced_testcase {
                 'preset' => 'starter',
                 'settings' => [
                     'enablebadges' => 0,
-                    'enableportfolios' => 0,
                 ],
                 'plugins' => [
                     'assign' => 1,
-                    'wiki' => 0,
-                    'data' => 0,
-                    'lesson' => 0,
+                    'lti' => 0,
                 ],
             ],
             'Full preset' => [
                 'preset' => 'full',
                 'settings' => [
                     'enablebadges' => 1,
-                    'enableportfolios' => 0,
                 ],
                 'plugins' => [
                     'assign' => 1,
                     'book' => 1,
-                    'data' => 1,
-                    'lesson' => 1,
+                    'lti' => 1,
                 ],
             ],
             'Preset 1, created manually' => [
@@ -356,7 +351,7 @@ final class helper_test extends \advanced_testcase {
                 ],
                 'plugins' => [
                     'assign' => 1,
-                    'glossary' => 0,
+                    'page' => 0,
                 ],
             ],
             'Unexisting preset name' => [
@@ -366,13 +361,11 @@ final class helper_test extends \advanced_testcase {
                 'preset' => self::get_fixture_path(__NAMESPACE__, 'import_settings_plugins.xml'),
                 'settings' => [
                     'allowemojipicker' => 1,
-                    'enableportfolios' => 1,
+                    'forum_maxattachments' => 3,
                 ],
                 'plugins' => [
                     'assign' => 1,
                     'page' => 0,
-                    'data' => 0,
-                    'lesson' => 1,
                 ],
             ],
             'Invalid XML file' => [
