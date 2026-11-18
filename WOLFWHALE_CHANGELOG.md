@@ -52,3 +52,43 @@ Each later change gets its own entry with:
 - Tests after the cleanup: A fresh PHPUnit database on PostgreSQL 17.12 ran the whole suite: 26,691 tests, 413,383 assertions, 0 errors, 10 failures, 251 skipped. The 10 failures are the file-download tests in `lib/tests/filelib_test.php`. They ask `download.moodle.org` for a sample file. This machine got a Cloudflare block page back, so the file hash did not match. Moodle already skips them when `TEST_EXTERNAL_FILES_HTTP_URL` is set to false. That switch was left unset. They were not given a new skip. MySQL was not installed on this machine. GitHub Actions then ran the same suite on both databases and both passed with 0 errors and 0 failures: PostgreSQL on PHP 8.4 was 26,703 tests and 413,915 assertions (192 skipped), and MySQL on PHP 8.3 was 26,703 tests and 151,734 assertions (194 skipped). Behat was not run. No data was copied from a real school, and no paid service was called.
 - What this cleanup changed: Web service entries for blog, notes, AI, and payment are gone, so a fresh install does not list them. The prediction engine stays off and, with no machine-learning backend installed, it no longer crashes when a test asks for one. Admin presets no longer store lesson, glossary, portfolio, or blog settings. Tests that still need tags or comments turn those on themselves. Forum no longer asks the missing portfolio code for an export link. The old blog, portfolio, payment, and AI tables are not created on a new install, and an upgrade drops them if they are still there.
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/2
+
+## WW-LMS-003 — Rebrand the site as WolfWhale
+
+- Date: 2026-11-18
+- Summary: A person using the site no longer sees the word Moodle in the name, the login page, the footer, or ordinary language strings. The new theme `theme_wolfwhale` is a child of Boost (Boost's files are not copied). It is the theme on a fresh install and on an upgrade from a site that did not have it yet. The look is light sky blue and aqua, with soft glass panels and rounded corners. The wordmark is the text WOLFWHALE in the self-hosted Fjalla One font, colour #2f5d8a. Four accent colours are available as theme variables and are not painted across the page. Sign-in instructions an administrator has written still appear under the wordmark. Capability names such as moodle/role:assign, component names, and other identifiers are not rewritten.
+- Classic theme: Moodle 5.3.1 does not include Classic. Nothing was removed.
+- Settings written on install and on the upgrade that first adds the theme:
+  - `theme` = `wolfwhale` (the automated test suites leave this as Boost)
+  - Site full name becomes `WolfWhale LMS` when it is empty or exactly `Moodle`
+  - Site short name becomes `WOLFWHALE` when it is empty or exactly `Moodle`
+  - A command-line install uses those two names when the installer is not given others
+- Files and folders changed, against upstream v5.3.1:
+  - `admin/cli/install.php` — default site full name and short name
+  - `public/lib/setup.php` — language strings are read through the WolfWhale string manager
+  - `public/lib/pagelib.php` — a missing site name in the page title falls back to WolfWhale
+  - `public/lib/tests/moodle_page_test.php` — the test expectation for that fallback
+  - `public/lib/classes/string_manager_install.php` — same product-name rewrite during install
+  - `public/lib/classes/output/core_renderer.php` — the keywords meta tag no longer says moodle
+  - `public/theme/wolfwhale/` — the new theme:
+    - `version.php`, `config.php`, `lib.php`, `db/install.php`
+    - `lang/en/theme_wolfwhale.php`
+    - `classes/string_manager.php` — rewrites the product name in language strings
+    - `classes/privacy/provider.php`
+    - `classes/output/core_renderer.php` — no upstream logo, no moodle.com services link
+    - `templates/core_admin/notification_ctas.mustache` — no marketplace or hosting cards
+    - `scss/pre.scss`, `scss/post.scss`
+    - `templates/core/login_panel.mustache`, `templates/core/loginform.mustache`
+    - `templates/theme_boost/footer.mustache` — no "Powered by Moodle" line
+    - `tests/string_manager_test.php`
+    - `thirdpartylibs.xml`
+    - `fonts/fjallaone/fjallaone-regular.woff2` and `fonts/fjallaone/OFL.txt` (SIL Open Font License)
+    - `pix/favicon.ico`, `pix/screenshot.png`
+- What still shows the word Moodle, on purpose or because changing it would break something:
+  - The copyright line on Site administration > Notifications. It reads "Moodle 5.3.1" and links to moodle.org. The GPL notice in that file says the line must stay. `NOTICE.md` and the copyright headers in the code stay as well.
+  - The footer link "Documentation for this page" does not say Moodle, but the address is still docs.moodle.org.
+  - Page source that a person does not read as a sentence: YUI file names, `@moodle` script paths, and the session cookie name MoodleSession.
+  - PHPUnit and Behat keep the upstream English and the Boost theme, because those tests look for the original wording.
+  - The old networking row stored in the database still has the display name Moodle. The networking screens are already gone.
+  - A server running PHP older than 8.1 prints "Moodle 4.4" and stops. The site cannot run on that PHP.
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/3

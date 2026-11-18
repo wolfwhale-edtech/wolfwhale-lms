@@ -426,6 +426,14 @@ if (!isset($CFG->config_php_settings)) {
     }
 }
 
+// WolfWhale LMS rewrites the product name in language strings. PHPUnit installs
+// its own string manager. Behat steps look for the upstream English.
+if (empty($CFG->config_php_settings['customstringmanager'])
+        && !PHPUNIT_TEST
+        && !defined('BEHAT_SITE_RUNNING')) {
+    $CFG->config_php_settings['customstringmanager'] = '\theme_wolfwhale\string_manager';
+}
+
 if (isset($CFG->debug)) {
     $CFG->debug = (int)$CFG->debug;
 } else {

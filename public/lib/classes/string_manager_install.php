@@ -146,6 +146,12 @@ class core_string_manager_install implements core_string_manager {
 
         $string = $string[$identifier];
 
+        // WolfWhale LMS: rewrite the product name in installer strings before placeholders are filled.
+        if ((!defined('PHPUNIT_TEST') || !PHPUNIT_TEST) && !defined('BEHAT_SITE_RUNNING')
+                && class_exists(\theme_wolfwhale\string_manager::class)) {
+            $string = \theme_wolfwhale\string_manager::rebrand($string);
+        }
+
         if ($a !== null) {
             if (is_object($a) or is_array($a)) {
                 $a = (array)$a;
