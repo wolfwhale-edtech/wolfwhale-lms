@@ -91,4 +91,4 @@ Each later change gets its own entry with:
   - PHPUnit and Behat keep the upstream English and the Boost theme, because those tests look for the original wording.
   - The old networking row stored in the database still has the display name Moodle. The networking screens are already gone.
   - A server running PHP older than 8.1 prints "Moodle 4.4" and stops. The site cannot run on that PHP.
-- Pull request: (opened with this change)
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/3
