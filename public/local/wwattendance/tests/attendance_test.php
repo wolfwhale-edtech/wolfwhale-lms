@@ -82,6 +82,41 @@ final class attendance_test extends \advanced_testcase {
     }
 
     /**
+     * Two teachers with different clocks share one sheet for the site's day.
+     */
+    public function test_the_attendance_day_ignores_profile_timezones(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $east = $this->getDataGenerator()->create_user();
+        $west = $this->getDataGenerator()->create_user();
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($east->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($west->id, $course->id, 'teacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $DB->set_field('user', 'timezone', 'Pacific/Auckland', ['id' => $east->id]);
+        $DB->set_field('user', 'timezone', 'Pacific/Honolulu', ['id' => $west->id]);
+
+        // 2023-11-14 22:13 UTC is the next day in Auckland and the same day in Honolulu.
+        $stamp = 1700000000;
+        $this->setUser($east);
+        $eastday = attendance::day_start($stamp);
+        $this->setUser($west);
+        $westday = attendance::day_start($stamp);
+        $this->assertSame($eastday, $westday);
+
+        attendance::save((int) $course->id, [
+            $student->id => attendance::PRESENT,
+        ], $westday);
+        $this->setUser($east);
+        $this->assertSame(
+            attendance::PRESENT,
+            attendance::marks((int) $course->id, $eastday)[(int) $student->id]
+        );
+    }
+
+    /**
      * A non-editing teacher may take attendance. A student and a manager may not.
      */
     public function test_only_teachers_can_take_attendance(): void {

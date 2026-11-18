@@ -66,13 +66,16 @@ class attendance {
     }
 
     /**
-     * Start of the user's today, or of the given moment.
+     * Start of the site's day for a moment.
+     *
+     * The site timezone is shared by every teacher. A profile timezone must not
+     * open a second sheet for the same course on the same day.
      *
      * @param int|null $time
      * @return int
      */
     public static function day_start(?int $time = null): int {
-        return usergetmidnight($time ?? time());
+        return usergetmidnight($time ?? time(), \core_date::get_server_timezone());
     }
 
     /**

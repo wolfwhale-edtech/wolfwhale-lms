@@ -266,8 +266,12 @@ class teacher {
                 }
                 $assign = new \assign($context, $cm, $course);
                 $instance = $assign->get_instance();
+                $groupids = self::marking_groups($cm);
+                if ($groupids === []) {
+                    continue;
+                }
                 if (!empty($instance->teamsubmission)) {
-                    $count = $assign->count_submissions_need_grading_with_groups([]);
+                    $count = $assign->count_submissions_need_grading_with_groups($groupids ?? []);
                     if ($count < 1) {
                         continue;
                     }
@@ -288,7 +292,7 @@ class teacher {
                     'assignid' => $instance->id,
                     'submitted' => ASSIGN_SUBMISSION_STATUS_SUBMITTED,
                 ];
-                [$esql, $eparams] = get_enrolled_sql($context, '', [], true);
+                [$esql, $eparams] = get_enrolled_sql($context, '', $groupids ?? [], true);
                 $params += $eparams;
                 $scale = ((int) $instance->grade < 0) ? ' OR g.grade = ' . ASSIGN_GRADE_NOT_SET : '';
                 $sql = "SELECT s.id, s.userid, u.firstname, u.lastname, u.firstnamephonetic,
@@ -697,7 +701,7 @@ class teacher {
             if (!empty($assign->get_instance()->teamsubmission)) {
                 continue;
             }
-            foreach ($students as $student) {
+            foreach (self::eligible($students, $cm) as $student) {
                 $assign->update_effective_access($student->id);
                 $due = (int) $assign->get_instance($student->id)->duedate;
                 $flags = $assign->get_user_flags($student->id, false);
@@ -725,10 +729,10 @@ class teacher {
                 continue;
             }
             $base = $DB->get_record('quiz', ['id' => $cm->instance], '*', MUST_EXIST);
-            foreach ($students as $student) {
+            foreach (self::eligible($students, $cm) as $student) {
                 $quiz = quiz_update_effective_access(clone $base, $student->id);
-                $close = (int) ($quiz->timeclose ?? 0);
-                if ($close <= 0 || $close >= $now) {
+                $deadline = self::quiz_deadline($quiz);
+                if ($deadline <= 0 || $deadline >= $now) {
                     continue;
                 }
                 $finished = $DB->record_exists('quiz_attempts', [
@@ -740,11 +744,69 @@ class teacher {
                 if ($finished) {
                     continue;
                 }
-                self::keep_earlier($map, (int) $student->id, $close, self::plain($base->name),
+                self::keep_earlier($map, (int) $student->id, $deadline, self::plain($base->name),
                     (new \moodle_url('/mod/quiz/view.php', ['id' => $cm->id]))->out(false));
             }
         }
         return $map;
+    }
+
+    /**
+     * Groups this teacher may mark, or null when every group is allowed.
+     *
+     * An empty array means separate groups and this teacher is in none of them,
+     * so the queue is empty. An empty list passed to the enrolment query would
+     * mean the opposite: every group.
+     *
+     * @param \cm_info $cm
+     * @return int[]|null
+     */
+    private static function marking_groups(\cm_info $cm): ?array {
+        if (groups_get_activity_groupmode($cm) != SEPARATEGROUPS) {
+            return null;
+        }
+        $context = \context_module::instance($cm->id);
+        if (has_capability('moodle/site:accessallgroups', $context)) {
+            return null;
+        }
+        $groups = groups_get_activity_allowed_groups($cm);
+        if (!$groups) {
+            return [];
+        }
+        return array_map('intval', array_keys($groups));
+    }
+
+    /**
+     * Students who are allowed to see this activity.
+     *
+     * A group or grouping restriction is applied here. Course absence is not.
+     *
+     * @param \stdClass[] $students
+     * @param \cm_info $cm
+     * @return \stdClass[] Keyed by user id.
+     */
+    private static function eligible(array $students, \cm_info $cm): array {
+        $info = new \core_availability\info_module($cm);
+        $kept = [];
+        foreach ($info->filter_user_list($students) as $student) {
+            $kept[(int) $student->id] = $student;
+        }
+        return $kept;
+    }
+
+    /**
+     * When a quiz becomes late: the due date, the close date, or the earlier of the two.
+     *
+     * @param \stdClass $quiz
+     * @return int
+     */
+    private static function quiz_deadline(\stdClass $quiz): int {
+        $due = (int) ($quiz->duedate ?? 0);
+        $close = (int) ($quiz->timeclose ?? 0);
+        if ($due > 0 && $close > 0) {
+            return min($due, $close);
+        }
+        return max($due, $close);
     }
 
     /**

@@ -513,6 +513,98 @@ final class teacher_test extends \advanced_testcase {
     }
 
     /**
+     * A non-editing teacher in separate groups only sees their own groups.
+     */
+    public function test_marking_stays_inside_the_teachers_groups(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $teacher = $this->getDataGenerator()->create_user();
+        $outsider = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'teacher');
+        $this->getDataGenerator()->enrol_user($outsider->id, $course->id, 'teacher');
+        $mine = $this->getDataGenerator()->create_user(['firstname' => 'River', 'lastname' => 'Stone']);
+        $theirs = $this->getDataGenerator()->create_user(['firstname' => 'Dale', 'lastname' => 'West']);
+        $this->getDataGenerator()->enrol_user($mine->id, $course->id, 'student');
+        $this->getDataGenerator()->enrol_user($theirs->id, $course->id, 'student');
+
+        $groupa = $this->getDataGenerator()->create_group(['courseid' => $course->id, 'name' => 'Group A']);
+        $groupb = $this->getDataGenerator()->create_group(['courseid' => $course->id, 'name' => 'Group B']);
+        $this->getDataGenerator()->create_group_member(['groupid' => $groupa->id, 'userid' => $teacher->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $groupa->id, 'userid' => $mine->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $groupb->id, 'userid' => $theirs->id]);
+
+        $assign = $this->assignment($course->id, 'Grouped essay', ['groupmode' => SEPARATEGROUPS]);
+        $this->submit((int) $mine->id, (int) $assign->cmid);
+        $this->submit((int) $theirs->id, (int) $assign->cmid);
+
+        $this->setUser($teacher);
+        $items = teacher::marking_items();
+        $this->assertCount(1, $items);
+        $this->assertSame('River Stone', $items[0]['word']);
+        $this->assertStringNotContainsString('Dale West', json_encode($items));
+
+        $this->setUser($outsider);
+        $this->assertSame([], teacher::marking_items());
+    }
+
+    /**
+     * A quiz is late at its due date, even when it still accepts attempts.
+     */
+    public function test_a_quiz_due_date_counts_as_overdue(): void {
+        $this->resetAfterTest();
+        $now = time();
+        $teacher = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['fullname' => 'Quiz room']);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $student = $this->getDataGenerator()->create_user(['firstname' => 'Quiz', 'lastname' => 'Taker']);
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $this->getDataGenerator()->create_module('quiz', [
+            'course' => $course->id,
+            'name' => 'Due quiz',
+            'duedate' => $now - HOURSECS,
+            'timeclose' => $now + WEEKSECS,
+        ]);
+        $this->visit((int) $student->id, (int) $course->id, $now);
+
+        $this->setUser($teacher);
+        $rows = $this->rows_by_word(teacher::stuck_rows());
+        $this->assertArrayHasKey('Quiz Taker', $rows);
+        $this->assertStringContainsString('Due quiz', $rows['Quiz Taker']['fact']);
+    }
+
+    /**
+     * A group restriction keeps students outside that group off the overdue list.
+     */
+    public function test_overdue_work_ignores_students_who_cannot_see_the_activity(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $now = time();
+        $teacher = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course(['fullname' => 'North room']);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $inside = $this->getDataGenerator()->create_user(['firstname' => 'River', 'lastname' => 'Stone']);
+        $outside = $this->getDataGenerator()->create_user(['firstname' => 'Dale', 'lastname' => 'West']);
+        $this->getDataGenerator()->enrol_user($inside->id, $course->id, 'student');
+        $this->getDataGenerator()->enrol_user($outside->id, $course->id, 'student');
+        $group = $this->getDataGenerator()->create_group(['courseid' => $course->id]);
+        $this->getDataGenerator()->create_group_member(['groupid' => $group->id, 'userid' => $inside->id]);
+        $assign = $this->assignment($course->id, 'Group essay', ['duedate' => $now - DAYSECS]);
+        $availability = json_encode(\core_availability\tree::get_root_json([
+            \availability_group\condition::get_json($group->id),
+        ]));
+        $DB->set_field('course_modules', 'availability', $availability, ['id' => $assign->cmid]);
+        rebuild_course_cache($course->id, true);
+        $this->visit((int) $inside->id, (int) $course->id, $now);
+        $this->visit((int) $outside->id, (int) $course->id, $now);
+
+        $this->setUser($teacher);
+        $rows = $this->rows_by_word(teacher::stuck_rows());
+        $this->assertArrayHasKey('River Stone', $rows);
+        $this->assertArrayNotHasKey('Dale West', $rows);
+    }
+
+    /**
      * A student who calls the teacher data sees none of it.
      */
     public function test_a_student_sees_no_teacher_data(): void {
