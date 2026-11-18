@@ -212,3 +212,4 @@ Each later change gets its own entry with:
   - `public/local/wwattendance/classes/attendance.php` — a read of one person's marks, refused without the parent capability in that person's user context
   - `public/local/wwattendance/lang/en/local_wwattendance.php` — the closed-page word
   - `public/local/wwattendance/tests/attendance_test.php` — a teacher cannot use that read
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/6
