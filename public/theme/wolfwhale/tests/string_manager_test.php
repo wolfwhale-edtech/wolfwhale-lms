@@ -59,6 +59,28 @@ final class string_manager_test extends \basic_testcase {
     }
 
     /**
+     * Capability names, component names, and other identifiers stay as written.
+     */
+    public function test_rebrand_keeps_identifiers(): void {
+        $this->assertSame(
+            'By default, moodle/role:assign is required',
+            string_manager::rebrand('By default, moodle/role:assign is required')
+        );
+        $this->assertSame(
+            'users with the capability (moodle/course:request) will',
+            string_manager::rebrand('users with the capability (moodle/course:request) will')
+        );
+        $this->assertSame(
+            'Enabling this removes the moodle/role:assign requirement in WolfWhale.',
+            string_manager::rebrand('Enabling this removes the moodle/role:assign requirement in Moodle.')
+        );
+        $this->assertSame('mod_moodle', string_manager::rebrand('mod_moodle'));
+        $this->assertSame('core_moodle', string_manager::rebrand('core_moodle'));
+        $this->assertSame('moodle\\output\\core_renderer', string_manager::rebrand('moodle\\output\\core_renderer'));
+        $this->assertSame('WolfWhale.', string_manager::rebrand('Moodle.'));
+    }
+
+    /**
      * Text with no product name is returned unchanged.
      */
     public function test_rebrand_leaves_unrelated_text(): void {

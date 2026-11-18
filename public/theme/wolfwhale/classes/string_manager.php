@@ -48,7 +48,9 @@ class string_manager extends \core_string_manager_standard {
     /**
      * Replace the product name in a language string.
      *
-     * Web addresses and the session cookie name are left as they are.
+     * Web addresses, the session cookie name, and identifiers are left as they are.
+     * An identifier is a capability (moodle/role:assign), a component, or any token
+     * joined to the product name by a slash, colon, underscore, or dot.
      * Placeholder tokens such as {$a->moodlerelease} are left as they are.
      *
      * @param string $value Language string template
@@ -70,13 +72,19 @@ class string_manager extends \core_string_manager_standard {
             $value
         );
 
-        $value = preg_replace('/\bmoodlers\b/i', 'WolfWhale users', $value);
-        $value = preg_replace_callback('/\bmoodle\b/i', function(array $match): string {
-            if ($match[0] === 'MOODLE') {
-                return 'WOLFWHALE';
-            }
-            return 'WolfWhale';
-        }, $value);
+        $value = preg_replace('/(?<![\w\/\\\\:-])moodlers(?![\w\/\\\\:-])/i', 'WolfWhale users', $value);
+        // Ordinary words only. A slash, colon, underscore, or hyphen means this is a
+        // capability, component, or other identifier, and it must stay unchanged.
+        $value = preg_replace_callback(
+            '/(?<![\w\/\\\\:-])moodle(?![\w\/\\\\:-])/i',
+            function(array $match): string {
+                if ($match[0] === 'MOODLE') {
+                    return 'WOLFWHALE';
+                }
+                return 'WolfWhale';
+            },
+            $value
+        );
 
         if ($protected) {
             $value = strtr($value, $protected);
