@@ -471,7 +471,7 @@ body[id^="page-local-wolfwhale-"] #region-main-box {
     .ww-print,
     .drawer,
     .secondary-navigation {
-        display: none !important;
+        display: none;
     }
 
     .ww-report,
