@@ -56,7 +56,7 @@ Each later change gets its own entry with:
 ## WW-LMS-003 — Rebrand the site as WolfWhale
 
 - Date: 2026-11-18
-- Summary: A person using the site no longer sees the word Moodle in the name, the login page, the footer, or ordinary language strings. The new theme `theme_wolfwhale` is a child of Boost (Boost's files are not copied). It is the theme on a fresh install and on an upgrade from a site that did not have it yet. The look is light sky blue and aqua, with soft glass panels and rounded corners. The wordmark is the text WOLFWHALE in the self-hosted Fjalla One font, colour #2f5d8a. Four accent colours are available as theme variables and are not painted across the page.
+- Summary: A person using the site no longer sees the word Moodle in the name, the login page, the footer, or ordinary language strings. The new theme `theme_wolfwhale` is a child of Boost (Boost's files are not copied). It is the theme on a fresh install and on an upgrade from a site that did not have it yet. The look is light sky blue and aqua, with soft glass panels and rounded corners. The wordmark is the text WOLFWHALE in the self-hosted Fjalla One font, colour #2f5d8a. Four accent colours are available as theme variables and are not painted across the page. Sign-in instructions an administrator has written still appear under the wordmark.
 - Classic theme: Moodle 5.3.1 does not include Classic. Nothing was removed.
 - Settings written on install and on the upgrade that first adds the theme:
   - `theme` = `wolfwhale` (the automated test suites leave this as Boost)

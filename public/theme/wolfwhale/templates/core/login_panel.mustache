@@ -21,8 +21,12 @@
 
     Example context (json):
     {
+        "leftinstructions": "<p>Use the account your school gave you.</p>"
     }
 }}
 <div class="login-layout-left-content ww-login-brand">
     <h1 class="ww-wordmark">WOLFWHALE</h1>
+    {{#leftinstructions}}
+        <div class="ww-login-instructions">{{{leftinstructions}}}</div>
+    {{/leftinstructions}}
 </div>

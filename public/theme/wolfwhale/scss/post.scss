@@ -116,6 +116,15 @@ body.pagelayout-login #page .login-layout-left::after {
         inset 0 1px 0 rgba(255, 255, 255, .95);
 }
 
+.ww-login-instructions {
+    color: #16324a;
+    font-size: 1rem;
+    letter-spacing: 0;
+    line-height: 1.5;
+    margin-top: 1.5rem;
+    text-align: start;
+}
+
 .login-layout-right {
     background-color: rgba(255, 255, 255, .62);
 }
