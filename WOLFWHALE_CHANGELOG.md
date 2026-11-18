@@ -158,4 +158,4 @@ Each later change gets its own entry with:
     - `templates/take.mustache`
     - `styles.css`
     - `tests/attendance_test.php`
-- Pull request: pending
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/5
