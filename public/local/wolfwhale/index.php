@@ -27,6 +27,9 @@ require(__DIR__ . '/../../config.php');
 require_login();
 
 if (isguestuser() || !\local_wolfwhale\home::is_student((int) $USER->id)) {
+    if (\local_wolfwhale\teacher::is_teacher((int) $USER->id)) {
+        redirect(\local_wolfwhale\teacher::url());
+    }
     redirect(new moodle_url('/my/'));
 }
 

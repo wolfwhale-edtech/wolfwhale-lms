@@ -109,3 +109,53 @@ Each later change gets its own entry with:
 - The page does not store any personal data. It only reads what Moodle already stores for the signed-in person.
 - Folders touched: `public/local/wolfwhale/` (new), `NOTICE.md`, `WOLFWHALE_CHANGELOG.md`.
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/4
+
+## WW-LMS-005 — Teacher home
+
+- Date: 2026-11-18
+- Summary: A person who teaches a course now lands on a home of large picture tiles instead of the usual dashboard. The tiles are Post, Marking, Attendance, Messages, Stuck, and Marks. Each tile uses that teacher's own courses. A person who is only a student still lands on the student home. A site administrator still gets the usual dashboard, even if they also teach. A manager or a course creator who does not teach a course still gets the usual dashboard. A person who is a student in one course and a teacher in another lands on the teacher home.
+- How a teacher is recognised: they are signed in, they are not a guest, they are not a site administrator, and they hold a teacher or editing-teacher role on a course, or on a category that contains that course. A teacher or editing-teacher role on the whole site does not by itself open this home, and it does not list every course.
+- What each tile shows, and where one tap goes:
+  - Post: the course name when there is one course they can change, or the count when there are several. The tap opens those courses. Each course has Lesson, File, and Assignment. Lesson opens the real add screen for a page. File opens the real add screen for a file. Assignment opens the real add screen for an assignment. Nothing is created until that screen is saved. A non-editing teacher cannot change activities, so Post says "None". The separate lesson activity is not in this fork, so a lesson here is a page.
+  - Marking: how many submitted assignments still need a grade. The tap opens the list. Each row opens that submission in the grader. A grade already saved is not in the list. A team assignment that still needs grading is one row for the assignment. Another teacher's course is not listed. If the grade capability is prohibited, the row is not listed. In separate groups, a teacher who cannot see every group only sees the groups they belong to. An editing teacher, who can see every group, still sees them all.
+  - Attendance: the course name when there is one course, or the count when there are several. One course opens the take-attendance page. Several courses open the list, and each course opens its own page. The page lists enrolled students and stores present, absent, or late for the site's day, so two teachers with different clocks share one sheet. A second save on the same day updates the same day. A student, a manager, and a teacher of another course cannot open it.
+  - Messages: the number of unread conversations, the same number the site already uses. The tap opens the students in this teacher's courses. Each name opens a conversation with that student. If messaging is switched off, or this person cannot send messages, the tile is not there.
+  - Stuck: how many students, per course, have overdue work or have not opened the course in 7 days. Overdue work is an assignment whose due date has passed with no submission, or a quiz whose due date or close date has passed with no finished attempt. A student who is not allowed to see that activity, for example because it is restricted to another group, is not listed for it. An extension that moves the date into the future is not overdue. A visit 6 days ago is not listed for absence. A visit of 7 days, or no visit at all, is listed. The tap opens the list. An overdue assignment opens that student's grader row. A late quiz opens the quiz. A long absence opens that person's course profile.
+  - Marks: one course opens the grader report. Several courses open a list, and each course opens its grader report. If the grader report capability is prohibited, the course is not listed.
+- Read aloud: the teacher home uses the same speaker buttons as the student home. They use the browser's own speech. If the browser cannot speak, the buttons are not shown.
+- Look: the same glossy sky-blue glass tiles. Post and Messages use the indigo accent, Attendance the teal accent, Marking and Marks the yellow accent, Stuck and the speaker buttons the red accent. The icons are original drawings stored in the page. Nothing is loaded from another site.
+- Attendance stores personal data: the day, the course, who was present, absent, or late, and who took the register. Deleting a student removes that student's marks and leaves everyone else. Deleting the person who took the register clears that name and leaves the marks. The teacher home itself still stores nothing.
+- Treaty Education outcomes: no outcome text was added, and no hook was added. There is no outcome source in this fork to attach a hook to, and inventing the wording was not allowed.
+- What was checked: PHPUnit for the new data and capability checks, 39 tests and 242 assertions, including the existing student-home tests. Separate groups, a quiz due date, a group restriction, and two teacher timezones are covered. A local site was installed and opened in a browser with made-up names. A teacher landed on the teacher home, the empty teacher home showed None where there was nothing to do, the attendance page showed the saved present, absent, and late marks, a student still landed on the student home, and an administrator still landed on the usual dashboard.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the teacher-home icons
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wolfwhale/version.php` — version raised to 2026111802
+  - `public/local/wolfwhale/index.php` — a teacher who opens the student home is sent to the teacher home
+  - `public/local/wolfwhale/classes/hook_callbacks.php` — login, dashboard, and the bar link for a teacher
+  - `public/local/wolfwhale/classes/teacher.php` — new, the teacher-home data
+  - `public/local/wolfwhale/teacher.php` — the teacher home
+  - `public/local/wolfwhale/post.php` — Lesson, File, and Assignment
+  - `public/local/wolfwhale/marking.php` — submissions that need a grade
+  - `public/local/wolfwhale/attendance.php` — courses where attendance can be taken
+  - `public/local/wolfwhale/stuck.php` — students who are overdue or away
+  - `public/local/wolfwhale/marks.php` — grader report links
+  - `public/local/wolfwhale/students.php` — students this teacher can message
+  - `public/local/wolfwhale/lang/en/local_wolfwhale.php` — the new words
+  - `public/local/wolfwhale/styles.css` — tile and list styles
+  - `public/local/wolfwhale/templates/teacher.mustache` — the teacher home
+  - `public/local/wolfwhale/templates/list.mustache` — the lists
+  - `public/local/wolfwhale/templates/post.mustache` — the add screen
+  - `public/local/wolfwhale/tests/teacher_test.php` — data and capability tests
+  - `public/local/wwattendance/` — new attendance plugin:
+    - `version.php`
+    - `db/install.xml` — one table for the day, one table for each person's mark
+    - `db/access.php` — take attendance, for teacher and editing teacher
+    - `lang/en/local_wwattendance.php`
+    - `classes/attendance.php`
+    - `classes/privacy/provider.php`
+    - `take.php` — one course, one day
+    - `templates/take.mustache`
+    - `styles.css`
+    - `tests/attendance_test.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/5

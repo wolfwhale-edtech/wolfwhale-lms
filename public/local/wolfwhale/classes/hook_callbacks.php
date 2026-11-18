@@ -17,7 +17,7 @@
 namespace local_wolfwhale;
 
 /**
- * Sends a student to the student home.
+ * Sends a student to the student home and a teacher to the teacher home.
  *
  * The automated suites are left alone. They still open the normal dashboard.
  *
@@ -35,7 +35,11 @@ class hook_callbacks {
         if (self::skip() || !isloggedin() || isguestuser()) {
             return;
         }
-        if (!home::should_redirect($PAGE->url, (int) $USER->id)) {
+        $userid = (int) $USER->id;
+        if (teacher::should_redirect($PAGE->url, $userid)) {
+            redirect(teacher::url());
+        }
+        if (!home::should_redirect($PAGE->url, $userid)) {
             return;
         }
         redirect(home::url());
@@ -54,7 +58,11 @@ class hook_callbacks {
         if (!is_string($current) || $current === '') {
             $current = null;
         }
-        $replacement = home::login_wantsurl($current, (int) $USER->id);
+        $userid = (int) $USER->id;
+        $replacement = teacher::login_wantsurl($current, $userid);
+        if ($replacement === null) {
+            $replacement = home::login_wantsurl($current, $userid);
+        }
         if ($replacement !== null) {
             $SESSION->wantsurl = $replacement;
         }
@@ -68,9 +76,27 @@ class hook_callbacks {
     public static function primary_extend(\core\hook\navigation\primary_extend $hook): void {
         global $USER;
 
-        if (self::skip() || !isloggedin() || isguestuser() || !home::is_student((int) $USER->id)) {
+        if (self::skip() || !isloggedin() || isguestuser()) {
             return;
         }
+        $userid = (int) $USER->id;
+        if (teacher::is_teacher($userid)) {
+            self::point_home_at(teacher::url(), $hook);
+            return;
+        }
+        if (!home::is_student($userid)) {
+            return;
+        }
+        self::point_home_at(home::url(), $hook);
+    }
+
+    /**
+     * Point the bar's home link at a WolfWhale page.
+     *
+     * @param \moodle_url $url
+     * @param \core\hook\navigation\primary_extend $hook
+     */
+    private static function point_home_at(\moodle_url $url, \core\hook\navigation\primary_extend $hook): void {
         $node = $hook->get_primaryview()->find('myhome', \navigation_node::TYPE_SETTING);
         if (!$node) {
             $node = $hook->get_primaryview()->find('myhome', null);
@@ -78,7 +104,7 @@ class hook_callbacks {
         if (!$node) {
             return;
         }
-        $node->action = home::url();
+        $node->action = $url;
         $node->text = get_string('home', 'local_wolfwhale');
     }
 

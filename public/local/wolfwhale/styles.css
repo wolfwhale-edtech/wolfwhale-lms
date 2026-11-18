@@ -1,6 +1,6 @@
-/* WolfWhale student home. Glass tiles on the theme's sky. */
+/* WolfWhale home. Glass tiles on the theme's sky. */
 
-#page-local-wolfwhale-index #page-header {
+body[id^="page-local-wolfwhale-"] #page-header {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -12,8 +12,8 @@
     border: 0;
 }
 
-#page-local-wolfwhale-index #region-main,
-#page-local-wolfwhale-index #region-main-box {
+body[id^="page-local-wolfwhale-"] #region-main,
+body[id^="page-local-wolfwhale-"] #region-main-box {
     background: transparent;
     border: 0;
     box-shadow: none;
@@ -79,8 +79,22 @@
     border-top-color: #149a9a;
 }
 
-.ww-tile-messages {
+.ww-tile-messages,
+.ww-tile-post {
     border-top-color: #3d4db8;
+}
+
+.ww-tile-marking,
+.ww-tile-marks {
+    border-top-color: #e6b325;
+}
+
+.ww-tile-attendance {
+    border-top-color: #149a9a;
+}
+
+.ww-tile-stuck {
+    border-top-color: #d64545;
 }
 
 .ww-tile-link {
@@ -129,8 +143,22 @@
     color: #149a9a;
 }
 
-.ww-tile-messages .ww-tile-icon {
+.ww-tile-messages .ww-tile-icon,
+.ww-tile-post .ww-tile-icon {
     color: #3d4db8;
+}
+
+.ww-tile-marking .ww-tile-icon,
+.ww-tile-marks .ww-tile-icon {
+    color: #e6b325;
+}
+
+.ww-tile-attendance .ww-tile-icon {
+    color: #149a9a;
+}
+
+.ww-tile-stuck .ww-tile-icon {
+    color: #d64545;
 }
 
 .ww-tile-courses .ww-tile-icon {
@@ -224,5 +252,83 @@
 
     .ww-tile-word {
         font-size: 1.85rem;
+    }
+}
+
+.ww-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ww-row,
+.ww-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .25rem;
+    min-height: 6.5rem;
+    padding: 1.3rem 1.1rem;
+    color: #16324a;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 1.5rem;
+    background-color: rgba(255, 255, 255, .82);
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, .95) 0%, rgba(186, 230, 255, .72) 100%);
+    border: 1px solid rgba(255, 255, 255, .95);
+    box-shadow: 0 1rem 2rem rgba(47, 93, 138, .14), inset 0 1px 0 #fff;
+}
+
+.ww-row:hover,
+.ww-row:focus,
+.ww-action:hover,
+.ww-action:focus {
+    color: #16324a;
+    text-decoration: none;
+}
+
+.ww-row:focus-visible,
+.ww-action:focus-visible {
+    outline: 3px solid #145a7a;
+    outline-offset: 3px;
+}
+
+.ww-row-word,
+.ww-row-fact,
+.ww-row-course,
+.ww-course-name,
+.ww-action {
+    font-size: 1.55rem;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.ww-course {
+    margin: 0 0 1.5rem;
+}
+
+.ww-course-name {
+    margin: 0 0 .7rem;
+    color: #16324a;
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.ww-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.ww-action {
+    background-image: linear-gradient(to bottom, #fff 0%, #d9e4ff 100%);
+}
+
+@media (min-width: 40rem) {
+    .ww-actions {
+        grid-template-columns: 1fr 1fr 1fr;
     }
 }

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for the WolfWhale student home.
+ * English strings for the WolfWhale home.
  *
  * @package    local_wolfwhale
  * @copyright  2026 WolfWhale EdTech
@@ -24,16 +24,26 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['assignment'] = 'Assignment';
+$string['attendance'] = 'Attendance';
 $string['badges'] = 'Badges';
 $string['courses'] = 'Courses';
+$string['days'] = '{$a} days';
 $string['due'] = 'Due';
+$string['file'] = 'File';
 $string['home'] = 'Home';
+$string['lesson'] = 'Lesson';
+$string['marking'] = 'Marking';
+$string['marks'] = 'Marks';
 $string['messages'] = 'Messages';
+$string['never'] = 'Never';
 $string['none'] = 'None';
 $string['nothingdue'] = 'Nothing due';
 $string['nothingtoday'] = 'Nothing today';
-$string['pluginname'] = 'WolfWhale student home';
-$string['privacy:metadata'] = 'The WolfWhale student home does not store any personal data.';
+$string['pluginname'] = 'WolfWhale home';
+$string['post'] = 'Post';
+$string['privacy:metadata'] = 'The WolfWhale home does not store any personal data.';
 $string['read'] = 'Read';
 $string['speech'] = '{$a->word}. {$a->fact}';
+$string['stuck'] = 'Stuck';
 $string['today'] = 'Today';
