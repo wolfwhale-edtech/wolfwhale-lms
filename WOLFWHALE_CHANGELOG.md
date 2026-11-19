@@ -329,3 +329,4 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/classes/exporter.php` — the ledger, avatars, and goals for that school
   - `public/local/wwadmin/templates/home.mustache`
   - `public/local/wwadmin/lang/en/local_wwadmin.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/8
