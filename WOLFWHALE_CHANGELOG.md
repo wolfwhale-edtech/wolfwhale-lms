@@ -272,4 +272,4 @@ Each later change gets its own entry with:
     - `templates/page.mustache`
     - `templates/form.mustache`
     - `tests/scope_test.php`
-- Pull request:
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/7
