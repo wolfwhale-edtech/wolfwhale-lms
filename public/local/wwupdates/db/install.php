@@ -23,8 +23,9 @@
  */
 
 /**
- * Add the phone field used only for that parent's texts.
+ * Nothing is created here.
+ *
+ * The parent's mobile number is the mobile field already on their account.
  */
 function xmldb_local_wwupdates_install(): void {
-    \local_wwupdates\preferences::install_phone_field();
 }

@@ -24,59 +24,11 @@ namespace local_wwupdates;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class preferences {
-    /** @var string Profile field shortname. */
-    public const FIELD = 'parentphone';
-
     /** @var string[] App, email, and text. */
     public const CHANNELS = ['app', 'email', 'text'];
 
     /** @var string[] Kinds of update. */
     public const TYPES = ['mark', 'absent', 'due', 'badge', 'message', 'weekly'];
-
-    /**
-     * Create the phone field when it is missing.
-     */
-    public static function install_phone_field(): void {
-        global $CFG, $DB;
-
-        require_once($CFG->dirroot . '/user/profile/lib.php');
-        if ($DB->record_exists('user_info_field', ['shortname' => self::FIELD])) {
-            return;
-        }
-        $categoryid = $DB->get_field('user_info_category', 'id', ['name' => 'Parent']);
-        if (!$categoryid) {
-            $sort = (int) $DB->get_field_sql('SELECT COALESCE(MAX(sortorder), 0) + 1 FROM {user_info_category}');
-            $categoryid = $DB->insert_record('user_info_category', (object) [
-                'name' => 'Parent',
-                'sortorder' => $sort,
-            ]);
-        }
-        $sort = (int) $DB->get_field_sql(
-            'SELECT COALESCE(MAX(sortorder), 0) + 1 FROM {user_info_field} WHERE categoryid = ?',
-            [$categoryid]
-        );
-        $DB->insert_record('user_info_field', (object) [
-            'shortname' => self::FIELD,
-            'name' => get_string('phone', 'local_wwupdates'),
-            'datatype' => 'text',
-            'description' => '',
-            'descriptionformat' => FORMAT_HTML,
-            'categoryid' => $categoryid,
-            'sortorder' => $sort,
-            'required' => 0,
-            'locked' => 0,
-            'visible' => PROFILE_VISIBLE_PRIVATE,
-            'forceunique' => 0,
-            'signup' => 0,
-            'defaultdata' => '',
-            'defaultdataformat' => 0,
-            'param1' => '20',
-            'param2' => '20',
-            'param3' => '0',
-            'param4' => '',
-            'param5' => '',
-        ]);
-    }
 
     /**
      * True when this switch is on. Text is off until the parent turns it on.
@@ -128,38 +80,33 @@ class preferences {
     }
 
     /**
-     * This parent's phone number, or an empty string.
+     * This parent's mobile number, or an empty string.
+     *
+     * The number is the mobile field on this parent's own account.
      *
      * @param int $userid
      * @return string
      */
     public static function phone(int $userid): string {
-        global $CFG;
+        global $DB;
 
-        require_once($CFG->dirroot . '/user/profile/lib.php');
-        $record = profile_user_record($userid, false);
-        $value = $record->{self::FIELD} ?? '';
+        $value = $DB->get_field('user', 'phone2', ['id' => $userid]);
         return is_string($value) ? trim($value) : '';
     }
 
     /**
-     * Store a phone number for the signed-in parent only.
+     * Store a mobile number for the signed-in parent only.
      *
      * @param int $userid
      * @param string $raw
      */
     public static function set_phone(int $userid, string $raw): void {
-        global $CFG, $USER;
+        global $DB, $USER;
 
         if ((int) $USER->id !== $userid || $userid <= 0) {
             throw new \moodle_exception('cannotview', 'local_wwupdates');
         }
-        require_once($CFG->dirroot . '/user/profile/lib.php');
-        $user = (object) [
-            'id' => $userid,
-            'profile_field_' . self::FIELD => self::clean_phone($raw),
-        ];
-        profile_save_data($user);
+        $DB->set_field('user', 'phone2', self::clean_phone($raw), ['id' => $userid]);
     }
 
     /**

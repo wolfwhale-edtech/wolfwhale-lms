@@ -51,7 +51,6 @@ $string['on'] = 'On';
 $string['phone'] = 'Phone';
 $string['pluginname'] = 'Parent updates';
 $string['pointsline'] = 'Points: {$a}.';
-$string['privacy:metadata:phone'] = 'The phone number used for this parent\'s texts.';
 $string['privacy:metadata:preference:absent'] = 'Whether absence updates are on.';
 $string['privacy:metadata:preference:app'] = 'Whether app updates are on.';
 $string['privacy:metadata:preference:badge'] = 'Whether badge and level updates are on.';

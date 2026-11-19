@@ -26,9 +26,9 @@ use core_privacy\local\request\writer;
 /**
  * Privacy provider for parent updates.
  *
- * The phone number is a profile field for that parent. The sent table records
- * which parent was told about which child. A school's day and hour are not
- * personal data.
+ * The mobile number is the one already stored on the parent's account.
+ * The sent table records which parent was told about which child.
+ * A school's day and hour are not personal data.
  *
  * @package    local_wwupdates
  * @copyright  2026 WolfWhale EdTech
@@ -66,12 +66,11 @@ class provider implements
                 'privacy:metadata:preference:' . $key
             );
         }
-        $collection->add_user_preference('parentphone', 'privacy:metadata:phone');
         return $collection;
     }
 
     /**
-     * Export the switches and the phone number.
+     * Export the switches. The mobile number is stored on the user account.
      *
      * @param int $userid
      */
@@ -87,15 +86,6 @@ class provider implements
                 \local_wwupdates\preferences::name($key),
                 $value,
                 get_string('privacy:metadata:preference:' . $key, 'local_wwupdates')
-            );
-        }
-        $phone = \local_wwupdates\preferences::phone($userid);
-        if ($phone !== '') {
-            writer::export_user_preference(
-                'local_wwupdates',
-                'parentphone',
-                $phone,
-                get_string('privacy:metadata:phone', 'local_wwupdates')
             );
         }
     }
