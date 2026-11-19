@@ -455,4 +455,4 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/classes/home.php` — the Week tile
   - `public/local/wwadmin/templates/home.mustache` — the calendar icon
   - `public/local/wwadmin/lang/en/local_wwadmin.php` — the word Week
-- Pull request:
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
