@@ -17,7 +17,7 @@
 namespace local_wolfwhale;
 
 /**
- * Sends a student to the student home and a teacher to the teacher home.
+ * Sends a student to the student home, a teacher to the teacher home, and a parent to the parent home.
  *
  * The automated suites are left alone. They still open the normal dashboard.
  *
@@ -38,6 +38,9 @@ class hook_callbacks {
         $userid = (int) $USER->id;
         if (teacher::should_redirect($PAGE->url, $userid)) {
             redirect(teacher::url());
+        }
+        if (parents::should_redirect($PAGE->url, $userid)) {
+            redirect(parents::url());
         }
         if (!home::should_redirect($PAGE->url, $userid)) {
             return;
@@ -61,6 +64,9 @@ class hook_callbacks {
         $userid = (int) $USER->id;
         $replacement = teacher::login_wantsurl($current, $userid);
         if ($replacement === null) {
+            $replacement = parents::login_wantsurl($current, $userid);
+        }
+        if ($replacement === null) {
             $replacement = home::login_wantsurl($current, $userid);
         }
         if ($replacement !== null) {
@@ -82,12 +88,20 @@ class hook_callbacks {
         $userid = (int) $USER->id;
         if (teacher::is_teacher($userid)) {
             self::point_home_at(teacher::url(), $hook);
-            return;
+        } else if (parents::is_parent($userid)) {
+            self::point_home_at(parents::url(), $hook);
+        } else if (home::is_student($userid)) {
+            self::point_home_at(home::url(), $hook);
         }
-        if (!home::is_student($userid)) {
-            return;
+        if (parents::can_link($userid)) {
+            $hook->get_primaryview()->add(
+                get_string('parents', 'local_wolfwhale'),
+                new \moodle_url('/local/wolfwhale/linkparent.php'),
+                \navigation_node::TYPE_CUSTOM,
+                null,
+                'wolfwhaleparents'
+            );
         }
-        self::point_home_at(home::url(), $hook);
     }
 
     /**

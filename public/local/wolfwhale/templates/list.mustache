@@ -17,19 +17,30 @@
 {{!
     @template local_wolfwhale/list
 
-    A list of real rows. Each row is a word, a fact, and one link.
+    A list of real rows. Each row is a word and a fact.
+    A row with an address is a link. A row without one is text.
 }}
 <div class="ww-home">
+    {{> local_wolfwhale/children }}
     <div class="ww-list">
         {{#empty}}
         <p class="ww-row-word ww-row ww-row-empty">{{none}}</p>
         {{/empty}}
         {{#rows}}
+        {{#url}}
         <a class="ww-row" href="{{url}}">
             <span class="ww-row-word">{{word}}</span>
             {{#fact}}<span class="ww-row-fact">{{fact}}</span>{{/fact}}
             {{#course}}<span class="ww-row-course">{{course}}</span>{{/course}}
         </a>
+        {{/url}}
+        {{^url}}
+        <div class="ww-row">
+            <span class="ww-row-word">{{word}}</span>
+            {{#fact}}<span class="ww-row-fact">{{fact}}</span>{{/fact}}
+            {{#course}}<span class="ww-row-course">{{course}}</span>{{/course}}
+        </div>
+        {{/url}}
         {{/rows}}
     </div>
 </div>

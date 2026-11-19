@@ -17,10 +17,13 @@
 namespace local_wolfwhale\privacy;
 
 /**
- * Privacy provider for the WolfWhale student home.
+ * Privacy provider for the WolfWhale home.
  *
- * The page reads the logged-in person's courses, calendar, badges, and
- * messages through Moodle's own APIs. It does not store anything itself.
+ * The pages read courses, grades, calendar, badges, attendance, and messages
+ * through the site's own APIs. Linking a parent stores a role assignment,
+ * which the core role system already records. A message contact, when one is
+ * added so a parent can write to their child's teacher, is stored by the
+ * message system. This plugin does not have a table of its own.
  *
  * @package    local_wolfwhale
  * @copyright  2026 WolfWhale EdTech
