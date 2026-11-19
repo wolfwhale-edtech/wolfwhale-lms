@@ -213,3 +213,67 @@ Each later change gets its own entry with:
   - `public/local/wwattendance/lang/en/local_wwattendance.php` — the closed-page word
   - `public/local/wwattendance/tests/attendance_test.php` — a teacher cannot use that read
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/6
+
+## WW-LMS-007 — Admin home and school data export
+
+- Date: 2026-11-19
+- Summary: A site administrator, or a person with the manager role on a course category, now lands on an admin home of large picture tiles instead of the usual dashboard. The tiles are People, Classes, School, Reports, Export, and Licences. A manager of one category is the administrator of that school or Nation only. A category and the categories under it are one school. Another category is not included. A teacher who is not a manager, and a student, still land on the homes they already had. Billing and prices are not in this change. A site administrator can enter a seat count. The page shows that count next to the number of active people. No price is stored.
+- What each tile shows, and where one tap goes:
+  - People: how many people are in the schools this person administers. The tap opens the list. Add creates an account and enrols the person in a course in that school. Suspend is refused when the person also belongs to another school, because suspending an account would reach that school too. Remove takes the person out of this school. The account is deleted only when they belong nowhere else. Upload reads a CSV with the core CSV reader and creates people with the core user record. A row whose course is outside the school is refused and is not created. A site administrator who already holds the system upload capability also gets a link to the existing upload screen.
+  - Classes: how many courses are in those schools. The tap opens the list. Add and Categories open the existing course and category screens for a school this person may manage. Terms opens the term list.
+  - School: the attendance rate when there is one school, or the number of schools when there are several. The tap opens one school: active students, active teachers, courses, the attendance rate from the attendance marks, and the overdue work count. Nothing is filled in when attendance has not been taken.
+  - Reports: the number of schools. The tap downloads a CSV with one row per school and term. The columns are School, Term, Term start, Term end, Active students, Active teachers, Courses, Attendance rate, and Overdue work. A school with no terms still has one row and the term columns are empty. Term names and dates are whatever that school saved. No calendar is assumed.
+  - Export: how many archives are ready. The tap asks for a zip of one school. A background task builds it. The zip holds CSV and JSON for users, enrolments, grades, attendance, and assignment submission metadata. Passwords and submission text are not included. The task checks again that the person who asked may still export that school, and every query is limited to that school's categories. Each export is logged with who asked, when, and which school.
+  - Licences: active people, a slash, and the seat count, or None when no seat count has been entered.
+- Read aloud: the admin home uses the same speaker buttons as the other homes. They use the browser's own speech. If the browser cannot speak, the buttons are not shown. The speaker buttons use the red accent. People uses the indigo accent. School uses the teal accent. Export uses the yellow accent.
+- Terms are stored in a new plugin, `local_wwterms`, one row per school with a name, a start, and an end. Another school cannot read or delete them. The parent report card reads those rows for the child's school. When that school has saved terms, the report uses them. When it has none, the report still uses January through June and July through December.
+- What was checked: PHPUnit for the new plugins, 16 tests and 101 assertions, on PHP 8.3 and PostgreSQL 17. Suspending a person ends their open sessions. An enrolment that has ended or has not started is not counted. An assignment due-date override is used before a piece of work is called overdue. A course that cannot enrol anyone does not leave a new account behind. A category administrator cannot list, count, or export another category's users, courses, attendance, or submissions. A person who belongs to two schools cannot be suspended from one of them. Removing them from one school leaves the other enrolment. A forged export row for the other school is marked failed and writes no file. A local site was installed with made-up names for two schools. Each school had an administrator, a teacher, and students. The North administrator landed on the admin home, saw only North people, saved a term named Harvest from 8 September 2026 to 18 December 2026, and downloaded a zip that contained North and did not contain South. The South administrator's home showed South only, and opening the North snapshot did not show North's numbers.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the admin-home icons
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wolfwhale/version.php` — version raised to 2026111901, and it now depends on the terms plugin
+  - `public/local/wolfwhale/classes/parents.php` — the report card uses a school's saved terms
+  - `public/local/wolfwhale/reportcard.php` — the selected term is resolved for that child
+  - `public/local/wolfwhale/tests/parents_test.php` — a school with terms, and a school with none
+  - `public/local/wwterms/` — new terms plugin:
+    - `version.php`
+    - `db/install.xml` — one table, a name and dates for one school
+    - `db/access.php` — manage terms, for the manager role on a category
+    - `lang/en/local_wwterms.php`
+    - `classes/term.php`
+    - `classes/privacy/provider.php`
+    - `tests/term_test.php`
+  - `public/local/wwadmin/` — new admin home:
+    - `version.php`
+    - `db/install.xml` — one table for each export, one table for a seat count
+    - `db/access.php` — view a school, manage people, export a school
+    - `db/hooks.php` — login, the dashboard, and the bar link
+    - `lang/en/local_wwadmin.php`
+    - `styles.css`
+    - `index.php` — the admin home
+    - `people.php` — people in one school
+    - `person.php` — add, suspend, or remove one person
+    - `upload.php` — CSV upload limited to one school
+    - `classes.php` — courses and category links
+    - `terms.php` — terms for one school
+    - `school.php` — one school snapshot
+    - `report.php` — the CSV summary
+    - `export.php` — ask for an archive
+    - `download.php` — download one archive
+    - `licences.php` — active people and the seat count
+    - `classes/scope.php` — which schools a person may administer
+    - `classes/home.php` — the tiles
+    - `classes/people.php`
+    - `classes/snapshot.php`
+    - `classes/report.php`
+    - `classes/exporter.php`
+    - `classes/seats.php`
+    - `classes/ui.php`
+    - `classes/hook_callbacks.php`
+    - `classes/privacy/provider.php`
+    - `classes/task/export_task.php` — the background archive
+    - `templates/home.mustache`
+    - `templates/page.mustache`
+    - `templates/form.mustache`
+    - `tests/scope_test.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/7

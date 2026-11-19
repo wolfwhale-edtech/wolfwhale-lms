@@ -509,9 +509,8 @@ class parents {
                 'attendance' => self::attendance_summary($records, (int) $course->id),
             ];
         }
-        $year = (int) substr((string) $term['id'], 0, 4);
         $terms = [];
-        foreach (self::terms_for_year($year) as $candidate) {
+        foreach (self::terms_for_child($childid, $term) as $candidate) {
             $terms[] = [
                 'name' => $candidate['short'],
                 'url' => (new \moodle_url('/local/wolfwhale/reportcard.php', [
@@ -580,28 +579,52 @@ class parents {
     /**
      * The term that contains this moment.
      *
+     * When the child has a school with saved terms, those dates are used.
+     * The January-June and July-December split is used only when that school
+     * has none.
+     *
      * @param int|null $time
+     * @param int|null $childid
      * @return array
      */
-    public static function current_term(?int $time = null): array {
+    public static function current_term(?int $time = null, ?int $childid = null): array {
         $time = $time ?? time();
-        $tz = \core_date::get_user_timezone_object();
-        $year = (int) (new \DateTimeImmutable('@' . $time))->setTimezone($tz)->format('Y');
-        foreach (self::terms_for_year($year) as $term) {
-            if ($time >= $term['from'] && $time <= $term['until']) {
-                return $term;
+        if ($childid) {
+            $school = self::school_terms($childid);
+            if ($school) {
+                return self::term_containing($school, $time);
             }
         }
-        return self::terms_for_year($year)[0];
+        $tz = \core_date::get_user_timezone_object();
+        $year = (int) (new \DateTimeImmutable('@' . $time))->setTimezone($tz)->format('Y');
+        return self::term_containing(self::terms_for_year($year), $time);
     }
 
     /**
-     * A term id such as 2026-2, or null when it is not one.
+     * A term id, or null when it is not one this child should see.
+     *
+     * A saved school term uses an id such as s12. A calendar term uses 2026-2.
+     * Calendar ids are not returned once the child's school has saved terms.
      *
      * @param string $id
+     * @param int|null $childid
      * @return array|null
      */
-    public static function term_by_id(string $id): ?array {
+    public static function term_by_id(string $id, ?int $childid = null): ?array {
+        if ($childid) {
+            foreach (self::school_terms($childid) as $term) {
+                if ($term['id'] === $id) {
+                    return $term;
+                }
+            }
+            if (self::school_terms($childid)) {
+                return null;
+            }
+        } else if (preg_match('/^s(\d+)$/', $id, $matches)) {
+            global $DB;
+            $record = $DB->get_record('local_wwterms', ['id' => (int) $matches[1]]);
+            return $record ? self::term_from_school($record) : null;
+        }
         if (!preg_match('/^(\d{4})-([12])$/', $id, $matches)) {
             return null;
         }
@@ -611,6 +634,113 @@ class parents {
             }
         }
         return null;
+    }
+
+    /**
+     * Saved terms for this child's school, or the calendar split for the selected term.
+     *
+     * @param int $childid
+     * @param array $selected
+     * @return array[]
+     */
+    private static function terms_for_child(int $childid, array $selected): array {
+        $school = self::school_terms($childid);
+        if ($school) {
+            return $school;
+        }
+        $year = (int) substr((string) ($selected['id'] ?? ''), 0, 4);
+        if ($year < 2000) {
+            $year = (int) (new \DateTimeImmutable('@' . time()))
+                ->setTimezone(\core_date::get_user_timezone_object())
+                ->format('Y');
+        }
+        return self::terms_for_year($year);
+    }
+
+    /**
+     * Terms saved for the schools this child is enrolled in.
+     *
+     * A course in a child category uses terms saved on that category, or on
+     * the nearest parent category that has terms. Another school's terms are
+     * not included.
+     *
+     * @param int $childid
+     * @return array[]
+     */
+    private static function school_terms(int $childid): array {
+        global $DB;
+
+        if (!class_exists(\local_wwterms\term::class)) {
+            return [];
+        }
+        $found = [];
+        $checked = [];
+        foreach (self::child_courses($childid) as $course) {
+            $category = $DB->get_record('course_categories', ['id' => $course->category], 'id, path');
+            if (!$category) {
+                continue;
+            }
+            $chain = array_reverse(array_filter(array_map('intval', explode('/', (string) $category->path))));
+            foreach ($chain as $categoryid) {
+                if (array_key_exists($categoryid, $checked)) {
+                    if ($checked[$categoryid]) {
+                        break;
+                    }
+                    continue;
+                }
+                $records = \local_wwterms\term::records($categoryid);
+                $checked[$categoryid] = $records !== [];
+                if (!$records) {
+                    continue;
+                }
+                foreach ($records as $record) {
+                    $found[(int) $record->id] = self::term_from_school($record);
+                }
+                break;
+            }
+        }
+        $terms = array_values($found);
+        usort($terms, static function (array $a, array $b): int {
+            return $a['from'] <=> $b['from'] ?: strcmp($a['id'], $b['id']);
+        });
+        return $terms;
+    }
+
+    /**
+     * One saved term in the shape the report already uses.
+     *
+     * @param \stdClass $record
+     * @return array
+     */
+    private static function term_from_school(\stdClass $record): array {
+        $name = trim((string) $record->name);
+        return [
+            'id' => 's' . (int) $record->id,
+            'short' => $name,
+            'label' => $name,
+            'from' => (int) $record->timestart,
+            'until' => (int) $record->timeend,
+        ];
+    }
+
+    /**
+     * The term that contains the moment, or the latest one that has already ended.
+     *
+     * @param array[] $terms
+     * @param int $time
+     * @return array
+     */
+    private static function term_containing(array $terms, int $time): array {
+        $past = null;
+        foreach ($terms as $term) {
+            if ($time >= $term['from'] && $time <= $term['until']) {
+                return $term;
+            }
+            if ($term['until'] < $time) {
+                $past = $term;
+            }
+        }
+        return $past ?? $terms[0];
     }
 
     /**
@@ -924,7 +1054,7 @@ class parents {
         $courses = enrol_get_users_courses(
             $childid,
             true,
-            'id, fullname, shortname, showgrades, visible, startdate, enddate'
+            'id, fullname, shortname, showgrades, visible, startdate, enddate, category'
         );
         $kept = [];
         foreach ($courses as $course) {
@@ -1262,7 +1392,7 @@ class parents {
      */
     private static function report_tile(int $childid): array {
         self::require_linked($childid);
-        $term = self::current_term();
+        $term = self::current_term(null, $childid);
         $url = (new \moodle_url('/local/wolfwhale/reportcard.php', [
             'child' => $childid,
             'term' => $term['id'],

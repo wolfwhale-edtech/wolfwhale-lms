@@ -1,0 +1,119 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwadmin/home
+
+    Admin home. Each tile is one word, one icon, and one real fact.
+
+    The icons in this file are original WolfWhale artwork, GPL v3.
+}}
+<div class="ww-home">
+    <button type="button" class="ww-speak ww-read" data-ww-speech="{{screenspeech}}" hidden>
+        <svg class="ww-speak-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path d="M8 24h12l14-12v40L20 40H8z" fill="currentColor"/>
+            <path d="M42 22a14 14 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+            <path d="M48 14a24 24 0 0 1 0 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span>{{read}}</span>
+    </button>
+    <div class="ww-home-tiles">
+        {{#tiles}}
+        <article class="ww-tile ww-tile-{{id}}{{#empty}} is-empty{{/empty}}">
+            <a class="ww-tile-link" href="{{url}}">
+                <span class="ww-tile-icon" aria-hidden="true">
+                    {{#ispeople}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <circle cx="22" cy="16" r="8" fill="currentColor"/>
+                        <circle cx="44" cy="18" r="7" fill="currentColor"/>
+                        <path d="M6 54c2-14 8-18 16-18s14 4 16 18" fill="currentColor"/>
+                        <path d="M34 54c1-10 6-14 12-14 7 0 11 4 13 14" fill="currentColor"/>
+                    </svg>
+                    {{/ispeople}}
+                    {{#isclasses}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M8 14h22a6 6 0 0 1 6 6v32H14a6 6 0 0 0-6 6z" fill="currentColor"/>
+                        <path d="M56 14H34a6 6 0 0 0-6 6v32h22a6 6 0 0 1 6 6z" fill="currentColor" opacity=".8"/>
+                    </svg>
+                    {{/isclasses}}
+                    {{#isschool}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 6l24 14v6H8v-6z" fill="currentColor"/>
+                        <path d="M12 30h8v24h-8zM28 30h8v24h-8zM44 30h8v24h-8z" fill="currentColor"/>
+                        <path d="M6 54h52v6H6z" fill="currentColor"/>
+                    </svg>
+                    {{/isschool}}
+                    {{#isreports}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <rect x="12" y="6" width="40" height="52" rx="6" fill="currentColor"/>
+                        <path d="M22 22h20M22 32h20M22 42h12" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                    {{/isreports}}
+                    {{#isexport}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M14 8h24l14 14v34H14z" fill="currentColor"/>
+                        <path d="M38 8v14h14" fill="#fff"/>
+                        <path d="M32 28v18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M24 40l8 8 8-8" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{/isexport}}
+                    {{#islicences}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <rect x="8" y="16" width="48" height="32" rx="6" fill="currentColor"/>
+                        <circle cx="22" cy="32" r="6" fill="#fff"/>
+                        <path d="M34 26h14M34 32h14M34 38h10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    {{/islicences}}
+                </span>
+                <span class="ww-tile-word">{{word}}</span>
+                <span class="ww-tile-fact">{{fact}}</span>
+            </a>
+            <button type="button" class="ww-speak" data-ww-speech="{{speech}}" aria-label="{{speech}}" hidden>
+                <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                    <path d="M8 24h12l14-12v40L20 40H8z" fill="currentColor"/>
+                    <path d="M42 22a14 14 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M48 14a24 24 0 0 1 0 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </article>
+        {{/tiles}}
+    </div>
+</div>
+{{#js}}
+(function() {
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function') {
+        return;
+    }
+    var buttons = document.querySelectorAll('.ww-home .ww-speak');
+    for (var i = 0; i < buttons.length; i++) {
+        (function(button) {
+            button.hidden = false;
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var text = button.getAttribute('data-ww-speech') || '';
+                if (!text) {
+                    return;
+                }
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = document.documentElement.lang || 'en';
+                window.speechSynthesis.speak(utterance);
+            });
+        })(buttons[i]);
+    }
+})();
+{{/js}}
