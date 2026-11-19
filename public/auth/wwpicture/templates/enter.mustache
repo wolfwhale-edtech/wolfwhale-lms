@@ -1,0 +1,46 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template auth_wwpicture/enter
+
+    Three picture taps.
+
+    Example context (json):
+    {}
+}}
+<div class="ww-enter">
+    <h1 class="ww-who">{{{face}}}<span>{{name}}</span></h1>
+    <form method="post" action="{{url}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <div class="ww-slots">
+            {{#slots}}{{{svg}}}{{/slots}}
+        </div>
+        {{#locked}}
+            <p class="ww-locked">{{#str}}locked, auth_wwpicture{{/str}}</p>
+        {{/locked}}
+        <div class="ww-pics">
+            {{#pics}}
+                <button class="ww-pic" type="submit" name="pic" value="{{key}}" aria-label="{{word}}" {{#locked}}disabled{{/locked}}>
+                    {{{svg}}}
+                </button>
+            {{/pics}}
+        </div>
+        {{#haspicks}}
+            <button class="ww-again" type="submit" name="again" value="1">{{#str}}again, auth_wwpicture{{/str}}</button>
+        {{/haspicks}}
+    </form>
+</div>

@@ -142,3 +142,45 @@ body.pagelayout-login #page .login-layout-left::after {
     border: 1px solid rgba(255, 255, 255, .95);
     box-shadow: 0 .4rem 1rem rgba(47, 93, 138, .15);
 }
+
+body.pagelayout-login {
+    .footer-popover {
+        display: none;
+    }
+
+    .login-container .form-label {
+        color: #16324a;
+        font-size: 1.05rem;
+    }
+
+    .login-container .form-control {
+        min-height: 3.25rem;
+        font-size: 1.15rem;
+    }
+
+    .ww-signin,
+    .ww-oauth {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .75rem;
+        width: 100%;
+        min-height: 3.5rem;
+        margin-bottom: .75rem;
+        border-radius: 1rem;
+        font-size: 1.25rem;
+    }
+
+    .ww-oauth {
+        background: rgba(255, 255, 255, .92);
+        border: 1px solid #7ec8e8;
+        color: #16324a;
+        text-decoration: none;
+    }
+
+    .ww-oauth svg {
+        width: 1.75rem;
+        height: 1.75rem;
+        flex: 0 0 auto;
+    }
+}

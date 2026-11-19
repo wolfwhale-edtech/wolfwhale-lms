@@ -1,0 +1,42 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template auth_wwpicture/teacher
+
+    Class link and resets.
+
+    Example context (json):
+    {}
+}}
+<div class="ww-teacher">
+    <h1>{{coursename}}</h1>
+    <div class="ww-qr">{{{qr}}}</div>
+    <p><a href="{{url}}">{{url}}</a></p>
+    <form method="post" action="{{action}}">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <button class="btn btn-primary" type="submit" name="all" value="1">{{#str}}cards, auth_wwpicture{{/str}}</button>
+        <ul class="ww-roster">
+            {{#students}}
+                <li>
+                    {{{face}}}
+                    <span>{{name}}</span>
+                    <button class="btn btn-outline-secondary" type="submit" name="reset" value="{{id}}">{{#str}}reset, auth_wwpicture{{/str}}</button>
+                </li>
+            {{/students}}
+        </ul>
+    </form>
+</div>

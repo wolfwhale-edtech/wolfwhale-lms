@@ -330,3 +330,44 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/templates/home.mustache`
   - `public/local/wwadmin/lang/en/local_wwadmin.php`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/8
+
+## WW-LMS-009 — Sign-in
+
+- Date: 2026-11-19
+- Summary: The sign-in screen is email, password, Google, Microsoft, and Picture. Google and Microsoft use the core OAuth 2 sign-in that was still in the tree after the deep cut. A button is shown only after an administrator pastes a client id and secret for that issuer and turns the issuer on. No client id or secret is stored in this change. A school, which is a top-level course category, can list the email domains it allows. When any school has a list, a new Google or Microsoft sign-in must match one of those domains, and a person already in a school must match that school's list. A linked account is checked as that account, even when the external email is different. Picture sign-in is a new plugin. A teacher opens one page for a class, with a link and a QR code. A student on that page taps their own face, then three of nine pictures (sun, tree, fish, star, moon, flower, house, bird, cloud). The code is stored with password_hash. Five wrong tries lock the account for 15 minutes, and a second try inside 2 seconds is refused. Each person's attempts are taken one at a time, so two browsers cannot share a failure count. The class page works only with the teacher's link, only for students with an active enrolment in that course, and only while picture sign-in is on for that school and the plugin itself is on. A teacher can reset a code and print the pictures. The database keeps the hash. The print page keeps the pictures in the teacher's session so the card can be printed. A student who has saved an avatar is shown that picture. A student who has not is shown their initials. Live Google and Microsoft sign-in was not tried. There are no real client ids.
+- What was checked: PHPUnit for the new plugin, 11 tests and 57 assertions, on PHP 8.3.6 and PostgreSQL 17.12. A saved avatar is the face on the class page, and a student without one is shown their initials. The picture code in the database is a hash. A wrong code fails, is rate-limited, and then locks. A student from another class cannot sign in on that class page. A suspended enrolment cannot sign in. A school with picture sign-in off cannot use it, and turning the plugin off closes the class page. Google and Microsoft are absent from the sign-in screen until an issuer is configured and enabled, and a disabled issuer or a blank client id hides the button again. A linked account is refused when its school does not allow the external email, even if another school does. A mocked HTTP response supplied the Google userinfo. The existing OAuth 2 auth tests still pass. A local site was installed with made-up names. Lee Moss signed in with an email and a password and landed on the teacher home. Ada Moss tapped her face and the pictures and landed on the student home, signed in. The print page showed both children's cards.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the sign-in pictures
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/auth/oauth2/classes/auth.php` — a school email domain can refuse an OAuth sign-in
+  - `public/theme/wolfwhale/version.php` — version raised to 2026111901
+  - `public/theme/wolfwhale/classes/output/core_renderer.php` — the sign-in buttons
+  - `public/theme/wolfwhale/scss/post.scss` — large sign-in controls
+  - `public/theme/wolfwhale/templates/core/loginform.mustache` — email, password, Google, Microsoft, Picture
+  - `public/auth/wwpicture/` — new picture sign-in plugin:
+    - `version.php`
+    - `auth.php`
+    - `lib.php` — the course menu link
+    - `settings.php` — link to the school switches
+    - `login.php` — the class faces
+    - `enter.php` — the three pictures
+    - `class.php` — the teacher link, QR code, and reset
+    - `cards.php` — the printable cards
+    - `schools.php` — picture sign-in and email domains for each school
+    - `styles.css`
+    - `db/install.xml` — the code hash, the class link, and the school row
+    - `db/install.php` — turns on email sign-in and the OAuth 2 plugin outside the test suites
+    - `db/access.php`
+    - `lang/en/auth_wwpicture.php`
+    - `classes/code.php`
+    - `classes/school.php`
+    - `classes/buttons.php`
+    - `classes/pictures.php`
+    - `classes/privacy/provider.php`
+    - `templates/roster.mustache`
+    - `templates/enter.mustache`
+    - `templates/teacher.mustache`
+    - `templates/cards.mustache`
+    - `templates/schools.mustache`
+    - `tests/login_test.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/9

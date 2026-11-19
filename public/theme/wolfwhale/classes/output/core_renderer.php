@@ -52,4 +52,27 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function services_support_link(): string {
         return '';
     }
+
+    /**
+     * Sign-in screen: email, password, and the configured school buttons.
+     *
+     * @param \core_auth\output\login $form
+     * @return string
+     */
+    public function render_login(\core_auth\output\login $form) {
+        $context = $form->export_for_template($this);
+        $context->google = false;
+        $context->microsoft = false;
+        $context->pictureurl = (new \moodle_url('/auth/wwpicture/login.php'))->out(false);
+        if (class_exists(\auth_wwpicture\buttons::class)) {
+            $oauth = \auth_wwpicture\buttons::oauth();
+            if (!empty($oauth['google'])) {
+                $context->google = $oauth['google'];
+            }
+            if (!empty($oauth['microsoft'])) {
+                $context->microsoft = $oauth['microsoft'];
+            }
+        }
+        return $this->render_from_template('core/loginform', $context);
+    }
 }

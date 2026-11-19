@@ -24,6 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026111800;
+$plugin->version   = 2026111901;
 $plugin->requires  = 2026100200;
 $plugin->component = 'theme_wolfwhale';

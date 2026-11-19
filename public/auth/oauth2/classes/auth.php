@@ -442,6 +442,7 @@ class auth extends \auth_plugin_base {
 
         $userinfo['username'] = trim(core_text::strtolower($userinfo['username']));
         $oauthemail = $userinfo['email'];
+        $oauthusername = $userinfo['username'];
 
         // Once we get here we have the user info from oauth.
         $userwasmapped = false;
@@ -460,6 +461,8 @@ class auth extends \auth_plugin_base {
         }
 
         $issuer = $client->get_issuer();
+        // The local account a linked login already points at, when there is one.
+        $schooluserid = 0;
         // First we try and find a defined mapping.
         $linkedlogin = api::match_username_to_user($userinfo['username'], $issuer);
 
@@ -491,11 +494,13 @@ class auth extends \auth_plugin_base {
                     // Update user fields and continue with login.
                     $userinfo = $this->update_user($userinfo, $moodleuser);
                     $userwasmapped = true;
+                    $schooluserid = (int) $moodleuser->id;
                 }
             } else if ($mappeduser && ($mappeduser->confirmed || !$issuer->get('requireconfirmation'))) {
                 // Update user fields.
                 $userinfo = $this->update_user($userinfo, $mappeduser);
                 $userwasmapped = true;
+                $schooluserid = (int) $mappeduser->id;
             } else {
                 // Trigger login failed event.
                 $failurereason = AUTH_LOGIN_UNAUTHORISED;
@@ -525,6 +530,20 @@ class auth extends \auth_plugin_base {
             // Trigger login failed event.
             $failurereason = AUTH_LOGIN_UNAUTHORISED;
             $event = \core\event\user_login_failed::create(['other' => ['username' => $userinfo['username'],
+                                                                        'reason' => $failurereason]]);
+            $event->trigger();
+
+            $errormsg = get_string('notloggedindebug', 'auth_oauth2', get_string('loginerror_invaliddomain', 'auth_oauth2'));
+            $SESSION->loginerrormsg = $errormsg;
+            $client->log_out();
+            redirect(new moodle_url('/login/index.php'));
+        }
+
+        // A school can limit Google and Microsoft to its own email domains.
+        if (class_exists(\auth_wwpicture\school::class) &&
+                !\auth_wwpicture\school::email_allowed($oauthemail, $schooluserid)) {
+            $failurereason = AUTH_LOGIN_UNAUTHORISED;
+            $event = \core\event\user_login_failed::create(['other' => ['username' => $oauthusername,
                                                                         'reason' => $failurereason]]);
             $event->trigger();
 
