@@ -399,4 +399,4 @@ Each later change gets its own entry with:
     - `js/rules.test.js`
     - `js/queue.test.js`
     - `tests/lessons_test.php`
-- Pull request:
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/10
