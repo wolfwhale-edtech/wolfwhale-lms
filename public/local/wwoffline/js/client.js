@@ -194,6 +194,10 @@
             return Promise.resolve();
         }
         return fetch(row.page, {credentials: 'same-origin'}).then(function(response) {
+            var owner = response.headers.get('X-WW-User');
+            if (!owner || String(owner) !== String(row.userId)) {
+                return null;
+            }
             return response.text().then(function(html) {
                 if (!response.ok && wwOfflineQueue.isConfirmed(response.url, html) === false &&
                         /\/login\//.test(response.url)) {
@@ -374,6 +378,47 @@
         }
     });
 
+    function forgetLocal(form) {
+        var cmid = cmidFrom(form);
+        wwOfflineDb.open().then(function(db) {
+            return wwOfflineDb.submissions(db).delete(userId + ':' + cmid);
+        }).catch(function() {
+            return null;
+        });
+    }
+
+    function watchEditors() {
+        if (!window.tinymce || watchEditors.done) {
+            return;
+        }
+        watchEditors.done = true;
+        var bind = function(editor) {
+            var save = function() {
+                if (navigator.onLine || !editor.getElement() || !editor.getElement().form) {
+                    return;
+                }
+                window.clearTimeout(draftTimer);
+                draftTimer = window.setTimeout(function() {
+                    saveLocal(editor.getElement().form, 'draft');
+                }, 400);
+            };
+            editor.on('input change keyup', save);
+        };
+        window.tinymce.editors.forEach(bind);
+        window.tinymce.on('AddEditor', function(event) {
+            bind(event.editor);
+        });
+    }
+
+    var tinyTries = 0;
+    var tinyTimer = window.setInterval(function() {
+        tinyTries++;
+        if (window.tinymce || tinyTries > 40) {
+            window.clearInterval(tinyTimer);
+            watchEditors();
+        }
+    }, 250);
+
     document.addEventListener('input', function(event) {
         var area = event.target;
         if (!area || area.name !== 'onlinetext_editor[text]' || navigator.onLine || !area.form) {
@@ -391,6 +436,7 @@
             return;
         }
         if (navigator.onLine) {
+            forgetLocal(form);
             return;
         }
         event.preventDefault();

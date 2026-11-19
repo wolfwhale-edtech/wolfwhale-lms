@@ -113,6 +113,7 @@ describe('queued assignment text', () => {
 
     it('posts through the fresh form and its session key', () => {
         const replay = queue.buildReplay(FORM, {
+            userId: 4,
             text: '<p>Offline river</p>',
             statement: '',
             page: 'https://school.test/mod/assign/view.php?id=8&action=editsubmission',
@@ -122,6 +123,14 @@ describe('queued assignment text', () => {
         expect(replay.fields.action).toBe('savesubmission');
         expect(replay.fields.submitbutton).toBe('Save changes');
         expect(replay.action).toBe('https://school.test/mod/assign/view.php');
+    });
+
+    it('does not send one student\'s text with another student\'s form', () => {
+        const replay = queue.buildReplay(FORM, {
+            userId: 9,
+            text: 'River notes',
+        });
+        expect(replay).toBeNull();
     });
 
     it('does not build a replay from a sign-in page', () => {

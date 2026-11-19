@@ -112,6 +112,35 @@ function headersForCache(source) {
  * @param {string|null} userId
  * @returns {Promise<void>}
  */
+/**
+ * The read page can stand in for the real activity address, which is not fetched.
+ *
+ * @param {string} cacheKey
+ * @param {Response} response
+ * @returns {string|null}
+ */
+function lessonAlias(cacheKey, response) {
+    if (!/\/local\/wwoffline\/lesson\.php/.test(cacheKey)) {
+        return null;
+    }
+    var alias = response.headers.get('X-WW-Alias');
+    if (!alias) {
+        return null;
+    }
+    try {
+        var url = new URL(alias, self.location.origin);
+        if (url.origin !== self.location.origin) {
+            return null;
+        }
+        if (!/\/mod\/(?:page|book|resource)\/view\.php$/.test(url.pathname)) {
+            return null;
+        }
+        return url.toString();
+    } catch (e) {
+        return null;
+    }
+}
+
 function storeResponse(cacheKey, response, userId) {
     if (!response || !response.ok || response.type !== 'basic') {
         return Promise.resolve();
@@ -141,6 +170,10 @@ function storeResponse(cacheKey, response, userId) {
                 var writes = [cache.put(new Request(cacheKey), stored.clone())];
                 if (response.url && response.url !== cacheKey) {
                     writes.push(cache.put(new Request(response.url), stored.clone()));
+                }
+                var alias = lessonAlias(cacheKey, response);
+                if (alias) {
+                    writes.push(cache.put(new Request(alias), stored.clone()));
                 }
                 return Promise.all(writes);
             });

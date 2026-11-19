@@ -153,18 +153,105 @@ class lessons {
     }
 
     /**
-     * The view address and the files that belong to one lesson.
+     * Address that shows one lesson without recording that it was opened.
+     *
+     * @param \cm_info $cm
+     * @return \moodle_url
+     */
+    public static function read_url(\cm_info $cm): \moodle_url {
+        return new \moodle_url('/local/wwoffline/lesson.php', ['id' => $cm->id]);
+    }
+
+    /**
+     * The real activity address. Opening this one records the visit.
+     *
+     * @param \cm_info $cm
+     * @return \moodle_url
+     */
+    public static function view_url(\cm_info $cm): \moodle_url {
+        return new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $cm->id]);
+    }
+
+    /**
+     * Lesson text for a person who can already see the activity.
+     *
+     * Reading this does not mark the activity viewed or complete.
+     *
+     * @param \cm_info $cm
+     * @return string HTML
+     */
+    public static function readable(\cm_info $cm): string {
+        global $CFG, $DB;
+
+        $context = \context_module::instance($cm->id);
+        if ($cm->modname === 'page') {
+            $page = $DB->get_record('page', ['id' => $cm->instance], '*', MUST_EXIST);
+            $content = file_rewrite_pluginfile_urls(
+                $page->content,
+                'pluginfile.php',
+                $context->id,
+                'mod_page',
+                'content',
+                $page->revision
+            );
+            return format_text($content, $page->contentformat, [
+                'noclean' => true,
+                'overflowdiv' => true,
+                'context' => $context,
+            ]);
+        }
+        if ($cm->modname === 'book') {
+            require_once($CFG->dirroot . '/mod/book/locallib.php');
+            $book = $DB->get_record('book', ['id' => $cm->instance], '*', MUST_EXIST);
+            $chapters = book_preload_chapters($book);
+            $html = '';
+            foreach ($chapters as $chapter) {
+                if (!empty($chapter->hidden)) {
+                    continue;
+                }
+                $text = file_rewrite_pluginfile_urls(
+                    $chapter->content,
+                    'pluginfile.php',
+                    $context->id,
+                    'mod_book',
+                    'chapter',
+                    $chapter->id
+                );
+                $html .= format_text($text, $chapter->contentformat, [
+                    'noclean' => true,
+                    'overflowdiv' => true,
+                    'context' => $context,
+                ]);
+            }
+            return $html;
+        }
+        $links = [];
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($context->id, 'mod_resource', 'content', false, 'itemid, filepath, filename', false);
+        foreach ($files as $file) {
+            $url = \moodle_url::make_pluginfile_url(
+                $file->get_contextid(),
+                $file->get_component(),
+                $file->get_filearea(),
+                $file->get_itemid(),
+                $file->get_filepath(),
+                $file->get_filename()
+            );
+            $links[] = \html_writer::link($url, $file->get_filename());
+        }
+        return implode('<br>', $links);
+    }
+
+    /**
+     * The read address and the files that belong to one lesson.
      *
      * @param \cm_info $cm
      * @return string[]
      */
     private static function urls_for(\cm_info $cm): array {
-        $urls = [];
-        if ($cm->url instanceof \moodle_url) {
-            $urls[] = $cm->url->out(false);
-        } else {
-            $urls[] = (new \moodle_url('/mod/' . $cm->modname . '/view.php', ['id' => $cm->id]))->out(false);
-        }
+        // This address renders the lesson without recording a visit or completion.
+        // The activity view address would do both.
+        $urls = [self::read_url($cm)->out(false)];
 
         $area = $cm->modname === 'book' ? 'chapter' : 'content';
         $context = \context_module::instance($cm->id);

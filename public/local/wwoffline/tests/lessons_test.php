@@ -73,7 +73,8 @@ final class lessons_test extends \advanced_testcase {
         $this->setUser($student);
         $urls = lessons::prefetch_urls($student->id);
         $joined = implode("\n", $urls);
-        $this->assert_has_cm($joined, '/mod/page/view.php', (int) $first->cmid);
+        $this->assert_has_cm($joined, '/local/wwoffline/lesson.php', (int) $first->cmid);
+        $this->assertStringNotContainsString('/mod/page/view.php', $joined);
         $this->assert_lacks_cm($joined, (int) $second->cmid);
         $this->assert_lacks_cm($joined, (int) $secretpage->cmid);
         $this->assertStringNotContainsString('/mod/url/', $joined);
@@ -82,22 +83,65 @@ final class lessons_test extends \advanced_testcase {
         $this->view_page($first);
         $urls = lessons::prefetch_urls($student->id);
         $joined = implode("\n", $urls);
-        $this->assert_has_cm($joined, '/mod/page/view.php', (int) $second->cmid);
+        $this->assert_has_cm($joined, '/local/wwoffline/lesson.php', (int) $second->cmid);
+        $this->assertStringNotContainsString('/mod/page/view.php', $joined);
         $this->assert_lacks_cm($joined, (int) $first->cmid);
         $this->assert_lacks_cm($joined, (int) $secretpage->cmid);
 
         $this->view_page($second);
         $urls = lessons::prefetch_urls($student->id);
         $joined = implode("\n", $urls);
-        $this->assert_has_cm($joined, '/mod/resource/view.php', (int) $file->cmid);
+        $this->assert_has_cm($joined, '/local/wwoffline/lesson.php', (int) $file->cmid);
+        $this->assertStringNotContainsString('/mod/resource/view.php', $joined);
         $this->assertStringContainsString('/pluginfile.php/', $joined);
         $this->assertStringContainsString('mod_resource', $joined);
         $this->assertStringNotContainsString('sesskey', $joined);
 
         $otherurls = implode("\n", lessons::prefetch_urls($other->id));
-        $this->assert_has_cm($otherurls, '/mod/page/view.php', (int) $secretpage->cmid);
+        $this->assert_has_cm($otherurls, '/local/wwoffline/lesson.php', (int) $secretpage->cmid);
+        $this->assertStringNotContainsString('/mod/page/view.php', $otherurls);
         $this->assert_lacks_cm($otherurls, (int) $first->cmid);
         $this->assert_lacks_cm($otherurls, (int) $file->cmid);
+    }
+
+    /**
+     * Reading the offline copy does not record a visit.
+     */
+    public function test_reading_ahead_does_not_record_a_visit(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $this->preventResetByRollback();
+        set_config('enabled_stores', 'logstore_standard', 'tool_log');
+        set_config('buffersize', 0, 'logstore_standard');
+        get_log_manager(true);
+        $this->setAdminUser();
+
+        $student = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $page = $this->getDataGenerator()->create_module('page', [
+            'course' => $course->id,
+            'name' => 'River start',
+            'content' => '<p>Blue paper.</p>',
+        ]);
+
+        $this->setUser($student);
+        $cm = get_fast_modinfo($course)->get_cm($page->cmid);
+        $html = lessons::readable($cm);
+        foreach (get_log_manager()->get_readers() as $reader) {
+            if (method_exists($reader, 'flush')) {
+                $reader->flush();
+            }
+        }
+
+        $this->assertStringContainsString('Blue paper.', $html);
+        $this->assertStringNotContainsString('/mod/page/view.php', lessons::read_url($cm)->out(false));
+        $this->assertSame(0, $DB->count_records('logstore_standard_log', [
+            'userid' => $student->id,
+            'eventname' => '\mod_page\event\course_module_viewed',
+            'contextinstanceid' => $page->cmid,
+        ]));
     }
 
     /**
@@ -116,7 +160,8 @@ final class lessons_test extends \advanced_testcase {
 
         $this->setUser($student);
         $joined = implode("\n", lessons::prefetch_urls($student->id));
-        $this->assert_has_cm($joined, '/mod/book/view.php', (int) $book->cmid);
+        $this->assert_has_cm($joined, '/local/wwoffline/lesson.php', (int) $book->cmid);
+        $this->assertStringNotContainsString('/mod/book/view.php', $joined);
         $this->assertStringNotContainsString('sesskey', $joined);
     }
 

@@ -268,6 +268,9 @@
         if (!parsed || !parsed.fields.sesskey) {
             return null;
         }
+        if (record.userId && parsed.fields.userid && String(parsed.fields.userid) !== String(record.userId)) {
+            return null;
+        }
         var fields = {};
         var names = Object.keys(parsed.fields);
         var i;
