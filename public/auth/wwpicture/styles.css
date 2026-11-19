@@ -168,6 +168,6 @@
     .navbar,
     footer,
     .footer-popover {
-        display: none !important;
+        display: none;
     }
 }

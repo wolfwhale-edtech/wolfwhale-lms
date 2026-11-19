@@ -50,3 +50,5 @@ $string['schools'] = 'Schools';
 $string['star'] = 'Star';
 $string['sun'] = 'Sun';
 $string['tree'] = 'Tree';
+$string['wwpicture:manage'] = 'Open the class sign-in page';
+$string['wwpicture:manageschool'] = 'Set picture sign-in for a school';
