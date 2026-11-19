@@ -25,8 +25,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Create the parent role in the child's user context.
+ * Fresh installs do not create the parent role here.
+ *
+ * The shortname parent is also created by the policy tests. A role made
+ * during install would already be there and those tests could not create it.
+ * The role is created on upgrade, and the first time a parent is linked.
  */
 function xmldb_local_wolfwhale_install(): void {
-    \local_wolfwhale\parents::install_role();
 }

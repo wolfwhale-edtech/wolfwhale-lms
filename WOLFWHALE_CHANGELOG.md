@@ -190,7 +190,7 @@ Each later change gets its own entry with:
   - `public/local/wolfwhale/classes/teacher.php` — a parent who opens a teacher page is sent to the parent home
   - `public/local/wolfwhale/classes/parents.php` — new, the parent-home data and the link rules
   - `public/local/wolfwhale/db/access.php` — link a parent, for a manager and a teacher in a course
-  - `public/local/wolfwhale/db/install.php` — create the parent role
+  - `public/local/wolfwhale/db/install.php` — present, but does not create the parent role, so the policy tests can still create that shortname
   - `public/local/wolfwhale/db/upgrade.php` — the same role on an existing site
   - `public/local/wolfwhale/parent.php` — the parent home
   - `public/local/wolfwhale/parentmarks.php` — course totals

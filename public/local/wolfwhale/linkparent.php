@@ -30,6 +30,10 @@ if (!\local_wolfwhale\parents::can_link()) {
     throw new moodle_exception('cannotview', 'local_wolfwhale');
 }
 
+if (!\local_wolfwhale\parents::role_id()) {
+    \local_wolfwhale\parents::install_role();
+}
+
 $return = new moodle_url('/local/wolfwhale/linkparent.php');
 $error = '';
 
