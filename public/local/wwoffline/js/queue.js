@@ -73,6 +73,51 @@
     }
 
     /**
+     * Words a student typed. Tags from the editor are not part of that text.
+     *
+     * @param {string} value
+     * @returns {string}
+     */
+    function toPlain(value) {
+        var text = String(value || '');
+        if (text.indexOf('<') === -1) {
+            return text.replace(/\r\n/g, '\n').replace(/^\n+|\n+$/g, '');
+        }
+        text = text.replace(/<br\s*\/?>/gi, '\n');
+        text = text.replace(/<\/p>/gi, '\n\n');
+        text = text.replace(/<[^>]+>/g, '');
+        text = decodeAttr(text);
+        return text.replace(/\n{3,}/g, '\n\n').replace(/^\n+|\n+$/g, '');
+    }
+
+    /**
+     * @param {string} value
+     * @returns {string}
+     */
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    /**
+     * Plain text as simple paragraphs the assignment form accepts.
+     *
+     * @param {string} value
+     * @returns {string}
+     */
+    function toSubmissionHtml(value) {
+        var plain = toPlain(value);
+        if (!plain) {
+            return '';
+        }
+        return plain.split(/\n{2,}/).map(function(paragraph) {
+            return '<p>' + escapeHtml(paragraph).replace(/\n/g, '<br>') + '</p>';
+        }).join('');
+    }
+
+    /**
      * @param {string} tag
      * @param {string} name
      * @returns {string}
@@ -94,7 +139,7 @@
         var record = {
             userId: String(item.userId),
             cmid: String(item.cmid),
-            text: String(item.text == null ? '' : item.text),
+            text: toPlain(item.text),
             statement: item.statement ? '1' : '',
             state: item.state === 'draft' ? 'draft' : 'waiting',
             page: stripPage(item.page || ''),
@@ -229,7 +274,7 @@
         for (i = 0; i < names.length; i++) {
             fields[names[i]] = parsed.fields[names[i]];
         }
-        fields['onlinetext_editor[text]'] = String(record.text == null ? '' : record.text);
+        fields['onlinetext_editor[text]'] = toSubmissionHtml(record.text);
         if (record.statement) {
             fields.submissionstatement = '1';
         }
@@ -295,6 +340,8 @@
     return {
         key: key,
         stripPage: stripPage,
+        toPlain: toPlain,
+        toSubmissionHtml: toSubmissionHtml,
         enqueue: enqueue,
         shouldSend: shouldSend,
         pending: pending,

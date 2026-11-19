@@ -76,7 +76,8 @@ describe('queued assignment text', () => {
         expect(record.sesskey).toBeUndefined();
         expect(JSON.stringify(record)).not.toContain('SECRET');
         expect(record.page).not.toContain('sesskey');
-        expect(record.text).toBe('<p>River notes</p>');
+        expect(record.text).toBe('River notes');
+        expect(record.text).not.toContain('<');
         expect(record.state).toBe('waiting');
         expect(queue.shouldSend(record)).toBe(true);
     });
@@ -89,6 +90,14 @@ describe('queued assignment text', () => {
 
         expect(await store.get('4:8')).toBeNull();
         expect((await store.get('5:8')).text).toBe('Bee');
+    });
+
+    it('keeps the student words and sends them as paragraphs', () => {
+        expect(queue.toPlain('<p>Fake river notes written offline.</p>')).toBe('Fake river notes written offline.');
+        expect(queue.toPlain('<p>One</p><p>Two</p>')).toBe('One\n\nTwo');
+        expect(queue.toSubmissionHtml('Fake river notes written offline.')).toBe('<p>Fake river notes written offline.</p>');
+        expect(queue.toSubmissionHtml('One\n\nTwo')).toBe('<p>One</p><p>Two</p>');
+        expect(queue.toSubmissionHtml('1 < 2')).toBe('<p>1 &lt; 2</p>');
     });
 
     it('does not send a draft or a row that still has a session key', () => {

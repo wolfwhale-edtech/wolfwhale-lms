@@ -119,18 +119,25 @@
      * @param {HTMLFormElement} form
      * @returns {string}
      */
+    /**
+     * @param {HTMLFormElement} form
+     * @returns {string}
+     */
     function readEditor(form) {
         var area = form.querySelector('[name="onlinetext_editor[text]"]');
         if (!area) {
             return '';
         }
-        if (window.tinymce && area.id && window.tinymce.get(area.id)) {
-            window.tinymce.get(area.id).save();
-        }
-        return area.value;
+        var editor = window.tinymce && area.id ? window.tinymce.get(area.id) : null;
+        var fromEditor = editor ? wwOfflineQueue.toPlain(editor.getContent()) : '';
+        var fromArea = wwOfflineQueue.toPlain(area.value);
+        return fromEditor || fromArea;
     }
 
     /**
+     * Put the student's words in the box. The stored value is plain text.
+     * The rich editor, when it is open, is given paragraphs so it shows those words.
+     *
      * @param {HTMLFormElement} form
      * @param {string} text
      */
@@ -139,10 +146,15 @@
         if (!area) {
             return;
         }
-        area.value = text;
-        if (window.tinymce && area.id && window.tinymce.get(area.id)) {
-            window.tinymce.get(area.id).setContent(text);
+        var plain = wwOfflineQueue.toPlain(text);
+        area.value = plain;
+        var editor = window.tinymce && area.id ? window.tinymce.get(area.id) : null;
+        if (editor) {
+            editor.setContent(wwOfflineQueue.toSubmissionHtml(plain));
+            return;
         }
+        area.hidden = false;
+        area.style.removeProperty('display');
     }
 
     /**
@@ -327,6 +339,13 @@
 
     window.addEventListener('offline', function() {
         setOffline(true);
+        var areas = document.querySelectorAll('[name="onlinetext_editor[text]"]');
+        var i;
+        for (i = 0; i < areas.length; i++) {
+            if (areas[i].form) {
+                writeEditor(areas[i].form, readEditor(areas[i].form));
+            }
+        }
     });
     window.addEventListener('online', function() {
         setOffline(false);
