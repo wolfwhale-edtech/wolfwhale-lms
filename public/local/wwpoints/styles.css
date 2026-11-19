@@ -1,0 +1,222 @@
+/* Points, avatars, and goals. */
+
+body[id^="page-local-wwpoints-"] #page-header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+body[id^="page-local-wwpoints-"] #region-main,
+body[id^="page-local-wwpoints-"] #region-main-box {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.ww-page-title {
+    margin: 0 0 1rem;
+    color: #16324a;
+    font-size: 2.4rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.ww-avatar,
+.ww-avatar-preview {
+    display: block;
+}
+
+.ww-avatar svg,
+.ww-avatar-preview svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.ww-avatar {
+    width: 3rem;
+    height: 3rem;
+    flex: none;
+}
+
+.ww-avatar-preview {
+    width: 12rem;
+    height: 12rem;
+    margin: 0 auto 1.25rem;
+}
+
+.ww-avatar-form,
+.ww-goal-form,
+.ww-award {
+    margin: 0 auto 1rem;
+    max-width: 40rem;
+}
+
+.ww-part {
+    margin: 0 0 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 1.4rem;
+    background: rgba(255, 255, 255, .72);
+}
+
+.ww-part-word,
+.ww-award-name,
+.ww-field > span {
+    color: #16324a;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.ww-part-options,
+.ww-award-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-top: .6rem;
+}
+
+.ww-option,
+.ww-save {
+    min-height: 3.4rem;
+    padding: .6rem 1rem;
+    color: #16324a;
+    font-size: 1.2rem;
+    font-weight: 700;
+    background: #fff;
+    border: 1px solid rgba(47, 93, 138, .2);
+    border-radius: 1rem;
+}
+
+.ww-option.is-on,
+.ww-save {
+    color: #fff;
+    background: #149a9a;
+    border-color: #149a9a;
+}
+
+.ww-take {
+    background: #d64545;
+    border-color: #d64545;
+}
+
+.ww-option {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.ww-swatch {
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 999px;
+    border: 1px solid rgba(22, 50, 74, .25);
+}
+
+.ww-field {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    margin: 0 0 .8rem;
+}
+
+.ww-field input {
+    min-height: 3.2rem;
+    padding: .4rem .8rem;
+    font-size: 1.25rem;
+    border: 1px solid rgba(47, 93, 138, .25);
+    border-radius: .8rem;
+}
+
+.ww-award {
+    padding: 1rem;
+    border-radius: 1.4rem;
+    background: rgba(255, 255, 255, .78);
+}
+
+.ww-award-person,
+.ww-row-person,
+.ww-person-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+}
+
+.ww-award-total {
+    color: #149a9a;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.ww-goals {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0 0 1rem;
+}
+
+.ww-goal {
+    padding: 1rem 1.1rem;
+    border-radius: 1.4rem;
+    background: rgba(255, 255, 255, .78);
+    border-top: 8px solid #149a9a;
+}
+
+.ww-goal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .7rem;
+}
+
+.ww-goal-name {
+    color: #16324a;
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.ww-goal .ww-speak:not([hidden]) {
+    position: static;
+    min-width: 3rem;
+    min-height: 3rem;
+    margin: 0;
+}
+
+.ww-goal-bar {
+    display: block;
+    height: 1.6rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(20, 154, 154, .18);
+}
+
+.ww-goal-bar > span {
+    display: block;
+    width: var(--ww-goal);
+    height: 100%;
+    background: #149a9a;
+}
+
+.ww-tile-points,
+.ww-tile-goal {
+    border-top-color: #149a9a;
+}
+
+.ww-tile-points .ww-tile-icon,
+.ww-tile-goal .ww-tile-icon {
+    color: #149a9a;
+}
+
+.ww-tile-points .ww-tile-link,
+.ww-tile-badges.has-points .ww-tile-link {
+    flex-direction: row;
+    flex-wrap: wrap;
+}

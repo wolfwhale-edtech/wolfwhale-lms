@@ -68,9 +68,16 @@
                         <path d="M56 14H34c-4 0-6 2-6 6v32c2-2 4-3 6-3h22z" fill="currentColor" opacity=".72"/>
                     </svg>
                     {{/iscourses}}
+                    {{#ispoints}}
+                    {{{avatar}}}
+                    {{/ispoints}}
                 </span>
                 <span class="ww-tile-word">{{word}}</span>
                 <span class="ww-tile-fact">{{fact}}</span>
+                {{#levelword}}
+                <span class="ww-tile-word">{{levelword}}</span>
+                <span class="ww-tile-fact">{{levelfact}}</span>
+                {{/levelword}}
             </a>
             <button type="button" class="ww-speak" data-ww-speech="{{speech}}" aria-label="{{speech}}" hidden>
                 <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -81,6 +88,9 @@
             </button>
         </article>
         {{/tiles}}
+    </div>
+    <div class="ww-goals">
+        {{> local_wwpoints/goals }}
     </div>
 </div>
 {{#js}}

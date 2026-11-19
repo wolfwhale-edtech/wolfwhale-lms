@@ -164,13 +164,19 @@ class exporter {
         $userids = array_map('intval', array_keys($users));
         $courses = scope::courses($tree);
         $courseids = array_map('intval', array_keys($courses));
-        return [
+        $sets = [
             'users' => self::user_rows($users),
             'enrolments' => self::enrolment_rows($courseids, $userids),
             'grades' => self::grade_rows($courseids, $userids),
             'attendance' => self::attendance_rows($courseids),
             'submissions' => self::submission_rows($courseids, $userids),
         ];
+        if (class_exists(\local_wwpoints\points::class)) {
+            $sets['points'] = \local_wwpoints\points::export_rows($courseids, $userids);
+            $sets['avatars'] = \local_wwpoints\avatar::export_rows($userids);
+            $sets['goals'] = \local_wwpoints\goal::export_rows($courseids, $tree);
+        }
+        return $sets;
     }
 
     /**
@@ -425,6 +431,9 @@ class exporter {
             'grades' => ['userid', 'courseid', 'itemname', 'itemtype', 'itemmodule', 'finalgrade', 'rawgrademax', 'timemodified'],
             'attendance' => ['userid', 'courseid', 'sessdate', 'takenby', 'status'],
             'submissions' => ['userid', 'courseid', 'assignment', 'name', 'status', 'attemptnumber', 'timecreated', 'timemodified', 'latest'],
+            'points' => ['userid', 'courseid', 'amount', 'reason', 'eventname', 'sourcekey', 'awardedby', 'timecreated'],
+            'avatars' => ['userid', 'face', 'skin', 'hair', 'eyes', 'clothing', 'accessory'],
+            'goals' => ['courseid', 'categoryid', 'name', 'target', 'timeend', 'createdby'],
         ];
         return $empty[$name] ?? [];
     }

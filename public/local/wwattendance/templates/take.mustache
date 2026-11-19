@@ -30,7 +30,7 @@
         <input type="hidden" name="courseid" value="{{courseid}}">
         {{#students}}
         <fieldset class="ww-person">
-            <legend class="ww-person-name">{{name}}</legend>
+            <legend class="ww-person-name"><span class="ww-avatar">{{{avatar}}}</span>{{name}}</legend>
             <div class="ww-choices">
                 <label class="ww-choice ww-present{{#ispresent}} is-on{{/ispresent}}">
                     <input type="radio" name="status[{{id}}]" value="present"{{#ispresent}} checked{{/ispresent}}>

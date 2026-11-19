@@ -62,7 +62,7 @@ class home {
     }
 
     /**
-     * The six tiles, in display order.
+     * The tiles, in display order.
      *
      * @return array[]
      */
@@ -108,7 +108,32 @@ class home {
                 $ready < 1, new \moodle_url('/local/wwadmin/export.php')),
             self::tile('licences', 'licences', seats::fact($licence['active'], $licence['seats']),
                 false, new \moodle_url('/local/wwadmin/licences.php')),
+            self::goal_tile($roots),
         ];
+    }
+
+    /**
+     * The school goal for the schools this person administers.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function goal_tile(array $roots): array {
+        $names = [];
+        foreach ($roots as $root) {
+            $goal = \local_wwpoints\goal::for_category((int) $root);
+            if ($goal) {
+                $names[] = \local_wwpoints\points::plain($goal->name);
+            }
+        }
+        if (count($roots) === 1) {
+            $fact = $names ? $names[0] : get_string('none', 'local_wwadmin');
+            $empty = !$names;
+        } else {
+            $fact = $names ? (string) count($names) : get_string('none', 'local_wwadmin');
+            $empty = !$names;
+        }
+        return self::tile('goal', 'goal', $fact, $empty, new \moodle_url('/local/wwpoints/schoolgoal.php'));
     }
 
     /**

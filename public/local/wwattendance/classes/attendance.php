@@ -206,6 +206,7 @@ class attendance {
                 'timemodified' => $now,
             ]);
         }
+        $present = [];
         foreach ($clean as $userid => $status) {
             $existing = $DB->get_record('local_wwattendance_log', [
                 'sessionid' => $sessionid,
@@ -215,16 +216,28 @@ class attendance {
                 $existing->status = $status;
                 $existing->timemodified = $now;
                 $DB->update_record('local_wwattendance_log', $existing);
+                $logid = (int) $existing->id;
             } else {
-                $DB->insert_record('local_wwattendance_log', (object) [
+                $logid = (int) $DB->insert_record('local_wwattendance_log', (object) [
                     'sessionid' => $sessionid,
                     'userid' => $userid,
                     'status' => $status,
                     'timemodified' => $now,
                 ]);
             }
+            if ($status === self::PRESENT) {
+                $present[] = ['userid' => $userid, 'logid' => $logid];
+            }
         }
         $transaction->allow_commit();
+        foreach ($present as $row) {
+            \local_wwattendance\event\attendance_marked::create([
+                'objectid' => $row['logid'],
+                'context' => $context,
+                'relateduserid' => $row['userid'],
+                'other' => ['sessionid' => $sessionid],
+            ])->trigger();
+        }
         return $sessionid;
     }
 

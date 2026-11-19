@@ -33,7 +33,7 @@
     </button>
     <div class="ww-home-tiles">
         {{#tiles}}
-        <article class="ww-tile ww-tile-{{id}}{{#empty}} is-empty{{/empty}}">
+        <article class="ww-tile ww-tile-{{id}}{{#empty}} is-empty{{/empty}}{{#pointsword}} has-points{{/pointsword}}">
             <a class="ww-tile-link" href="{{url}}">
                 <span class="ww-tile-icon" aria-hidden="true">
                     {{#ismarks}}
@@ -77,6 +77,12 @@
                 </span>
                 <span class="ww-tile-word">{{word}}</span>
                 <span class="ww-tile-fact">{{fact}}</span>
+                {{#pointsword}}
+                <span class="ww-tile-word">{{pointsword}}</span>
+                <span class="ww-tile-fact">{{points}}</span>
+                <span class="ww-tile-word">{{levelword}}</span>
+                <span class="ww-tile-fact">{{level}}</span>
+                {{/pointsword}}
             </a>
             <button type="button" class="ww-speak" data-ww-speech="{{speech}}" aria-label="{{speech}}" hidden>
                 <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
