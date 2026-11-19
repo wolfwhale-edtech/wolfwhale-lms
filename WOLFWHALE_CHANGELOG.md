@@ -226,11 +226,15 @@ Each later change gets its own entry with:
   - Export: how many archives are ready. The tap asks for a zip of one school. A background task builds it. The zip holds CSV and JSON for users, enrolments, grades, attendance, and assignment submission metadata. Passwords and submission text are not included. The task checks again that the person who asked may still export that school, and every query is limited to that school's categories. Each export is logged with who asked, when, and which school.
   - Licences: active people, a slash, and the seat count, or None when no seat count has been entered.
 - Read aloud: the admin home uses the same speaker buttons as the other homes. They use the browser's own speech. If the browser cannot speak, the buttons are not shown. The speaker buttons use the red accent. People uses the indigo accent. School uses the teal accent. Export uses the yellow accent.
-- Terms are stored in a new plugin, `local_wwterms`, one row per school with a name, a start, and an end. Another school cannot read or delete them. A later report card can read the same rows.
+- Terms are stored in a new plugin, `local_wwterms`, one row per school with a name, a start, and an end. Another school cannot read or delete them. The parent report card reads those rows for the child's school. When that school has saved terms, the report uses them. When it has none, the report still uses January through June and July through December.
 - What was checked: PHPUnit for the new plugins, 16 tests and 101 assertions, on PHP 8.3 and PostgreSQL 17. Suspending a person ends their open sessions. An enrolment that has ended or has not started is not counted. An assignment due-date override is used before a piece of work is called overdue. A course that cannot enrol anyone does not leave a new account behind. A category administrator cannot list, count, or export another category's users, courses, attendance, or submissions. A person who belongs to two schools cannot be suspended from one of them. Removing them from one school leaves the other enrolment. A forged export row for the other school is marked failed and writes no file. A local site was installed with made-up names for two schools. Each school had an administrator, a teacher, and students. The North administrator landed on the admin home, saw only North people, saved a term named Harvest from 8 September 2026 to 18 December 2026, and downloaded a zip that contained North and did not contain South. The South administrator's home showed South only, and opening the North snapshot did not show North's numbers.
 - Files and folders changed, against upstream v5.3.1:
   - `NOTICE.md` — the admin-home icons
   - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wolfwhale/version.php` — version raised to 2026111901, and it now depends on the terms plugin
+  - `public/local/wolfwhale/classes/parents.php` — the report card uses a school's saved terms
+  - `public/local/wolfwhale/reportcard.php` — the selected term is resolved for that child
+  - `public/local/wolfwhale/tests/parents_test.php` — a school with terms, and a school with none
   - `public/local/wwterms/` — new terms plugin:
     - `version.php`
     - `db/install.xml` — one table, a name and dates for one school

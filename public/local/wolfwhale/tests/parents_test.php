@@ -357,6 +357,88 @@ final class parents_test extends \advanced_testcase {
     }
 
     /**
+     * A saved school term replaces the January-June and July-December split.
+     */
+    public function test_report_uses_school_terms_when_the_school_has_them(): void {
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        parents::install_role();
+
+        $north = $this->getDataGenerator()->create_category(['name' => 'North School']);
+        $south = $this->getDataGenerator()->create_category(['name' => 'South School']);
+        $now = time();
+        $from = $now - (10 * DAYSECS);
+        $until = $now + (10 * DAYSECS);
+        \local_wwterms\term::create((int) $north->id, 'Harvest', $from, $until);
+        \local_wwterms\term::create((int) $north->id, 'Freeze', $now + (40 * DAYSECS), $now + (80 * DAYSECS));
+        \local_wwterms\term::create((int) $south->id, 'South only', $from, $until);
+
+        $course = $this->getDataGenerator()->create_course([
+            'category' => $north->id,
+            'fullname' => 'North room',
+            'startdate' => $from,
+            'showgrades' => 1,
+        ]);
+        $plain = $this->getDataGenerator()->create_course([
+            'fullname' => 'Plain room',
+            'startdate' => $from,
+            'showgrades' => 1,
+        ]);
+        $teacher = $this->getDataGenerator()->create_user();
+        $parent = $this->getDataGenerator()->create_user(['firstname' => 'Pat', 'lastname' => 'North']);
+        $child = $this->getDataGenerator()->create_user(['firstname' => 'Ada', 'lastname' => 'North']);
+        $otherchild = $this->getDataGenerator()->create_user(['firstname' => 'Bea', 'lastname' => 'Plain']);
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($child->id, $course->id, 'student');
+        $this->getDataGenerator()->enrol_user($otherchild->id, $plain->id, 'student');
+        $assign = $this->getDataGenerator()->create_module('assign', [
+            'course' => $course->id,
+            'name' => 'North essay',
+        ]);
+        $this->give_grade((int) $course->id, (int) $assign->id, (int) $child->id, 91);
+
+        $this->setUser($teacher);
+        \local_wwattendance\attendance::save((int) $course->id, [
+            $child->id => \local_wwattendance\attendance::PRESENT,
+        ], $now);
+        \local_wwattendance\attendance::save((int) $course->id, [
+            $child->id => \local_wwattendance\attendance::LATE,
+        ], $from - DAYSECS);
+
+        $this->setAdminUser();
+        parents::link((int) $parent->id, (int) $child->id);
+        parents::link((int) $parent->id, (int) $otherchild->id);
+
+        $this->setUser($parent);
+        $term = parents::current_term(null, (int) $child->id);
+        $this->assertSame('Harvest', $term['short']);
+        $this->assertSame('Harvest', $term['label']);
+        $calendar = parents::current_term();
+        $this->assertNull(parents::term_by_id($calendar['id'], (int) $child->id));
+        $this->assertSame($term, parents::term_by_id($term['id'], (int) $child->id));
+
+        $report = parents::report((int) $child->id, $term);
+        $this->assertSame('Harvest', $report['termname']);
+        $names = array_column($report['terms'], 'name');
+        $this->assertSame(['Harvest', 'Freeze'], $names);
+        $reporttext = json_encode($report);
+        $this->assertStringContainsString('North room', $reporttext);
+        $this->assertStringContainsString('91', $reporttext);
+        $this->assertStringContainsString('Present 1', $reporttext);
+        $this->assertStringContainsString('Late 0', $reporttext);
+        $this->assertStringNotContainsString('South only', $reporttext);
+        $this->assertStringNotContainsString('Term 1', $reporttext);
+        $this->assertStringNotContainsString('Term 2', $reporttext);
+
+        $tiles = json_encode(parents::get_tiles((int) $child->id));
+        $this->assertStringContainsString('Harvest', $tiles);
+
+        $fallback = parents::current_term(null, (int) $otherchild->id);
+        $this->assertMatchesRegularExpression('/^\d{4}-[12]$/', $fallback['id']);
+        $this->assertContains($fallback['short'], ['Term 1', 'Term 2']);
+    }
+
+    /**
      * Two families, a shared sibling pair, and one child in another course.
      *
      * @return array

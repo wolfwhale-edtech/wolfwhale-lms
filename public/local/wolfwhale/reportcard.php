@@ -28,9 +28,9 @@ require_login();
 \local_wolfwhale\parents::require_parent();
 
 $child = \local_wolfwhale\parents::resolve(optional_param('child', 0, PARAM_INT));
-$term = \local_wolfwhale\parents::term_by_id(optional_param('term', '', PARAM_ALPHANUMEXT));
+$term = \local_wolfwhale\parents::term_by_id(optional_param('term', '', PARAM_ALPHANUMEXT), (int) $child->id);
 if (!$term) {
-    $term = \local_wolfwhale\parents::current_term();
+    $term = \local_wolfwhale\parents::current_term(null, (int) $child->id);
 }
 $data = \local_wolfwhale\parents::report((int) $child->id, $term);
 \local_wolfwhale\parents::setup_page('report', new moodle_url('/local/wolfwhale/reportcard.php', [
