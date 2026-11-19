@@ -255,6 +255,25 @@ final class login_test extends \advanced_testcase {
     }
 
     /**
+     * A saved avatar is the face. A student without one gets initials.
+     */
+    public function test_face_uses_a_saved_avatar(): void {
+        $this->resetAfterTest();
+        [, , $user] = $this->class_with_student();
+
+        $plain = code::face($user);
+        $this->assertStringContainsString('AM', $plain);
+        $this->assertStringNotContainsString('<svg', $plain);
+
+        $this->setUser($user);
+        \local_wwpoints\avatar::save((int) $user->id, ['clothing' => 'red']);
+        $drawn = code::face($user);
+        $this->assertStringContainsString('<svg', $drawn);
+        $this->assertStringContainsString('#d64545', $drawn);
+        $this->assertStringNotContainsString('AM', $drawn);
+    }
+
+    /**
      * A suspended enrolment cannot use the class page.
      */
     public function test_suspended_enrolment_cannot_sign_in(): void {

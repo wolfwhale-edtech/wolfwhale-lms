@@ -179,13 +179,17 @@ class code {
     }
 
     /**
-     * A face for the class page. Uses the points avatar when that plugin is installed.
+     * A face for the class page. A saved avatar is used. Otherwise the initials.
      *
      * @param \stdClass $user
      * @return string
      */
     public static function face(\stdClass $user): string {
-        if (class_exists(\local_wwpoints\avatar::class)) {
+        global $DB;
+
+        if (class_exists(\local_wwpoints\avatar::class)
+                && $DB->get_manager()->table_exists('local_wwpoints_avatar')
+                && $DB->record_exists('local_wwpoints_avatar', ['userid' => $user->id])) {
             return \local_wwpoints\avatar::svg_for((int) $user->id);
         }
         $letters = \core_text::strtoupper(
