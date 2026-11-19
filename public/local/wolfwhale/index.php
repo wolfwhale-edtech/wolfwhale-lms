@@ -37,6 +37,10 @@ if (isguestuser() || !\local_wolfwhale\home::is_student((int) $USER->id)) {
 }
 
 // The calendar read below resets the page, so the page is set up after it.
+// The home has no maths. Mark the maths library as already set up so this
+// page does not point at another site. This has to happen before anything
+// prepares the page filters.
+$PAGE->requires->should_create_one_time_item_now('filter_mathjaxloader-scripts');
 $data = \local_wolfwhale\home::export();
 
 $PAGE->set_context(context_user::instance($USER->id));

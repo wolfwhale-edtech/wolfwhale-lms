@@ -16,7 +16,10 @@ const moduleNameMapper = Object.fromEntries(
 module.exports = {
     testEnvironment: 'jsdom',
     clearMocks: true,
-    testMatch: ['**/esm/tests/**/*.test.{ts,tsx}'],
+    testMatch: [
+        '**/esm/tests/**/*.test.{ts,tsx}',
+        '**/local/wwoffline/js/**/*.test.js',
+    ],
     moduleNameMapper,
     transform: {
         '^.+\\.(ts|tsx)$': ['ts-jest', {

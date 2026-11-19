@@ -371,3 +371,32 @@ Each later change gets its own entry with:
     - `templates/schools.mustache`
     - `tests/login_test.php`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/9
+
+## WW-LMS-010 — Offline mode
+
+- Date: 2026-11-19
+- Summary: A student on a slow connection, or with no connection, can still open the home they last saw, the lessons they already opened, and the next lesson in each course. Lesson here means a page, a book, or a file. The separate lesson activity is not in this fork. Core does not ship a service worker that can do this. The mobile tool only publishes a small manifest so a phone can offer its app. The new worker is served from the site and covers the whole site. Each signed-in person has their own cache. Signing out deletes that cache. A sign-in page is never stored. An address that carries a session key is never stored. A stored page has the session key removed, including a session key that was sitting in a form. Assignment text typed while offline is kept on the device, without a session key, and is sent through the normal assignment form once the connection returns. The send reads a new session key from the live form. The page says Waiting until the server has accepted it, then Sent. The offline mark is an icon and the word Offline. The student home does not load the maths library, so it does not call another website. Pictures in the page body load when they reach the screen. The home tiles are drawn in the page, so there is no picture to fetch for them.
+- What was checked: Jest, 14 tests, for the cache rules and the queued assignment. PHPUnit on PHP 8.3.6 and PostgreSQL 17.12, 2 tests and 17 assertions. The next lesson is the next page, book, or file the student can see, not a hidden activity and not another student's course. A local site was opened with made-up names. Ada Moss loaded the home and a page named River start, then the browser was set to offline. The home still showed River notes, one item due, and River class, with the word Offline. The page still showed the sentence about blue paper. A second page, River next, had not been opened by hand and was still there. Ada typed assignment text while offline. The screen said Waiting. When the connection returned, the assignment page said Sent and Submitted for grading, and the database held the same sentence. A cold load of the home on a Slow 3G limit (500 kbps, 400 ms delay), with the worker and the browser cache cleared, reported a load of 28.6 seconds. The theme CSS was the large file: 226 KB compressed, 4.5 seconds. The home document was 17 KB compressed. No request went to another website.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the offline icon
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `jest.config.js` — the new browser tests are included
+  - `public/local/wolfwhale/index.php` — the student home does not set up the maths library
+  - `public/local/wwoffline/` — new offline plugin:
+    - `version.php`
+    - `db/hooks.php`
+    - `lang/en/local_wwoffline.php`
+    - `styles.css`
+    - `sw.php` — serves the worker and allows it to cover the whole site
+    - `classes/hook_callbacks.php`
+    - `classes/lessons.php` — the next page, book, or file
+    - `classes/privacy/provider.php`
+    - `js/rules.js` — what may be stored, and for whom
+    - `js/queue.js` — assignment text waiting to be sent
+    - `js/db.js`
+    - `js/sw.js`
+    - `js/client.js`
+    - `js/rules.test.js`
+    - `js/queue.test.js`
+    - `tests/lessons_test.php`
+- Pull request:
