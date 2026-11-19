@@ -390,6 +390,7 @@ Each later change gets its own entry with:
   - `public/theme/boost/scss/moodle/modules.scss` — dropped the rules for choice, lesson, wiki, data, and feedback
   - `public/theme/boost/scss/moodle/core.scss` — dropped the blog rules
   - `public/theme/boost/scss/moodle/forms.scss` — dropped the portfolio button
+  - `public/theme/boost/style/moodle.css` — the built sheet matches those dropped rules
   - `public/local/wwoffline/` — new offline plugin:
     - `version.php`
     - `db/hooks.php`
