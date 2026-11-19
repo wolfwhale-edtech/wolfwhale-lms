@@ -29,14 +29,20 @@
         {{#rows}}
         {{#url}}
         <a class="ww-row" href="{{url}}">
-            <span class="ww-row-word">{{word}}</span>
+            <span class="ww-row-person">
+                {{#avatar}}<span class="ww-avatar">{{{avatar}}}</span>{{/avatar}}
+                <span class="ww-row-word">{{word}}</span>
+            </span>
             {{#fact}}<span class="ww-row-fact">{{fact}}</span>{{/fact}}
             {{#course}}<span class="ww-row-course">{{course}}</span>{{/course}}
         </a>
         {{/url}}
         {{^url}}
         <div class="ww-row">
-            <span class="ww-row-word">{{word}}</span>
+            <span class="ww-row-person">
+                {{#avatar}}<span class="ww-avatar">{{{avatar}}}</span>{{/avatar}}
+                <span class="ww-row-word">{{word}}</span>
+            </span>
             {{#fact}}<span class="ww-row-fact">{{fact}}</span>{{/fact}}
             {{#course}}<span class="ww-row-course">{{course}}</span>{{/course}}
         </div>

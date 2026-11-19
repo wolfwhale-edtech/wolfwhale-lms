@@ -24,9 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026111901;
+$plugin->version   = 2026111902;
 $plugin->requires  = 2026100200;
 $plugin->component = 'local_wolfwhale';
 $plugin->dependencies = [
     'local_wwterms' => 2026111900,
+    'local_wwpoints' => 2026111900,
 ];

@@ -1354,12 +1354,23 @@ class parents {
         $url = (new \moodle_url('/local/wolfwhale/parentbadges.php', ['child' => $childid]))->out(false);
         $count = count($rows);
         if ($count === 0) {
-            return self::tile('badges', $word, get_string('none', 'local_wolfwhale'), true, $url);
+            $tile = self::tile('badges', $word, get_string('none', 'local_wolfwhale'), true, $url);
+        } else if ($count === 1) {
+            $tile = self::tile('badges', $word, (string) $rows[0]['word'], false, $url);
+        } else {
+            $tile = self::tile('badges', $word, (string) $count, false, $url);
         }
-        if ($count === 1) {
-            return self::tile('badges', $word, (string) $rows[0]['word'], false, $url);
-        }
-        return self::tile('badges', $word, (string) $count, false, $url);
+        $total = \local_wwpoints\points::total($childid);
+        $level = \local_wwpoints\levels::for_points($total);
+        $tile['pointsword'] = get_string('points', 'local_wwpoints');
+        $tile['points'] = (string) $total;
+        $tile['levelword'] = get_string('level', 'local_wwpoints');
+        $tile['level'] = (string) $level;
+        $tile['speech'] .= ' ' . get_string('pointspeech', 'local_wwpoints', (object) [
+            'points' => $total,
+            'level' => $level,
+        ]);
+        return $tile;
     }
 
     /**

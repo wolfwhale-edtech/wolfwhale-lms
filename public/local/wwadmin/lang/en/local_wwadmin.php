@@ -47,6 +47,7 @@ $string['editingteacher'] = 'Editing teacher';
 $string['email'] = 'Email';
 $string['end'] = 'End';
 $string['export'] = 'Export';
+$string['goal'] = 'Goal';
 $string['exporttask'] = 'School data export';
 $string['failed'] = 'Failed';
 $string['firstname'] = 'First name';

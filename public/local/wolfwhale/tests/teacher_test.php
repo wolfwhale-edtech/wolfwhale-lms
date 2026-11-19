@@ -488,7 +488,7 @@ final class teacher_test extends \advanced_testcase {
         $this->assertSame('Quiet room', $tiles['marks']['fact']);
         $this->assertSame('Marking. None', $tiles['marking']['speech']);
         $this->assertSame(
-            ['post', 'marking', 'attendance', 'messages', 'stuck', 'marks'],
+            ['post', 'marking', 'attendance', 'messages', 'stuck', 'marks', 'points', 'goal'],
             array_keys($tiles)
         );
     }

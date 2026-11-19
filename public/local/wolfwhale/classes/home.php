@@ -104,8 +104,7 @@ class home {
      * Tiles for the logged-in person, in display order.
      *
      * Badges are left out when badges are switched off. Messages are left out
-     * when messaging is switched off. Points, levels, avatars, the library,
-     * and maps are not built, so they are not here.
+     * when messaging is switched off.
      *
      * @return array[]
      */
@@ -124,6 +123,7 @@ class home {
             $tiles[] = $messages;
         }
         $tiles[] = self::courses_tile();
+        $tiles[] = self::points_tile();
         return $tiles;
     }
 
@@ -133,13 +133,20 @@ class home {
      * @return array
      */
     public static function export(): array {
+        global $USER;
+
         $tiles = self::get_tiles();
+        $goals = \local_wwpoints\goal::bars_for_user((int) $USER->id);
         $speech = [];
         foreach ($tiles as $tile) {
             $speech[] = $tile['speech'];
         }
+        foreach ($goals as $goal) {
+            $speech[] = $goal['speech'];
+        }
         return [
             'tiles' => $tiles,
+            'goals' => $goals,
             'screenspeech' => implode(' ', $speech),
             'read' => get_string('read', 'local_wolfwhale'),
         ];
@@ -253,6 +260,29 @@ class home {
     }
 
     /**
+     * Points and the level that those points have reached.
+     *
+     * @return array
+     */
+    private static function points_tile(): array {
+        global $USER;
+
+        $total = \local_wwpoints\points::total((int) $USER->id);
+        $level = \local_wwpoints\levels::for_points($total);
+        $word = get_string('points', 'local_wwpoints');
+        $url = (new \moodle_url('/local/wwpoints/avatar.php'))->out(false);
+        $tile = self::tile('points', $word, (string) $total, false, $url);
+        $tile['levelword'] = get_string('level', 'local_wwpoints');
+        $tile['levelfact'] = (string) $level;
+        $tile['avatar'] = \local_wwpoints\avatar::svg_for((int) $USER->id);
+        $tile['speech'] = get_string('pointspeech', 'local_wwpoints', (object) [
+            'points' => $total,
+            'level' => $level,
+        ]);
+        return $tile;
+    }
+
+    /**
      * One tile.
      *
      * @param string $id Tile id.
@@ -276,6 +306,7 @@ class home {
             'isbadges' => $id === 'badges',
             'ismessages' => $id === 'messages',
             'iscourses' => $id === 'courses',
+            'ispoints' => $id === 'points',
         ];
     }
 

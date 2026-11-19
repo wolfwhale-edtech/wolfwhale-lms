@@ -48,6 +48,7 @@ foreach (\local_wwattendance\attendance::students($course->id) as $user) {
     $people[] = [
         'id' => (int) $user->id,
         'name' => fullname($user),
+        'avatar' => \local_wwpoints\avatar::svg_for((int) $user->id),
         'ispresent' => $status === \local_wwattendance\attendance::PRESENT,
         'isabsent' => $status === \local_wwattendance\attendance::ABSENT,
         'islate' => $status === \local_wwattendance\attendance::LATE,

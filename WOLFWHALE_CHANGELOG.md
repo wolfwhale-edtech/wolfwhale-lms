@@ -277,3 +277,56 @@ Each later change gets its own entry with:
     - `templates/form.mustache`
     - `tests/scope_test.php`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/7
+
+## WW-LMS-008 — Points, levels, avatars, and goals
+
+- Date: 2026-11-19
+- Summary: A student earns points from real events: submitting an assignment, completing an activity, being marked present, and earning a badge. Each award is one row in a ledger (who, course, amount, reason, source event, time). The same event cannot write a second row. A teacher can give or take points, with a reason, only in a course they teach. A level is the highest step in a threshold table stored in site settings, which an administrator can edit. The student picks an avatar on one screen from generic layered parts: face shape, skin tone, hair, eyes, clothing colour, and accessory. Some parts open at higher levels. The avatar is drawn from those parts. It is not a First Nations, Métis, or Inuit design, and it uses no Indigenous-language word. The part list is a plain set of keys so the owner can add culturally specific parts later. A teacher sets one class goal (a name they type, a points target, and an end date). A category administrator sets one school goal from the admin home. A goal counts only points from that class, or from courses in that category. The progress bar is on the student home and the teacher home. The student home has a Points and Level tile. The teacher home opens the give-points page and the class-goal page. The parent Badges tile also shows the child's points and level. The school export adds the points ledger, avatars, and goals for that school only.
+- What was checked: PHPUnit for the new points plugin and the homes it touches, 70 tests and 544 assertions, on PHP 8.3.6 and PostgreSQL 17.12. A teacher cannot award points in another course, or to a student who is not in the course, or with an empty reason. A student cannot save another person's avatar, or a part their level has not opened. A class goal and a school goal do not count the other school's points, and the export of one school does not contain the other school's ledger, avatars, or goals. The same assignment submission, completion, present mark, and badge award do not write a second row. The level changes when the stored threshold table changes. Deleting a person removes their points and avatar and clears their name from a goal they saved. A local site was installed with made-up names. Ada Moss submitted an assignment, completed a page, was marked present, earned a badge, and was given points by Lee Moss. The student home showed 45 points and level 2, the avatar she chose, and the North river and North school bars. Lee Moss opened the give-points page for Ada and the class goal. Pat Moss saw River star, 45 points, and level 2 on the Badges tile.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the points star, the goal flag, and the avatar drawing
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwpoints/` — new points plugin:
+    - `version.php`
+    - `settings.php` — the level table, the event amounts, and the locked parts
+    - `db/install.xml` — the ledger, the avatar, and the goal
+    - `db/install.php` — the starting settings
+    - `db/access.php` — give points, set a class goal, set a school goal
+    - `db/events.php` — the four observers
+    - `lang/en/local_wwpoints.php`
+    - `styles.css`
+    - `classes/points.php`
+    - `classes/levels.php`
+    - `classes/observer.php`
+    - `classes/avatar.php`
+    - `classes/goal.php`
+    - `classes/privacy/provider.php`
+    - `avatar.php` — the picker
+    - `award.php` — give or take points
+    - `goal.php` — the class goal
+    - `schoolgoal.php` — the school goal
+    - `templates/avatar.mustache`
+    - `templates/award.mustache`
+    - `templates/goal.mustache`
+    - `templates/goals.mustache`
+    - `tests/points_test.php`
+  - `public/local/wwattendance/version.php` — version raised to 2026111902
+  - `public/local/wwattendance/classes/attendance.php` — a present mark fires an event after the register is saved
+  - `public/local/wwattendance/classes/event/attendance_marked.php` — that event
+  - `public/local/wwattendance/take.php` — the avatar next to the name
+  - `public/local/wwattendance/templates/take.mustache`
+  - `public/local/wolfwhale/version.php` — version raised to 2026111902, and it now depends on the points plugin
+  - `public/local/wolfwhale/classes/home.php` — the Points and Level tile, and the goal bars
+  - `public/local/wolfwhale/classes/teacher.php` — the Points and Goal tiles, the goal bars, and avatars in the class lists
+  - `public/local/wolfwhale/classes/parents.php` — the child's points and level on the Badges tile
+  - `public/local/wolfwhale/templates/home.mustache`
+  - `public/local/wolfwhale/templates/teacher.mustache`
+  - `public/local/wolfwhale/templates/parent.mustache`
+  - `public/local/wolfwhale/templates/list.mustache`
+  - `public/local/wolfwhale/tests/teacher_test.php` — the two new tiles
+  - `public/local/wwadmin/version.php` — version raised to 2026111901, and it now depends on the points plugin
+  - `public/local/wwadmin/classes/home.php` — the Goal tile
+  - `public/local/wwadmin/classes/exporter.php` — the ledger, avatars, and goals for that school
+  - `public/local/wwadmin/templates/home.mustache`
+  - `public/local/wwadmin/lang/en/local_wwadmin.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/8

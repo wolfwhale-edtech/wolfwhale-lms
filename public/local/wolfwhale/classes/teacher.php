@@ -150,6 +150,8 @@ class teacher {
             self::messages_tile(),
             self::count_tile('stuck', 'stuck', count($stuck), new \moodle_url('/local/wolfwhale/stuck.php')),
             self::course_tile('marks', 'marks', $marks, new \moodle_url('/local/wolfwhale/marks.php'), false, true),
+            self::points_tile(),
+            self::goal_tile(),
         ];
         return array_values(array_filter($tiles));
     }
@@ -160,13 +162,20 @@ class teacher {
      * @return array
      */
     public static function export(): array {
+        global $USER;
+
         $tiles = self::get_tiles();
+        $goals = \local_wwpoints\goal::bars_for_teacher((int) $USER->id);
         $speech = [];
         foreach ($tiles as $tile) {
             $speech[] = $tile['speech'];
         }
+        foreach ($goals as $goal) {
+            $speech[] = $goal['speech'];
+        }
         return [
             'tiles' => $tiles,
+            'goals' => $goals,
             'screenspeech' => implode(' ', $speech),
             'read' => get_string('read', 'local_wolfwhale'),
         ];
@@ -322,19 +331,22 @@ class teacher {
                         'id' => $cm->id,
                         'action' => 'grader',
                     ];
+                    $avatar = '';
                     if ($blind) {
                         $params['blindid'] = $assign->get_uniqueid_for_user($row->userid);
                         $word = (string) $params['blindid'];
                     } else {
                         $params['userid'] = $row->userid;
                         $word = self::plain(fullname($row));
+                        $avatar = \local_wwpoints\avatar::svg_for((int) $row->userid);
                     }
                     $items[] = self::row(
                         $word,
                         self::plain($instance->name),
                         self::plain($course->fullname),
                         (new \moodle_url('/mod/assign/view.php', $params))->out(false),
-                        1
+                        1,
+                        $avatar
                     );
                 }
             }
@@ -435,7 +447,8 @@ class teacher {
                     implode(', ', $facts),
                     self::plain($course->fullname),
                     $url,
-                    1
+                    1,
+                    \local_wwpoints\avatar::svg_for((int) $student->id)
                 );
             }
         }
@@ -472,7 +485,8 @@ class teacher {
                 implode(', ', $person['courses']),
                 '',
                 (new \moodle_url('/message/index.php', ['id' => $id]))->out(false),
-                1
+                1,
+                \local_wwpoints\avatar::svg_for((int) $id)
             );
         }
         return $rows;
@@ -928,16 +942,72 @@ class teacher {
      * @param string $course
      * @param string $url
      * @param int $count
+     * @param string $avatar
      * @return array
      */
-    private static function row(string $word, string $fact, string $course, string $url, int $count): array {
-        return [
+    private static function row(
+        string $word,
+        string $fact,
+        string $course,
+        string $url,
+        int $count,
+        string $avatar = ''
+    ): array {
+        $row = [
             'word' => $word,
             'fact' => $fact,
             'course' => $course,
             'url' => $url,
             'count' => $count,
         ];
+        if ($avatar !== '') {
+            $row['avatar'] = $avatar;
+        }
+        return $row;
+    }
+
+    /**
+     * Points for the courses this teacher teaches.
+     *
+     * @return array|null
+     */
+    private static function points_tile(): ?array {
+        $courses = \local_wwpoints\points::courses_for('local/wwpoints:award');
+        if (!$courses) {
+            return null;
+        }
+        $url = new \moodle_url('/local/wwpoints/award.php');
+        $word = get_string('points', 'local_wwpoints');
+        if (count($courses) === 1) {
+            $course = reset($courses);
+            $url->param('courseid', $course->id);
+            return self::tile('points', $word, self::plain($course->fullname), false, $url->out(false));
+        }
+        return self::tile('points', $word, (string) count($courses), false, $url->out(false));
+    }
+
+    /**
+     * The class goal, or None when this teacher has not set one.
+     *
+     * @return array|null
+     */
+    private static function goal_tile(): ?array {
+        $courses = \local_wwpoints\points::courses_for('local/wwpoints:setgoal');
+        if (!$courses) {
+            return null;
+        }
+        $url = new \moodle_url('/local/wwpoints/goal.php');
+        $word = get_string('goal', 'local_wwpoints');
+        if (count($courses) === 1) {
+            $course = reset($courses);
+            $url->param('courseid', $course->id);
+            $goal = \local_wwpoints\goal::for_course((int) $course->id);
+            if (!$goal) {
+                return self::tile('goal', $word, get_string('none', 'local_wolfwhale'), true, $url->out(false));
+            }
+            return self::tile('goal', $word, self::plain($goal->name), false, $url->out(false));
+        }
+        return self::tile('goal', $word, (string) count($courses), false, $url->out(false));
     }
 
     /**
@@ -965,6 +1035,8 @@ class teacher {
             'ismessages' => $id === 'messages',
             'isstuck' => $id === 'stuck',
             'ismarks' => $id === 'marks',
+            'ispoints' => $id === 'points',
+            'isgoal' => $id === 'goal',
         ];
     }
 

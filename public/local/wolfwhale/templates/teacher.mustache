@@ -75,6 +75,17 @@
                         <path d="M8 24h48M8 38h48M26 24v30M42 24v30" fill="none" stroke="#fff" stroke-width="3"/>
                     </svg>
                     {{/ismarks}}
+                    {{#ispoints}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 6l7 16 17 2-13 11 4 17-15-9-15 9 4-17L8 24l17-2z" fill="currentColor"/>
+                    </svg>
+                    {{/ispoints}}
+                    {{#isgoal}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M14 8h6v48h-6z" fill="currentColor"/>
+                        <path d="M20 10h30l-8 12 8 12H20z" fill="currentColor"/>
+                    </svg>
+                    {{/isgoal}}
                 </span>
                 <span class="ww-tile-word">{{word}}</span>
                 <span class="ww-tile-fact">{{fact}}</span>
@@ -88,6 +99,9 @@
             </button>
         </article>
         {{/tiles}}
+    </div>
+    <div class="ww-goals">
+        {{> local_wwpoints/goals }}
     </div>
 </div>
 {{#js}}

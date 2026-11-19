@@ -1,0 +1,76 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwpoints/avatar
+
+    One screen of avatar parts. Each part is a word.
+}}
+<div class="ww-home">
+    <button type="button" class="ww-speak ww-read" data-ww-speech="{{speech}}" hidden>
+        <svg class="ww-speak-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path d="M8 24h12l14-12v40L20 40H8z" fill="currentColor"/>
+            <path d="M42 22a14 14 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+            <path d="M48 14a24 24 0 0 1 0 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span>{{read}}</span>
+    </button>
+    <form method="post" action="{{action}}" class="ww-avatar-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        {{#hidden}}
+        <input type="hidden" name="{{name}}" value="{{value}}">
+        {{/hidden}}
+        <div class="ww-avatar-preview" aria-hidden="true">{{{svg}}}</div>
+        {{#groups}}
+        <fieldset class="ww-part">
+            <legend class="ww-part-word">{{word}}</legend>
+            <div class="ww-part-options">
+                {{#options}}
+                <button type="submit" name="{{part}}" value="{{value}}" class="ww-option{{#on}} is-on{{/on}}">
+                    {{#swatch}}<span class="ww-swatch" style="background: {{swatch}}"></span>{{/swatch}}
+                    <span>{{word}}</span>
+                </button>
+                {{/options}}
+            </div>
+        </fieldset>
+        {{/groups}}
+    </form>
+</div>
+{{#js}}
+(function() {
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function') {
+        return;
+    }
+    var buttons = document.querySelectorAll('.ww-home .ww-speak');
+    for (var i = 0; i < buttons.length; i++) {
+        (function(button) {
+            button.hidden = false;
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var text = button.getAttribute('data-ww-speech') || '';
+                if (!text) {
+                    return;
+                }
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = document.documentElement.lang || 'en';
+                window.speechSynthesis.speak(utterance);
+            });
+        })(buttons[i]);
+    }
+})();
+{{/js}}
