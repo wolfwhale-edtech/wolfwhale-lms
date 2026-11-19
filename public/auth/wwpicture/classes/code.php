@@ -126,7 +126,7 @@ class code {
     public static function open(int $courseid, string $token): bool {
         global $DB;
 
-        if ($courseid <= 0 || $token === '' || !school::picture_on($courseid)) {
+        if ($courseid <= 0 || $token === '' || !is_enabled_auth('wwpicture') || !school::picture_on($courseid)) {
             return false;
         }
         $row = $DB->get_record('auth_wwpicture_link', ['courseid' => $courseid]);
@@ -147,13 +147,26 @@ class code {
 
         $context = \context_course::instance($courseid);
         $roleid = $DB->get_field('role', 'id', ['shortname' => 'student'], MUST_EXIST);
+        $now = self::now();
         $users = get_role_users(
             $roleid,
             $context,
             false,
             'u.id, u.firstname, u.lastname, u.middlename, u.alternatename, u.firstnamephonetic, ' .
             'u.lastnamephonetic, u.suspended, u.deleted, u.auth, u.confirmed, u.picture, u.imagealt',
-            'u.firstname, u.lastname'
+            'u.firstname, u.lastname',
+            false,
+            '',
+            '',
+            '',
+            'ue.status = :active AND e.status = :enabled AND ue.timestart <= :now1 ' .
+                'AND (ue.timeend = 0 OR ue.timeend > :now2)',
+            [
+                'active' => ENROL_USER_ACTIVE,
+                'enabled' => ENROL_INSTANCE_ENABLED,
+                'now1' => $now,
+                'now2' => $now,
+            ]
         );
         $rows = [];
         foreach ($users as $user) {
@@ -251,14 +264,38 @@ class code {
      * @return string ok, bad, locked, limited, denied, or closed
      */
     public static function sign_in(int $courseid, string $token, int $userid, array $picks): string {
-        global $DB;
-
         if (!self::open($courseid, $token)) {
             return 'closed';
         }
         if (!self::is_student($courseid, $userid)) {
             return 'denied';
         }
+
+        // One attempt at a time for this person, so two browsers cannot share a failure count.
+        $lockfactory = \core\lock\lock_config::get_lock_factory('auth_wwpicture');
+        $lock = $lockfactory->get_lock('code' . $userid, 5);
+        if (!$lock) {
+            return 'limited';
+        }
+        try {
+            return self::check_code($userid, $picks);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Read the stored hash, count a failure, or open the session.
+     *
+     * The caller holds the lock for this person.
+     *
+     * @param int $userid
+     * @param string[] $picks
+     * @return string
+     */
+    private static function check_code(int $userid, array $picks): string {
+        global $DB;
+
         $row = $DB->get_record('auth_wwpicture_code', ['userid' => $userid]);
         if (!$row || $row->codehash === '') {
             return 'denied';

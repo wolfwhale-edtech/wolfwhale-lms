@@ -107,6 +107,7 @@ final class login_test extends \advanced_testcase {
 
         $this->resetAfterTest();
         $this->setUser(0);
+        \core\plugininfo\auth::enable_plugin('wwpicture', 1);
         $cat = $this->getDataGenerator()->create_category(['name' => 'North']);
         $course = $this->getDataGenerator()->create_course(['category' => $cat->id]);
         school::save((int) $cat->id, false, '');
@@ -254,6 +255,88 @@ final class login_test extends \advanced_testcase {
     }
 
     /**
+     * A suspended enrolment cannot use the class page.
+     */
+    public function test_suspended_enrolment_cannot_sign_in(): void {
+        global $DB, $USER;
+
+        $this->resetAfterTest();
+        $this->setUser(0);
+        [$course, $token, $user] = $this->class_with_student();
+        $picks = ['sun', 'tree', 'fish'];
+        code::set((int) $user->id, $picks);
+        $DB->set_field('user_enrolments', 'status', ENROL_USER_SUSPENDED, ['userid' => $user->id]);
+
+        $this->assertSame('denied', code::sign_in($course, $token, (int) $user->id, $picks));
+        $this->assertNotEquals($user->id, $USER->id ?? 0);
+    }
+
+    /**
+     * Turning the picture plugin off closes the class page.
+     */
+    public function test_disabled_plugin_cannot_sign_in(): void {
+        global $USER;
+
+        $this->resetAfterTest();
+        $this->setUser(0);
+        [$course, $token, $user] = $this->class_with_student();
+        $picks = ['sun', 'tree', 'fish'];
+        code::set((int) $user->id, $picks);
+        \core\plugininfo\auth::enable_plugin('wwpicture', 0);
+
+        $this->assertFalse(code::open($course, $token));
+        $this->assertSame('closed', code::sign_in($course, $token, (int) $user->id, $picks));
+        $this->assertNotEquals($user->id, $USER->id ?? 0);
+    }
+
+    /**
+     * A linked account is checked against its own school, even when the external email matches another school.
+     */
+    public function test_mapped_account_uses_its_own_school(): void {
+        global $USER;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+        $north = $this->getDataGenerator()->create_category(['name' => 'North']);
+        $course = $this->getDataGenerator()->create_course(['category' => $north->id]);
+        school::save((int) $north->id, true, 'north.example');
+        $south = $this->getDataGenerator()->create_category(['name' => 'South']);
+        school::save((int) $south->id, true, 'other.example');
+        $ada = $this->getDataGenerator()->create_user([
+            'email' => 'ada@north.example',
+            'auth' => 'manual',
+            'confirmed' => 1,
+        ]);
+        $this->getDataGenerator()->enrol_user($ada->id, $course->id, 'student');
+
+        \curl::mock_response($this->discovery());
+        $issuer = \core\oauth2\api::create_standard_issuer('google');
+        $info = [
+            'username' => 'ada-external',
+            'email' => 'ada@other.example',
+            'firstname' => 'Ada',
+            'lastname' => 'Moss',
+        ];
+        \auth_oauth2\api::link_login($info, $issuer, (int) $ada->id, true);
+
+        $client = $this->createMock(\core\oauth2\client::class);
+        $client->method('get_raw_userinfo')->willReturn((object) $info);
+        $client->method('get_userinfo')->willReturn($info);
+        $client->method('get_issuer')->willReturn($issuer);
+        $client->method('log_out');
+
+        $this->setUser(0);
+        $auth = new \auth_oauth2\auth();
+        try {
+            @$auth->complete_login($client, new \moodle_url('/'));
+            $this->fail('The linked account is in the other school');
+        } catch (\moodle_exception $e) {
+            $this->assertNotEmpty($e->errorcode);
+        }
+        $this->assertNotEquals($ada->id, $USER->id ?? 0);
+    }
+
+    /**
      * One enabled school, one student, and the class link.
      *
      * @param string $school
@@ -261,6 +344,7 @@ final class login_test extends \advanced_testcase {
      * @return array
      */
     private function class_with_student(string $school = 'North', string $firstname = 'Ada'): array {
+        \core\plugininfo\auth::enable_plugin('wwpicture', 1);
         $courseid = $this->school_course($school);
         $user = $this->getDataGenerator()->create_user(['firstname' => $firstname, 'lastname' => 'Moss']);
         $this->getDataGenerator()->enrol_user($user->id, $courseid, 'student');
