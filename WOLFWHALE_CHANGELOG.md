@@ -370,3 +370,4 @@ Each later change gets its own entry with:
     - `templates/cards.mustache`
     - `templates/schools.mustache`
     - `tests/login_test.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/9
