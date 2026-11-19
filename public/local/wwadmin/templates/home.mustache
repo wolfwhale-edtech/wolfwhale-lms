@@ -83,6 +83,13 @@
                         <path d="M20 10h30l-8 12 8 12H20z" fill="currentColor"/>
                     </svg>
                     {{/isgoal}}
+                    {{#isweek}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <rect x="8" y="12" width="48" height="44" rx="6" fill="currentColor"/>
+                        <path d="M8 24h48" stroke="#fff" stroke-width="4"/>
+                        <path d="M20 8v10M44 8v10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                    {{/isweek}}
                 </span>
                 <span class="ww-tile-word">{{word}}</span>
                 <span class="ww-tile-fact">{{fact}}</span>

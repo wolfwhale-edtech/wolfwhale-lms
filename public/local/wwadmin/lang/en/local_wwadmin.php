@@ -98,6 +98,7 @@ $string['terms'] = 'Terms';
 $string['upload'] = 'Upload';
 $string['uploadusers'] = 'Upload users';
 $string['username'] = 'Username';
+$string['week'] = 'Week';
 $string['wwadmin:export'] = 'Export a school';
 $string['wwadmin:managepeople'] = 'Manage people';
 $string['wwadmin:view'] = 'View a school';

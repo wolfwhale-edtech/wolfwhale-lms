@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026111902;
+$plugin->version   = 2026111903;
 $plugin->requires  = 2026100200;
 $plugin->component = 'local_wolfwhale';
 $plugin->dependencies = [

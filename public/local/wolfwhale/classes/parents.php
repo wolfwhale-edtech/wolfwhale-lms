@@ -263,6 +263,7 @@ class parents {
             self::badges_tile($childid),
             self::messages_tile($childid),
             self::report_tile($childid),
+            self::updates_tile(),
         ];
         return array_values(array_filter($tiles));
     }
@@ -1412,6 +1413,23 @@ class parents {
     }
 
     /**
+     * The update switches, or null when that plugin is not installed.
+     *
+     * @return array|null
+     */
+    private static function updates_tile(): ?array {
+        global $USER;
+
+        if (!class_exists(\local_wwupdates\preferences::class)) {
+            return null;
+        }
+        $on = \local_wwupdates\preferences::any_channel((int) $USER->id);
+        $fact = get_string($on ? 'on' : 'off', 'local_wwupdates');
+        $url = (new \moodle_url('/local/wwupdates/preferences.php'))->out(false);
+        return self::tile('updates', get_string('updates', 'local_wwupdates'), $fact, !$on, $url);
+    }
+
+    /**
      * One tile.
      *
      * @param string $id
@@ -1435,6 +1453,7 @@ class parents {
             'isbadges' => $id === 'badges',
             'ismessages' => $id === 'messages',
             'isreport' => $id === 'report',
+            'isupdates' => $id === 'updates',
         ];
     }
 

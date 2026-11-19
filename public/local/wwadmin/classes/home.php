@@ -109,6 +109,7 @@ class home {
             self::tile('licences', 'licences', seats::fact($licence['active'], $licence['seats']),
                 false, new \moodle_url('/local/wwadmin/licences.php')),
             self::goal_tile($roots),
+            self::week_tile($roots),
         ];
     }
 
@@ -134,6 +135,23 @@ class home {
             $empty = !$names;
         }
         return self::tile('goal', 'goal', $fact, $empty, new \moodle_url('/local/wwpoints/schoolgoal.php'));
+    }
+
+    /**
+     * The day and hour of the weekly summary.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function week_tile(array $roots): array {
+        $url = new \moodle_url('/local/wwupdates/schedule.php');
+        if (!class_exists(\local_wwupdates\schedule::class) || !$roots) {
+            return self::tile('week', 'week', get_string('none', 'local_wwadmin'), true, $url);
+        }
+        if (count($roots) === 1) {
+            return self::tile('week', 'week', \local_wwupdates\schedule::label((int) $roots[0]), false, $url);
+        }
+        return self::tile('week', 'week', (string) count($roots), false, $url);
     }
 
     /**

@@ -410,3 +410,49 @@ Each later change gets its own entry with:
     - `js/queue.test.js`
     - `tests/lessons_test.php`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/10
+## WW-LMS-011 — Parent updates
+
+- Date: 2026-11-19
+- Summary: A parent can be told about their own linked children. The link is the parent role in the child's user context. A parent in another school is not told. The updates are a new mark, a missed attendance mark, work due within two days, a new badge or a higher level, a message from the child's teacher, and one weekly summary. The summary is marks, absences, work due in the next week, badges, points and level, and teacher messages from the past week. It does not copy the teacher's words. The text names the school and the child's first name. It does not use the word Moodle. App and email use the site's own notification and email processors. Text uses the site's SMS manager and whatever gateway an administrator has already switched on. No gateway is switched on by this change, and no key, number, or account is added. Text sends nothing until a gateway exists and the parent has turned Text on and saved a phone number. The phone number is a private profile field for that parent and is not used for anyone else. The parent home has big switches for App, Email, Text, Mark, Absent, Due, Badge, Message, and Week. A school administrator sets the day and hour of the weekly summary for that school only. Until they save a time, it is Monday at 08:00 on the site clock. The weekly task sends one summary per parent per child and does not send that week again.
+- What was checked: PHPUnit for the new updates, on PHP 8.3.6 and PostgreSQL 17.12: 5 tests and 62 assertions. A parent receives a mark and an absence for their own child. A parent linked in another school receives nothing, and a mark in a course the child is not enrolled in is not sent. Turning the channels off sends no app notification, no email, and no text. Text sends nothing when no gateway is configured. With a fake gateway that does not leave the machine, text goes only to that parent's number. The weekly summary contains the week's marks, absence, due work, badge, points, level, and the teacher's name, and a second run does not send it again. A school administrator cannot set another school's day. The existing parent, teacher, student, attendance, points, and admin tests still pass: 67 tests and 534 assertions. A local site was installed with made-up names. Mail went to a local catcher on this machine. A mark, an absence, and the weekly summary were sent to Pat Moss about Ada. No text was sent. No gateway was configured.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the bell, the update-switch drawings, and the calendar icon
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwupdates/` — new parent updates:
+    - `version.php`
+    - `lib.php` — text is allowed once a gateway exists
+    - `preferences.php` — the parent's switches and phone number
+    - `schedule.php` — the day and hour for one school
+    - `styles.css`
+    - `db/install.xml` — updates already sent, and each school's day and hour
+    - `db/install.php` — the private phone field
+    - `db/messages.php` — app and email providers
+    - `db/events.php`
+    - `db/tasks.php` — the hourly check for due work and the weekly summary
+    - `lang/en/local_wwupdates.php`
+    - `classes/preferences.php`
+    - `classes/audience.php` — parent links and school checks
+    - `classes/deliver.php`
+    - `classes/observer.php`
+    - `classes/summary.php`
+    - `classes/schedule.php`
+    - `classes/task/send_task.php`
+    - `classes/privacy/provider.php`
+    - `templates/preferences.mustache`
+    - `templates/toggle.mustache`
+    - `templates/schedule.mustache`
+    - `tests/updates_test.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026111903
+  - `public/local/wolfwhale/classes/parents.php` — the Updates tile
+  - `public/local/wolfwhale/templates/parent.mustache` — the bell icon
+  - `public/local/wwattendance/version.php` — version raised to 2026111903
+  - `public/local/wwattendance/classes/attendance.php` — an absence fires an event
+  - `public/local/wwattendance/classes/event/attendance_missed.php` — that event
+  - `public/local/wwpoints/version.php` — version raised to 2026111902
+  - `public/local/wwpoints/classes/points.php` — a higher level fires an event
+  - `public/local/wwpoints/classes/event/level_reached.php` — that event
+  - `public/local/wwadmin/version.php` — version raised to 2026111902
+  - `public/local/wwadmin/classes/home.php` — the Week tile
+  - `public/local/wwadmin/templates/home.mustache` — the calendar icon
+  - `public/local/wwadmin/lang/en/local_wwadmin.php` — the word Week
+- Pull request:

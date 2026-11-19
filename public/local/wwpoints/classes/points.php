@@ -97,7 +97,44 @@ class points {
             }
             throw $error;
         }
+        self::reached_level($userid, $courseid, $amount);
         return true;
+    }
+
+    /**
+     * Tell the site when this award moves the student to a higher level.
+     *
+     * @param int $userid
+     * @param int $courseid
+     * @param int $amount
+     */
+    private static function reached_level(int $userid, int $courseid, int $amount): void {
+        global $DB;
+
+        $total = (int) $DB->get_field_sql(
+            "SELECT COALESCE(SUM(amount), 0) FROM {local_wwpoints_ledger} WHERE userid = ?",
+            [$userid]
+        );
+        $before = levels::for_points($total - $amount);
+        $after = levels::for_points($total);
+        if ($after <= $before) {
+            return;
+        }
+        $context = \context_user::instance($userid);
+        if ($courseid > 0) {
+            $coursecontext = \context_course::instance($courseid, IGNORE_MISSING);
+            if ($coursecontext) {
+                $context = $coursecontext;
+            }
+        }
+        \local_wwpoints\event\level_reached::create([
+            'context' => $context,
+            'relateduserid' => $userid,
+            'other' => [
+                'level' => $after,
+                'points' => $total,
+            ],
+        ])->trigger();
     }
 
     /**
