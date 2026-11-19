@@ -152,7 +152,7 @@ class provider implements
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
 
-        $userid = $contextlist->get_user()->id;
+        $userid = (int) $contextlist->get_user()->id;
         foreach ($contextlist as $context) {
             if ($context->contextlevel != CONTEXT_USER || (int) $context->instanceid !== $userid) {
                 continue;
@@ -178,7 +178,7 @@ class provider implements
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
 
-        $userid = $contextlist->get_user()->id;
+        $userid = (int) $contextlist->get_user()->id;
         foreach ($contextlist as $context) {
             if ($context->contextlevel == CONTEXT_USER && (int) $context->instanceid === $userid) {
                 $DB->delete_records_select('local_wwupdates_sent', 'parentid = ? OR childid = ?', [$userid, $userid]);

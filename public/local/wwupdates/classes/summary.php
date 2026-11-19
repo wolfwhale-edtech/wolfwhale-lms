@@ -184,11 +184,13 @@ class summary {
             "SELECT gg.id, gg.finalgrade, gg.hidden, gi.itemname, gi.courseid, gi.id AS itemid
                FROM {grade_grades} gg
                JOIN {grade_items} gi ON gi.id = gg.itemid
+               JOIN {course} c ON c.id = gi.courseid
               WHERE gg.userid = ?
                 AND gg.finalgrade IS NOT NULL
                 AND gg.timemodified >= ?
                 AND gi.itemtype IN ('mod', 'manual')
-                AND gi.hidden = 0",
+                AND gi.hidden = 0
+                AND c.showgrades = 1",
             [$childid, $since]
         );
         $lines = [];

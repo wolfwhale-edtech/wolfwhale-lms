@@ -39,6 +39,10 @@ class observer {
         if (!audience::enrolled($childid, $courseid)) {
             return;
         }
+        $course = get_course($courseid);
+        if (empty($course->showgrades)) {
+            return;
+        }
         require_once($CFG->libdir . '/gradelib.php');
         $grade = $event->get_grade();
         $item = $grade->grade_item ?? null;
@@ -110,7 +114,14 @@ class observer {
                 return;
             }
         }
-        $issued = (int) ($event->other['badgeissuedid'] ?? $badge->id);
+        $issued = (int) ($event->other['badgeissuedid'] ?? 0);
+        if ($issued <= 0) {
+            return;
+        }
+        $award = $DB->get_record('badge_issued', ['id' => $issued], 'id, visible', IGNORE_MISSING);
+        if (!$award || empty($award->visible)) {
+            return;
+        }
         self::tell(
             $childid,
             $courseid,

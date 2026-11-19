@@ -290,6 +290,59 @@ final class updates_test extends \advanced_testcase {
     }
 
     /**
+     * A course that hides marks, and a badge the child has hidden, are not sent.
+     */
+    public function test_hidden_marks_and_badges_are_not_sent(): void {
+        global $CFG, $DB;
+
+        $this->resetAfterTest();
+        $CFG->enablebadges = 1;
+        $north = $this->family('North School', 'River class', 'Ada', 'Pat', 'Lee', 'pat.hidden@example.com');
+        $DB->set_field('course', 'showgrades', 0, ['id' => $north['course']->id]);
+        rebuild_course_cache($north['course']->id, true);
+        $this->grade($north, 'Secret essay', 40);
+        $this->assertStringNotContainsString('Secret essay', $this->note_text((int) $north['parent']->id));
+
+        $now = new \DateTimeImmutable('now', \core_date::get_server_timezone_object());
+        $this->setAdminUser();
+        schedule::save((int) $north['category']->id, (int) $now->format('w'), (int) $now->format('G'));
+        (new \local_wwupdates\task\send_task())->execute();
+        $this->assertStringNotContainsString('Secret essay', $this->note_text((int) $north['parent']->id));
+
+        set_user_preference('badgeprivacysetting', 0, $north['child']->id);
+        $badge = $this->getDataGenerator()->get_plugin_generator('core_badges')->create_badge([
+            'name' => 'Quiet star',
+            'type' => BADGE_TYPE_COURSE,
+            'courseid' => $north['course']->id,
+        ]);
+        $badge->issue($north['child']->id, true);
+        $this->assertStringNotContainsString('Quiet star', $this->note_text((int) $north['parent']->id));
+    }
+
+    /**
+     * Export and delete still find the rows when the user id comes back as text.
+     */
+    public function test_privacy_export_and_delete_use_the_user_id(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $north = $this->family('North School', 'River class', 'Ada', 'Pat', 'Lee', 'pat.privacy@example.com');
+        $this->grade($north, 'River essay', 83);
+        $parent = $DB->get_record('user', ['id' => $north['parent']->id]);
+        $context = \context_user::instance($parent->id);
+        $list = new \core_privacy\local\request\approved_contextlist($parent, 'local_wwupdates', [$context->id]);
+
+        \core_privacy\local\request\writer::reset();
+        \local_wwupdates\privacy\provider::export_user_data($list);
+        $data = \core_privacy\local\request\writer::with_context($context)->get_data(['Updates']);
+        $this->assertNotEmpty($data->updates);
+        $this->assertSame('mark', $data->updates[0]->kind);
+
+        \local_wwupdates\privacy\provider::delete_data_for_user($list);
+        $this->assertSame(0, $DB->count_records('local_wwupdates_sent', ['parentid' => $parent->id]));
+    }
+
+    /**
      * One school, one child, one parent, one teacher.
      *
      * @param string $school
@@ -423,6 +476,26 @@ final class updates_test extends \advanced_testcase {
         $text = '';
         foreach ($messages as $message) {
             $text .= $message->subject . "\n" . $message->body . "\n";
+        }
+        return $text;
+    }
+
+    /**
+     * The text of every in-app update for one parent.
+     *
+     * @param int $userid
+     * @return string
+     */
+    private function note_text(int $userid): string {
+        global $DB;
+
+        $text = '';
+        $notes = $DB->get_records('notifications', [
+            'component' => 'local_wwupdates',
+            'useridto' => $userid,
+        ]);
+        foreach ($notes as $note) {
+            $text .= $note->fullmessage . "\n";
         }
         return $text;
     }
