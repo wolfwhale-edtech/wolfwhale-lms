@@ -88,6 +88,9 @@ class people {
         $roleid = self::role_id($roleshortname);
         $coursecontext = \context_course::instance($course->id);
         require_capability('enrol/manual:enrol', $coursecontext);
+        if (!self::manual_enrolment_ready((int) $course->id)) {
+            throw new \moodle_exception('notadded', 'local_wwadmin');
+        }
 
         $existing = $DB->get_record('user', [
             'username' => $username,
@@ -100,6 +103,7 @@ class people {
             return (int) $existing->id;
         }
 
+        $transaction = $DB->start_delegated_transaction();
         $userid = \core\user::create_user((object) [
             'username' => $username,
             'firstname' => $firstname,
@@ -112,7 +116,13 @@ class people {
             'city' => '',
             'country' => !empty($CFG->country) ? $CFG->country : 'CA',
         ]);
-        self::enrol((int) $course->id, $userid, $roleid);
+        if (!enrol_try_internal_enrol((int) $course->id, $userid, $roleid)) {
+            $created = $DB->get_record('user', ['id' => $userid], '*', MUST_EXIST);
+            \core\user::delete_user($created);
+            $transaction->allow_commit();
+            throw new \moodle_exception('notadded', 'local_wwadmin');
+        }
+        $transaction->allow_commit();
         return $userid;
     }
 
@@ -200,6 +210,8 @@ class people {
         }
         $user = \core_user::get_user($userid, '*', MUST_EXIST);
         $user->suspended = 1;
+        // An open session keeps the old record and would still be usable.
+        \core\session\manager::destroy_user_sessions($userid);
         \core\user::update_user($user, false);
     }
 
@@ -354,6 +366,28 @@ class people {
             throw new \moodle_exception('invalidrole', 'local_wwadmin');
         }
         return (int) $DB->get_field('role', 'id', ['shortname' => $shortname], MUST_EXIST);
+    }
+
+    /**
+     * Whether this course can enrol someone with the manual plugin right now.
+     *
+     * Checked before an account is created, so a closed enrolment cannot leave
+     * a person who belongs to no school.
+     *
+     * @param int $courseid
+     * @return bool
+     */
+    private static function manual_enrolment_ready(int $courseid): bool {
+        global $DB;
+
+        if (!enrol_is_enabled('manual')) {
+            return false;
+        }
+        return $DB->record_exists('enrol', [
+            'enrol' => 'manual',
+            'courseid' => $courseid,
+            'status' => ENROL_INSTANCE_ENABLED,
+        ]);
     }
 
     /**

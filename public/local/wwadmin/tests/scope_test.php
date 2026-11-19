@@ -350,6 +350,101 @@ final class scope_test extends \advanced_testcase {
     }
 
     /**
+     * Suspending a person ends the sessions they already have open.
+     */
+    public function test_suspending_ends_open_sessions(): void {
+        $this->resetAfterTest();
+        $schools = $this->schools();
+        \core\session\manager::add_session($schools->northstudent->id);
+        $this->assertNotEmpty(\core\session\manager::get_sessions_by_userid($schools->northstudent->id));
+
+        $this->setUser($schools->northadmin);
+        people::suspend($schools->north->id, $schools->northstudent->id);
+
+        $this->assertSame([], \core\session\manager::get_sessions_by_userid($schools->northstudent->id));
+        $this->assertSame('1', $GLOBALS['DB']->get_field('user', 'suspended', ['id' => $schools->northstudent->id]));
+    }
+
+    /**
+     * A failed enrolment does not leave an account that belongs to no school.
+     */
+    public function test_a_failed_enrolment_does_not_leave_an_account(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $schools = $this->schools();
+        $DB->set_field('enrol', 'status', ENROL_INSTANCE_DISABLED, [
+            'courseid' => $schools->northcourse->id,
+            'enrol' => 'manual',
+        ]);
+        $this->setUser($schools->northadmin);
+
+        try {
+            people::add(
+                $schools->north->id,
+                'orphan',
+                'Orphan',
+                'North',
+                'orphan@example.com',
+                'Wolfwhale-2026!',
+                $schools->northcourse->id,
+                'student'
+            );
+            $this->fail('An account was created without an enrolment');
+        } catch (\moodle_exception $error) {
+            $this->assertSame('notadded', $error->errorcode);
+        }
+        $this->assertFalse($DB->record_exists('user', ['username' => 'orphan']));
+    }
+
+    /**
+     * An enrolment that has ended, or has not started, is not an active student.
+     */
+    public function test_expired_and_future_enrolments_are_not_active(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $schools = $this->schools();
+        $enrolment = $DB->get_record('user_enrolments', ['userid' => $schools->northother->id], '*', MUST_EXIST);
+        $enrolment->timeend = time() - DAYSECS;
+        $DB->update_record('user_enrolments', $enrolment);
+
+        $this->setUser($schools->northadmin);
+        $counts = snapshot::for_category($schools->north->id);
+        $this->assertSame(1, $counts->students);
+        $this->assertSame(1, $counts->overdue);
+
+        $enrolment->timestart = time() + DAYSECS;
+        $enrolment->timeend = 0;
+        $DB->update_record('user_enrolments', $enrolment);
+        $counts = snapshot::for_category($schools->north->id);
+        $this->assertSame(1, $counts->students);
+    }
+
+    /**
+     * An assignment override that moves the due date forward is not overdue.
+     */
+    public function test_an_assignment_override_moves_the_due_date(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $schools = $this->schools();
+        $assignid = $DB->get_field('course_modules', 'instance', ['id' => $schools->northassign->cmid], MUST_EXIST);
+        $DB->insert_record('assign_overrides', (object) [
+            'assignid' => $assignid,
+            'userid' => $schools->northstudent->id,
+            'groupid' => null,
+            'sortorder' => 1,
+            'duedate' => time() + 7 * DAYSECS,
+            'reasonformat' => FORMAT_PLAIN,
+        ]);
+
+        $this->setUser($schools->northadmin);
+        $counts = snapshot::for_category($schools->north->id);
+        $this->assertSame(0, $counts->overdue);
+    }
+
+    /**
      * Two schools, each with an administrator, a teacher, and students.
      *
      * North has one submitted assignment, so one piece of work is still overdue.

@@ -76,16 +76,20 @@ class snapshot {
         }
         [$catsql, $catparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'cat');
         [$archsql, $archparams] = $DB->get_in_or_equal($archetypes, SQL_PARAMS_NAMED, 'arch');
+        $now = \core\di::get(\core\clock::class)->time();
         $params = array_merge($catparams, $archparams, [
             'level' => CONTEXT_COURSE,
             'active' => ENROL_USER_ACTIVE,
             'enabled' => ENROL_INSTANCE_ENABLED,
             'deleted' => 0,
             'suspended' => 0,
+            'now1' => $now,
+            'now2' => $now,
         ]);
         $sql = "SELECT COUNT(DISTINCT u.id)
                   FROM {user} u
                   JOIN {user_enrolments} ue ON ue.userid = u.id AND ue.status = :active
+                       AND ue.timestart < :now1 AND (ue.timeend = 0 OR ue.timeend > :now2)
                   JOIN {enrol} e ON e.id = ue.enrolid AND e.status = :enabled
                   JOIN {course} c ON c.id = e.courseid
                   JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :level
@@ -184,11 +188,15 @@ class snapshot {
         $params['student'] = 'student';
         $params['active'] = ENROL_USER_ACTIVE;
         $params['enabled'] = ENROL_INSTANCE_ENABLED;
+        $now = \core\di::get(\core\clock::class)->time();
         $params['deleted'] = 0;
         $params['suspended'] = 0;
+        $params['now1'] = $now;
+        $params['now2'] = $now;
         $sql = "SELECT DISTINCT c.id AS courseid, u.id AS userid
                   FROM {user} u
                   JOIN {user_enrolments} ue ON ue.userid = u.id AND ue.status = :active
+                       AND ue.timestart < :now1 AND (ue.timeend = 0 OR ue.timeend > :now2)
                   JOIN {enrol} e ON e.id = ue.enrolid AND e.status = :enabled
                   JOIN {course} c ON c.id = e.courseid
                   JOIN {context} ctx ON ctx.instanceid = c.id AND ctx.contextlevel = :level
@@ -239,6 +247,34 @@ class snapshot {
         foreach ($DB->get_records_select('assign_user_flags', "assignment {$asql}", $aparams, '', 'id, assignment, userid, extensionduedate') as $flag) {
             $flags[(int) $flag->assignment][(int) $flag->userid] = (int) $flag->extensionduedate;
         }
+        $useroverrides = [];
+        $groupoverrides = [];
+        foreach ($DB->get_records_select(
+            'assign_overrides',
+            "assignid {$asql}",
+            $aparams,
+            'sortorder ASC, id ASC',
+            'id, assignid, userid, groupid, sortorder, duedate'
+        ) as $override) {
+            if ($override->duedate === null) {
+                continue;
+            }
+            if (!empty($override->userid)) {
+                $useroverrides[(int) $override->assignid][(int) $override->userid] = (int) $override->duedate;
+                continue;
+            }
+            if (!empty($override->groupid)) {
+                $sort = $override->sortorder === null ? PHP_INT_MAX : (int) $override->sortorder;
+                $existing = $groupoverrides[(int) $override->assignid][(int) $override->groupid] ?? null;
+                if ($existing === null || $sort < $existing['sort']) {
+                    $groupoverrides[(int) $override->assignid][(int) $override->groupid] = [
+                        'due' => (int) $override->duedate,
+                        'sort' => $sort,
+                    ];
+                }
+            }
+        }
+        $membership = self::group_members($courseids);
         $submitted = [];
         $params = $aparams;
         $params['submitted'] = 'submitted';
@@ -255,7 +291,12 @@ class snapshot {
         $count = 0;
         foreach ($assigns as $assign) {
             foreach ($students[(int) $assign->course] ?? [] as $userid => $unused) {
-                $due = (int) $assign->duedate;
+                $due = self::effective_assign_due(
+                    (int) $assign->duedate,
+                    $useroverrides[(int) $assign->id][$userid] ?? null,
+                    $groupoverrides[(int) $assign->id] ?? [],
+                    $membership[$userid] ?? []
+                );
                 $extension = $flags[(int) $assign->id][$userid] ?? 0;
                 if ($extension > $due) {
                     $due = $extension;
@@ -348,6 +389,62 @@ class snapshot {
             }
         }
         return $count;
+    }
+
+    /**
+     * Groups each person belongs to, keyed by user id.
+     *
+     * @param int[] $courseids
+     * @return array<int, array<int, bool>>
+     */
+    private static function group_members(array $courseids): array {
+        global $DB;
+
+        if (!$courseids) {
+            return [];
+        }
+        [$insql, $params] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED);
+        $sql = "SELECT gm.id, gm.userid, gm.groupid
+                  FROM {groups_members} gm
+                  JOIN {groups} g ON g.id = gm.groupid
+                 WHERE g.courseid {$insql}";
+        $map = [];
+        $records = $DB->get_recordset_sql($sql, $params);
+        foreach ($records as $row) {
+            $map[(int) $row->userid][(int) $row->groupid] = true;
+        }
+        $records->close();
+        return $map;
+    }
+
+    /**
+     * The due date after a user override, or the earliest group override.
+     *
+     * A user override replaces a group override. A null override leaves the
+     * assignment date unchanged.
+     *
+     * @param int $basedue
+     * @param int|null $userdue
+     * @param array<int, array{due: int, sort: int}> $groupdues
+     * @param array<int, bool> $groups
+     * @return int
+     */
+    private static function effective_assign_due(int $basedue, ?int $userdue, array $groupdues, array $groups): int {
+        $due = $basedue;
+        $sort = null;
+        foreach ($groups as $groupid => $unused) {
+            if (!isset($groupdues[$groupid])) {
+                continue;
+            }
+            if ($sort === null || $groupdues[$groupid]['sort'] < $sort) {
+                $sort = $groupdues[$groupid]['sort'];
+                $due = $groupdues[$groupid]['due'];
+            }
+        }
+        if ($userdue !== null) {
+            $due = $userdue;
+        }
+        return $due;
     }
 
     /**
