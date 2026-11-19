@@ -15,3 +15,5 @@ The icons on the student home (`public/local/wolfwhale/templates/home.mustache`)
 The icons on the teacher home (`public/local/wolfwhale/templates/teacher.mustache`) are original drawings by WolfWhale EdTech: a page and pencil, a check mark, two people, a speech bubble, a person with an exclamation, a grid, and a speaker. They are part of WolfWhale LMS and are licensed under GPL v3 with the rest of the project. No icon font or icon service is used.
 
 The icons on the parent home (`public/local/wolfwhale/templates/parent.mustache`) are original drawings by WolfWhale EdTech: a bar chart, a person with a check, a clock, a medal, a speech bubble, a page, and a speaker. They are part of WolfWhale LMS and are licensed under GPL v3 with the rest of the project. No icon font or icon service is used.
+
+The icons on the admin home (`public/local/wwadmin/templates/home.mustache`) are original drawings by WolfWhale EdTech: two people, an open book, a school building, a sheet of lines, a page with a down arrow, an identity card, and a speaker. They are part of WolfWhale LMS and are licensed under GPL v3 with the rest of the project. No icon font or icon service is used.
