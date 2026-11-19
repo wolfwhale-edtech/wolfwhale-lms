@@ -534,6 +534,19 @@ class auth extends \auth_plugin_base {
             redirect(new moodle_url('/login/index.php'));
         }
 
+        // A school can limit Google and Microsoft to its own email domains.
+        if (class_exists(\auth_wwpicture\school::class) && !\auth_wwpicture\school::email_allowed($oauthemail)) {
+            $failurereason = AUTH_LOGIN_UNAUTHORISED;
+            $event = \core\event\user_login_failed::create(['other' => ['username' => $userinfo['username'],
+                                                                        'reason' => $failurereason]]);
+            $event->trigger();
+
+            $errormsg = get_string('notloggedindebug', 'auth_oauth2', get_string('loginerror_invaliddomain', 'auth_oauth2'));
+            $SESSION->loginerrormsg = $errormsg;
+            $client->log_out();
+            redirect(new moodle_url('/login/index.php'));
+        }
+
         if (!$userwasmapped) {
             // No defined mapping - we need to see if there is an existing account with the same email.
             $moodleuser = \core_user::get_user_by_email($userinfo['email'], '*', null, IGNORE_MULTIPLE);
