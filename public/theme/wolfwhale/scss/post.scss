@@ -137,6 +137,21 @@ body.pagelayout-login #page .login-layout-left::after {
     padding: 2rem 1.75rem;
 }
 
+// The course index is a fixed panel. On a wide page the centred column starts
+// under that panel, so the open index covers the breadcrumb. Keep the panel on
+// the left and move the page clear of it.
+@media (min-width: 992px) {
+    body.drawer-open-index #page.drawers.show-drawer-left {
+        padding-left: 285px;
+    }
+
+    body.drawer-open-index .drawer.drawer-left.show {
+        left: 0;
+        right: auto;
+        width: 285px;
+    }
+}
+
 .footer-popover .btn-footer-popover {
     background-color: rgba(255, 255, 255, .85);
     border: 1px solid rgba(255, 255, 255, .95);

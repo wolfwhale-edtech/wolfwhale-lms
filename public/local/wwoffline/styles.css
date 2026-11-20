@@ -1,0 +1,36 @@
+/* Offline and submission state. An icon and one word. */
+
+.ww-net {
+    position: fixed;
+    z-index: 1100;
+    right: 1rem;
+    bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin: 0;
+    padding: .4rem .75rem;
+    color: #16324a;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    background: #fff;
+    border: 1px solid #8fd4f5;
+    border-radius: 999px;
+    box-shadow: 0 .25rem .75rem rgba(47, 93, 138, .18);
+}
+
+.ww-net[hidden] {
+    display: none;
+}
+
+.ww-net svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: 0 0 auto;
+}
+
+.ww-submission-state {
+    position: static;
+    margin: 0 0 1rem;
+}

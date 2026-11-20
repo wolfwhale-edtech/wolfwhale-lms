@@ -30497,23 +30497,6 @@ a.skip:active {
   overflow: hidden;
 }
 
-.addbloglink {
-  text-align: center;
-}
-
-.blog_entry .audience {
-  text-align: right;
-  padding-right: 4px;
-}
-
-.blog_entry .tags {
-  margin-top: 15px;
-}
-
-.blog_entry .content {
-  margin-left: 43px;
-}
-
 #doc-contents h1, #doc-contents .h1 {
   margin: 1em 0 0 0;
 }
@@ -40532,10 +40515,6 @@ input#id_externalurl {
   direction: ltr;
 }
 
-#portfolio-add-button {
-  display: inline;
-}
-
 .form-defaultinfo,
 .form-label .form-shortname {
   color: var(--bs-secondary-color);
@@ -41208,18 +41187,6 @@ select {
     grid-template-columns: 1fr;
   }
 }
-.path-mod-choice .horizontal .choices .option {
-  display: inline-block;
-}
-
-.path-mod-choice .choices .option label {
-  vertical-align: top;
-}
-
-.path-mod-choice .responseaction select.singleselect {
-  display: inline-block;
-}
-
 .path-mod-forum .forumsearch input,
 .path-mod-forum .forumsearch .helptooltip {
   margin: 0 3px;
@@ -41975,10 +41942,6 @@ select {
   text-align: inherit;
 }
 
-#page-mod-data-view #singleimage {
-  width: auto;
-}
-
 .template_heading {
   margin-top: 10px;
 }
@@ -42002,63 +41965,6 @@ canvas {
 
 div#dock {
   display: none;
-}
-
-/** General styles (scope: all of lesson) **/
-.path-mod-lesson .invisiblefieldset.fieldsetfix {
-  display: block;
-}
-
-.path-mod-lesson .answeroption .checkbox label p {
-  display: inline;
-}
-
-.path-mod-lesson .slideshow {
-  overflow: auto;
-  padding: 15px;
-}
-
-#page-mod-lesson-view .branchbuttoncontainer .singlebutton button[type=submit] {
-  white-space: normal;
-}
-
-#page-mod-lesson-view .vertical .singlebutton {
-  display: block;
-}
-#page-mod-lesson-view .vertical .singlebutton + .singlebutton {
-  margin-left: 0;
-  margin-top: 1rem;
-}
-#page-mod-lesson-view .fitem .felement .form-select {
-  align-self: flex-start;
-}
-#page-mod-lesson-view .mediaplugin,
-#page-mod-lesson-view .mediaplugin video {
-  min-width: 200px;
-}
-
-.path-mod-lesson .table td {
-  vertical-align: middle;
-}
-.path-mod-lesson .table td label {
-  margin-bottom: 0;
-}
-.path-mod-lesson .table td .highlight {
-  display: inline-block;
-  margin-left: 0.25rem;
-}
-.path-mod-lesson .table td input[type=checkbox] {
-  display: block;
-}
-
-.path-mod-wiki .wiki_headingtitle,
-.path-mod-wiki .midpad,
-.path-mod-wiki .wiki_headingtime {
-  text-align: inherit;
-}
-
-.path-mod-wiki .wiki_contentbox {
-  width: 100%;
 }
 
 .nav .caret {
@@ -42601,111 +42507,6 @@ img.userpicture {
 .path-admin-mod-lti .btn .loader img,
 .path-admin-mod-lti #tool-list-loader-container .loader img {
   height: auto;
-}
-
-/**
- * Mod Feedback.
- */
-.path-mod-feedback span.feedback_info {
-  font-weight: bold;
-}
-.path-mod-feedback span.feedback_depend {
-  color: #ca3120;
-}
-[data-bs-theme=dark] .path-mod-feedback span.feedback_depend {
-  color: var(--bs-danger-text-emphasis);
-}
-
-.path-mod-feedback hr.feedback_pagebreak {
-  height: 4px;
-  color: var(--bs-gray-600);
-  background-color: var(--bs-gray-600);
-  border: 0;
-  margin: 0;
-}
-.path-mod-feedback .feedback_bar_image {
-  height: 10px;
-}
-.path-mod-feedback #analysis-form label {
-  display: inline;
-}
-.path-mod-feedback .templateslist td.cell.action {
-  width: 10%;
-}
-.path-mod-feedback .templateslist th.header.action {
-  width: 10%;
-}
-.path-mod-feedback .feedback-item-label {
-  width: 100%;
-}
-.path-mod-feedback #feedback_edit_form [id*=_feedback_item_].feedback_itemlist,
-.path-mod-feedback #feedback_edit_form .feedback_itemlist.sortable-list-is-dragged {
-  padding: 1rem;
-  border: 1px solid #dee2e6;
-  background-color: var(--bs-white);
-  position: relative;
-  border-radius: 0.5rem;
-}
-.path-mod-feedback #feedback_edit_form [id*=_feedback_item_].feedback_itemlist .itemname,
-.path-mod-feedback #feedback_edit_form .feedback_itemlist.sortable-list-is-dragged .itemname {
-  margin-right: 2rem;
-}
-.path-mod-feedback #feedback_edit_form [id*=_feedback_item_].feedback_itemlist .itemactions,
-.path-mod-feedback #feedback_edit_form .feedback_itemlist.sortable-list-is-dragged .itemactions {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-}
-.path-mod-feedback #feedback_edit_form [id*=_feedback_item_].feedback_itemlist.sortable-list-current-position,
-.path-mod-feedback #feedback_edit_form .feedback_itemlist.sortable-list-is-dragged.sortable-list-current-position {
-  background-color: #f8f9fa;
-}
-.path-mod-feedback #feedback_edit_form .sortable-list-is-dragged {
-  opacity: 0.75;
-  max-width: 830px;
-}
-.path-mod-feedback #feedback_edit_form .loading-icon {
-  position: absolute;
-  left: 50%;
-  top: calc(50% - 0.5rem);
-}
-.path-mod-feedback#page-mod-feedback-manage_templates .coursetemplates .no-overflow,
-.path-mod-feedback#page-mod-feedback-manage_templates .publictemplates .no-overflow {
-  overflow: visible;
-}
-.path-mod-feedback#page-mod-feedback-manage_templates .coursetemplates .action-menu .menubar,
-.path-mod-feedback#page-mod-feedback-manage_templates .publictemplates .action-menu .menubar {
-  justify-content: end;
-}
-.path-mod-feedback table.analysis {
-  width: 100%;
-  border-top: 1px solid #dee2e6;
-  margin-top: 10px;
-}
-.path-mod-feedback table.analysis.itemtype_textarea td {
-  padding: 4px 0;
-}
-.path-mod-feedback table.analysis tr:first-child th {
-  padding-top: 10px;
-}
-.path-mod-feedback table.analysis tr:hover {
-  background: var(--bs-gray-300);
-}
-.path-mod-feedback table.analysis td.singlevalue:before,
-.path-mod-feedback table.analysis td.optionname:before {
-  content: "- ";
-}
-.path-mod-feedback table.analysis tr.isempty {
-  display: none;
-}
-.path-mod-feedback #showentrytable td.cell.completed_timemodified,
-.path-mod-feedback #showentryanontable td.cell.random_response {
-  font-weight: bold;
-}
-.path-mod-feedback #showentrytable td.cell.userpic,
-.path-mod-feedback #showentrytable td.cell.deleteentry,
-.path-mod-feedback #showentryanontable td.cell.deleteentry {
-  width: 10px;
 }
 
 /* reports.less */
