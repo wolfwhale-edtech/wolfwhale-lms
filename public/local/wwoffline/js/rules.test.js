@@ -121,6 +121,37 @@ describe('offline cache rules', () => {
         expect(caches.boxes[rules.cacheNameFor('shell', null)]).toBeDefined();
     });
 
+    it('never stores a picture sign-in page', async() => {
+        const caches = memoryCaches();
+        const urls = [
+            'https://school.test/auth/wwpicture/login.php',
+            'https://school.test/auth/wwpicture/enter.php?id=3',
+            'https://school.test/auth/wwpicture/class.php?id=3',
+            'https://school.test/auth/wwpicture/cards.php?id=3',
+        ];
+        for (const url of urls) {
+            expect(rules.classify(url, 'GET')).toBe('never');
+            const plan = await rules.remember(caches, {
+                url,
+                method: 'GET',
+                userId: 1,
+                ownerId: 1,
+                body: '<html>Picture sign-in</html>',
+            });
+            expect(plan.store).toBe(false);
+        }
+        const followed = rules.planStore({
+            url: HOME,
+            finalUrl: 'https://school.test/auth/wwpicture/login.php',
+            method: 'GET',
+            userId: 1,
+            ownerId: 1,
+            body: '<html>Picture sign-in</html>',
+        });
+        expect(followed.store).toBe(false);
+        expect(caches.boxes).toEqual({});
+    });
+
     it('never stores a sign-in page', async() => {
         const caches = memoryCaches();
         const plan = await rules.remember(caches, {

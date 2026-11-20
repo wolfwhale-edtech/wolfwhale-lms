@@ -133,6 +133,17 @@ describe('queued assignment text', () => {
         expect(replay).toBeNull();
     });
 
+    it('does not treat a picture sign-in page as a finished assignment', () => {
+        expect(queue.isConfirmed(
+            'https://school.test/auth/wwpicture/login.php',
+            '<div>Submitted for grading</div>',
+        )).toBe(false);
+        expect(queue.isConfirmed(
+            'https://school.test/auth/wwpicture/enter.php?id=3',
+            '<div>Submitted for grading</div>',
+        )).toBe(false);
+    });
+
     it('does not build a replay from a sign-in page', () => {
         const html = '<form><input name="username"><input name="password"><input name="sesskey" value="X"></form>';
         expect(queue.buildReplay(html, {text: 'River'})).toBeNull();

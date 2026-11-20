@@ -314,7 +314,8 @@
         } catch (e) {
             return false;
         }
-        if (/\/login\/(?:index|signup|forgot_password|logout)\.php$/.test(path) || /\/login\/?$/.test(path)) {
+        if (/\/login\/(?:index|signup|forgot_password|logout)\.php$/.test(path) || /\/login\/?$/.test(path) ||
+                /\/auth\/wwpicture\/.+\.php$/.test(path)) {
             return false;
         }
         if (isLoginHtml(body) || /invalidsesskey/i.test(body)) {

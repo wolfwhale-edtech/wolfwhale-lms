@@ -51,7 +51,8 @@
      */
     function isSignInPath(path) {
         return /\/login\/(?:index|signup|forgot_password|change_password|confirm)\.php$/.test(path) ||
-            /\/login\/?$/.test(path);
+            /\/login\/?$/.test(path) ||
+            /\/auth\/wwpicture\/.+\.php$/.test(path);
     }
 
     /**
