@@ -166,6 +166,43 @@ describe('offline cache rules', () => {
         expect(caches.boxes).toEqual({});
     });
 
+    it('stores parent settings without the session key in the form', async() => {
+        const caches = memoryCaches();
+        const url = 'https://school.test/local/wwupdates/preferences.php';
+        const plan = await rules.remember(caches, {
+            url,
+            method: 'GET',
+            userId: 4,
+            ownerId: 4,
+            body: '<form class="ww-updates" method="post">' +
+                '<input type="hidden" name="sesskey" value="SECRET">' +
+                '<input type="tel" name="phone" value="+15555550100">' +
+                '</form><script>M.cfg={"sesskey":"SECRET"};</script>',
+        });
+        const stored = caches.boxes[rules.cacheNameFor('settings', 4)][url];
+        expect(rules.classify(url, 'GET')).toBe('settings');
+        expect(plan.store).toBe(true);
+        expect(stored).not.toContain('SECRET');
+        expect(stored).toContain('+15555550100');
+        expect(rules.formHasSesskey(stored)).toBe(false);
+        expect(rules.hasLiveSesskey(stored)).toBe(false);
+    });
+
+    it('never stores the settings page when the address carries a session key', async() => {
+        const caches = memoryCaches();
+        const url = 'https://school.test/local/wwupdates/preferences.php?sesskey=SECRET';
+        expect(rules.classify(url, 'GET')).toBe('never');
+        const plan = await rules.remember(caches, {
+            url,
+            method: 'GET',
+            userId: 4,
+            ownerId: 4,
+            body: '<form class="ww-updates"></form>',
+        });
+        expect(plan.store).toBe(false);
+        expect(caches.boxes).toEqual({});
+    });
+
     it('never stores an address that carries a session key', async() => {
         const caches = memoryCaches();
         const url = LESSON + '&sesskey=SECRET';

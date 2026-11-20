@@ -86,6 +86,9 @@
         if (/\/local\/wolfwhale\/index\.php$/.test(path)) {
             return 'home';
         }
+        if (/\/local\/wwupdates\/preferences\.php$/.test(path)) {
+            return 'settings';
+        }
         if (/\/mod\/(?:page|book|resource)\/view\.php$/.test(path) ||
                 /\/local\/wwoffline\/lesson\.php$/.test(path)) {
             return 'lesson';
@@ -117,7 +120,7 @@
         if (kind === 'shell') {
             return 'ww-shell-' + VERSION;
         }
-        if (kind === 'home' || kind === 'lesson' || kind === 'lessonfile' || kind === 'userfile') {
+        if (kind === 'home' || kind === 'settings' || kind === 'lesson' || kind === 'lessonfile' || kind === 'userfile') {
             if (!userId || String(userId) === '0') {
                 return null;
             }

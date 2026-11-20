@@ -48,14 +48,16 @@ class hook_callbacks {
             return;
         }
         $userid = (int) $USER->id;
-        if (!\local_wolfwhale\home::is_student($userid)) {
+        $student = \local_wolfwhale\home::is_student($userid);
+        $parent = \local_wolfwhale\parents::is_parent($userid);
+        if (!$student && !$parent) {
             return;
         }
 
         $scope = self::scope_path();
         $sw = (new \moodle_url('/local/wwoffline/sw.php'))->out(false);
         $prefetch = [];
-        if (self::wants_prefetch()) {
+        if ($student && self::wants_prefetch()) {
             $prefetch = lessons::prefetch_urls($userid);
         }
         $icon = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">'

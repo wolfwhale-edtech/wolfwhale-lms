@@ -258,8 +258,139 @@
                         return sendRow(row, store);
                     });
                 });
-                return chain;
+                return chain.then(function() {
+                    return flushSettings();
+                });
             });
+        }).catch(function() {
+            return null;
+        });
+    }
+
+    /**
+     * @param {HTMLFormElement} form
+     * @returns {object}
+     */
+    function readSettings(form) {
+        var names = ['app', 'email', 'text', 'mark', 'absent', 'due', 'badge', 'message', 'weekly'];
+        var on = {};
+        var i;
+        for (i = 0; i < names.length; i++) {
+            var field = form.querySelector('[name="' + names[i] + '"]');
+            on[names[i]] = field && field.checked ? '1' : '0';
+        }
+        var phone = form.querySelector('[name="phone"]');
+        var url = new URL(window.location.href);
+        url.searchParams.delete('sesskey');
+        return {
+            userId: userId,
+            phone: phone ? phone.value : '',
+            on: on,
+            page: url.pathname + url.search,
+        };
+    }
+
+    /**
+     * @param {HTMLFormElement} form
+     * @returns {Promise<object>}
+     */
+    function saveSettings(form) {
+        return wwOfflineDb.open().then(function(db) {
+            return wwOfflineQueue.saveSettings(wwOfflineDb.meta(db), readSettings(form));
+        });
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    function flushSettings() {
+        if (!navigator.onLine) {
+            return Promise.resolve();
+        }
+        return wwOfflineDb.open().then(function(db) {
+            var store = wwOfflineDb.meta(db);
+            return store.get(wwOfflineQueue.settingsKey(userId)).then(function(row) {
+                if (!row || row.state !== 'waiting' || row.sesskey || !row.page) {
+                    return null;
+                }
+                return fetch(row.page, {credentials: 'same-origin'}).then(function(response) {
+                    var owner = response.headers.get('X-WW-User');
+                    if (!owner || String(owner) !== String(row.userId)) {
+                        return null;
+                    }
+                    return response.text().then(function(html) {
+                        var replay = wwOfflineQueue.buildSettingsReplay(html, row);
+                        if (!replay || !replay.fields.sesskey) {
+                            return null;
+                        }
+                        var body = new URLSearchParams();
+                        Object.keys(replay.fields).forEach(function(name) {
+                            body.append(name, replay.fields[name]);
+                        });
+                        var action = replay.action || row.page;
+                        return fetch(action, {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+                            body: body.toString(),
+                            redirect: 'follow',
+                        });
+                    });
+                }).then(function(posted) {
+                    if (!posted) {
+                        return null;
+                    }
+                    return posted.text().then(function(html) {
+                        if (!wwOfflineQueue.settingsConfirmed(posted.url, html)) {
+                            return null;
+                        }
+                        return store.delete(wwOfflineQueue.settingsKey(userId)).then(function() {
+                            sessionStorage.setItem('ww-settings-sent', '1');
+                            if (document.querySelector('form.ww-updates')) {
+                                window.location.assign(row.page);
+                            }
+                        });
+                    });
+                });
+            });
+        }).catch(function() {
+            return null;
+        });
+    }
+
+    /**
+     * Put a waiting save back on the switches.
+     */
+    function restoreSettings() {
+        var form = document.querySelector('form.ww-updates');
+        if (!form) {
+            return;
+        }
+        if (sessionStorage.getItem('ww-settings-sent')) {
+            sessionStorage.removeItem('ww-settings-sent');
+            showState(form, 'sent');
+        }
+        wwOfflineDb.open().then(function(db) {
+            return wwOfflineDb.meta(db).get(wwOfflineQueue.settingsKey(userId));
+        }).then(function(row) {
+            if (!row) {
+                return;
+            }
+            var names = Object.keys(row.on || {});
+            var i;
+            for (i = 0; i < names.length; i++) {
+                var field = form.querySelector('[name="' + names[i] + '"]');
+                if (field) {
+                    field.checked = row.on[names[i]] === '1';
+                }
+            }
+            var phone = form.querySelector('[name="phone"]');
+            if (phone && row.phone) {
+                phone.value = row.phone;
+            }
+            if (row.state === 'waiting') {
+                showState(form, 'waiting');
+            }
         }).catch(function() {
             return null;
         });
@@ -339,6 +470,7 @@
     lazyImages();
     setOffline(!navigator.onLine);
     restore();
+    restoreSettings();
     register();
 
     window.addEventListener('offline', function() {
@@ -368,6 +500,8 @@
         }
         wwOfflineDb.open().then(function(db) {
             return wwOfflineQueue.clearUser(wwOfflineDb.submissions(db), userId).then(function() {
+                return wwOfflineQueue.clearSettings(wwOfflineDb.meta(db), userId);
+            }).then(function() {
                 return wwOfflineDb.meta(db).delete('user');
             });
         }).catch(function() {
@@ -432,6 +566,26 @@
 
     document.addEventListener('submit', function(event) {
         var form = event.target;
+        if (form && form.classList && form.classList.contains('ww-updates')) {
+            var keyField = form.querySelector('[name="sesskey"]');
+            var live = keyField && keyField.value;
+            if (navigator.onLine && live) {
+                wwOfflineDb.open().then(function(db) {
+                    return wwOfflineQueue.clearSettings(wwOfflineDb.meta(db), userId);
+                }).catch(function() {
+                    return null;
+                });
+                return;
+            }
+            event.preventDefault();
+            saveSettings(form).then(function() {
+                showState(form, 'waiting');
+                if (navigator.onLine) {
+                    flushSettings();
+                }
+            });
+            return;
+        }
         if (!form || !form.querySelector || !form.querySelector('[name="onlinetext_editor[text]"]')) {
             return;
         }

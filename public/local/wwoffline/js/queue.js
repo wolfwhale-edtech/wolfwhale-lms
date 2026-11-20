@@ -341,6 +341,146 @@
         return confirmed ? 'sent' : 'waiting';
     }
 
+    var SETTING_NAMES = ['app', 'email', 'text', 'mark', 'absent', 'due', 'badge', 'message', 'weekly'];
+
+    /**
+     * @param {string|number} userId
+     * @returns {string}
+     */
+    function settingsKey(userId) {
+        return 'settings:' + String(userId);
+    }
+
+    /**
+     * Parent switches saved on this device. The row has no session key.
+     *
+     * @param {object} store
+     * @param {object} item
+     * @returns {Promise<object>}
+     */
+    function saveSettings(store, item) {
+        var on = {};
+        var i;
+        for (i = 0; i < SETTING_NAMES.length; i++) {
+            var name = SETTING_NAMES[i];
+            on[name] = item.on && (item.on[name] === '1' || item.on[name] === 1 || item.on[name] === true) ? '1' : '0';
+        }
+        var record = {
+            userId: String(item.userId),
+            phone: String(item.phone || '').replace(/[^0-9+]/g, ''),
+            on: on,
+            page: stripPage(item.page || ''),
+            state: 'waiting',
+        };
+        return store.set(settingsKey(record.userId), record).then(function() {
+            return record;
+        });
+    }
+
+    /**
+     * The settings form, including its current session key.
+     *
+     * @param {string} html
+     * @returns {{action: string, fields: object}|null}
+     */
+    function parseSettingsForm(html) {
+        var forms = String(html || '').match(/<form\b[^>]*>[\s\S]*?<\/form>/gi) || [];
+        var form = null;
+        var i;
+        for (i = 0; i < forms.length; i++) {
+            if (/class\s*=\s*["'][^"']*\bww-updates\b/.test(forms[i]) && /name\s*=\s*["']sesskey["']/.test(forms[i])) {
+                form = forms[i];
+                break;
+            }
+        }
+        if (!form) {
+            return null;
+        }
+        var action = attr(form.match(/<form\b[^>]*>/i)[0], 'action');
+        var fields = {};
+        var tags = form.match(/<input\b[^>]*>/gi) || [];
+        for (i = 0; i < tags.length; i++) {
+            var name = attr(tags[i], 'name');
+            var type = attr(tags[i], 'type').toLowerCase();
+            if (!name || type === 'submit' || type === 'button' || type === 'checkbox') {
+                continue;
+            }
+            fields[name] = attr(tags[i], 'value');
+        }
+        if (!fields.sesskey) {
+            return null;
+        }
+        return {action: action, fields: fields};
+    }
+
+    /**
+     * A save of the switches, using the fresh session key from the live form.
+     *
+     * @param {string} html
+     * @param {object} record
+     * @returns {{action: string, fields: object}|null}
+     */
+    function buildSettingsReplay(html, record) {
+        if (!record || record.sesskey || isLoginHtml(html)) {
+            return null;
+        }
+        var parsed = parseSettingsForm(html);
+        if (!parsed || !parsed.fields.sesskey) {
+            return null;
+        }
+        var fields = {
+            sesskey: parsed.fields.sesskey,
+            phone: record.phone || '',
+        };
+        var names = Object.keys(record.on || {});
+        var i;
+        for (i = 0; i < names.length; i++) {
+            if (record.on[names[i]] === '1') {
+                fields[names[i]] = '1';
+            }
+        }
+        return {
+            action: parsed.action || record.page || '',
+            fields: fields,
+        };
+    }
+
+    /**
+     * The server accepted the switches.
+     *
+     * @param {string} finalUrl
+     * @param {string} html
+     * @returns {boolean}
+     */
+    function settingsConfirmed(finalUrl, html) {
+        var url = String(finalUrl || '');
+        var body = String(html || '');
+        var path = '';
+        try {
+            path = new URL(url, 'http://ww.invalid').pathname;
+        } catch (e) {
+            return false;
+        }
+        if (/\/login\/(?:index|signup|forgot_password|logout)\.php$/.test(path) || /\/login\/?$/.test(path) ||
+                /\/auth\/wwpicture\/.+\.php$/.test(path)) {
+            return false;
+        }
+        if (isLoginHtml(body) || /invalidsesskey/i.test(body)) {
+            return false;
+        }
+        return /\/local\/wwupdates\/preferences\.php$/.test(path) &&
+            /class\s*=\s*["'][^"']*\bww-updates\b/.test(body);
+    }
+
+    /**
+     * @param {object} store
+     * @param {string|number} userId
+     * @returns {Promise<void>}
+     */
+    function clearSettings(store, userId) {
+        return store.delete(settingsKey(userId));
+    }
+
     return {
         key: key,
         stripPage: stripPage,
@@ -354,5 +494,10 @@
         buildReplay: buildReplay,
         isConfirmed: isConfirmed,
         outcome: outcome,
+        settingsKey: settingsKey,
+        saveSettings: saveSettings,
+        buildSettingsReplay: buildSettingsReplay,
+        settingsConfirmed: settingsConfirmed,
+        clearSettings: clearSettings,
     };
 }));
