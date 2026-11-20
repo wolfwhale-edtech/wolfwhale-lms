@@ -171,4 +171,56 @@ describe('queued assignment text', () => {
         )).toBe(true);
         expect(queue.outcome(true)).toBe('sent');
     });
+
+    it('saves parent switches without a session key and sends them with a fresh one', async() => {
+        const store = memoryStore();
+        const record = await queue.saveSettings(store, {
+            userId: 4,
+            phone: '+1 (555) 555-0100',
+            on: {
+                app: '1',
+                email: '0',
+                text: '1',
+                mark: '1',
+                absent: '0',
+                due: '1',
+                badge: '1',
+                message: '1',
+                weekly: '1',
+            },
+            sesskey: 'SECRET',
+            page: 'https://school.test/local/wwupdates/preferences.php?sesskey=SECRET',
+        });
+
+        expect(record.sesskey).toBeUndefined();
+        expect(JSON.stringify(record)).not.toContain('SECRET');
+        expect(record.page).not.toContain('sesskey');
+        expect(record.phone).toBe('+15555550100');
+        expect(record.on.email).toBe('0');
+        expect(record.on.text).toBe('1');
+
+        const html = [
+            '<form class="ww-updates" method="post" action="/local/wwupdates/preferences.php">',
+            '<input type="hidden" name="sesskey" value="FRESH">',
+            '<input type="tel" name="phone" value="">',
+            '</form>',
+        ].join('');
+        const replay = queue.buildSettingsReplay(html, record);
+        expect(replay.fields.sesskey).toBe('FRESH');
+        expect(replay.fields.phone).toBe('+15555550100');
+        expect(replay.fields.app).toBe('1');
+        expect(replay.fields.text).toBe('1');
+        expect(replay.fields.email).toBeUndefined();
+        expect(replay.fields.absent).toBeUndefined();
+        expect(JSON.stringify(replay)).not.toContain('SECRET');
+        expect(queue.settingsConfirmed(
+            'https://school.test/local/wwupdates/preferences.php',
+            html,
+        )).toBe(true);
+        expect(queue.settingsConfirmed(
+            'https://school.test/local/wwupdates/preferences.php',
+            '<div>invalidsesskey</div>',
+        )).toBe(false);
+        expect(queue.buildSettingsReplay(html, {sesskey: 'SECRET', on: {}, phone: ''})).toBeNull();
+    });
 });

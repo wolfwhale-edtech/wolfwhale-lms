@@ -1,0 +1,51 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwupdates/preferences
+
+    Parent switches. Each control is an icon and a word.
+
+    The icons in this file are original WolfWhale artwork, GPL v3.
+}}
+<form class="ww-updates" method="post">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    <div class="ww-toggles">
+        {{#channels}}
+        {{> local_wwupdates/toggle }}
+        {{/channels}}
+    </div>
+    <div class="ww-toggles">
+        {{#types}}
+        {{> local_wwupdates/toggle }}
+        {{/types}}
+    </div>
+    <label class="ww-phone">
+        <span>{{phoneword}}</span>
+        <input type="tel" name="phone" value="{{phone}}" autocomplete="tel" inputmode="tel">
+    </label>
+    <button class="ww-save" type="submit">{{save}}</button>
+</form>
+{{#js}}
+(function() {
+    var inputs = document.querySelectorAll('.ww-updates .ww-toggle input');
+    for (var i = 0; i < inputs.length; i++) {
+        inputs[i].addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+})();
+{{/js}}

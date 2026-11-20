@@ -207,11 +207,13 @@ class attendance {
             ]);
         }
         $present = [];
+        $absent = [];
         foreach ($clean as $userid => $status) {
             $existing = $DB->get_record('local_wwattendance_log', [
                 'sessionid' => $sessionid,
                 'userid' => $userid,
             ]);
+            $previous = $existing->status ?? '';
             if ($existing) {
                 $existing->status = $status;
                 $existing->timemodified = $now;
@@ -227,11 +229,21 @@ class attendance {
             }
             if ($status === self::PRESENT) {
                 $present[] = ['userid' => $userid, 'logid' => $logid];
+            } else if ($status === self::ABSENT && $previous !== self::ABSENT) {
+                $absent[] = ['userid' => $userid, 'logid' => $logid];
             }
         }
         $transaction->allow_commit();
         foreach ($present as $row) {
             \local_wwattendance\event\attendance_marked::create([
+                'objectid' => $row['logid'],
+                'context' => $context,
+                'relateduserid' => $row['userid'],
+                'other' => ['sessionid' => $sessionid],
+            ])->trigger();
+        }
+        foreach ($absent as $row) {
+            \local_wwattendance\event\attendance_missed::create([
                 'objectid' => $row['logid'],
                 'context' => $context,
                 'relateduserid' => $row['userid'],

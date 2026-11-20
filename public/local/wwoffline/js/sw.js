@@ -54,6 +54,8 @@ function clearPerson(userId) {
     userId = String(userId);
     return wwOfflineDb.open().then(function(db) {
         return wwOfflineQueue.clearUser(wwOfflineDb.submissions(db), userId).then(function() {
+            return wwOfflineQueue.clearSettings(wwOfflineDb.meta(db), userId);
+        }).then(function() {
             return wwOfflineDb.meta(db).get('user').then(function(current) {
                 if (String(current) === userId) {
                     return wwOfflineDb.meta(db).delete('user');
@@ -269,7 +271,7 @@ function prefetch(urls) {
         list.forEach(function(url) {
             chain = chain.then(function() {
                 var kind = wwOfflineRules.classify(url, 'GET');
-                if (kind !== 'home' && kind !== 'lesson' && kind !== 'lessonfile') {
+                if (kind !== 'home' && kind !== 'settings' && kind !== 'lesson' && kind !== 'lessonfile') {
                     return null;
                 }
                 return fetch(url, {credentials: 'include'}).then(function(response) {
@@ -360,7 +362,7 @@ self.addEventListener('fetch', function(event) {
         event.respondWith(shell(event.request));
         return;
     }
-    if (kind === 'home' || kind === 'lesson' || kind === 'lessonfile' || kind === 'userfile') {
+    if (kind === 'home' || kind === 'settings' || kind === 'lesson' || kind === 'lessonfile' || kind === 'userfile') {
         event.respondWith(person(event.request));
     }
 });
