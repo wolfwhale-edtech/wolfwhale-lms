@@ -497,3 +497,4 @@ Each later change gets its own entry with:
   - `public/theme/wolfwhale/classes/output/core_renderer.php` — the student home skips the old-browser polyfill
   - `public/local/wwoffline/version.php` — version raised to 2026112600
   - `public/local/wwoffline/js/client.js` — prefetch and sign-out do not touch a missing service worker
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/16
