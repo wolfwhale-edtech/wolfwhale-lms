@@ -501,4 +501,4 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/classes/home.php` — the Funder and Cards tiles
   - `public/local/wwadmin/templates/home.mustache` — those icons
   - `public/local/wwadmin/lang/en/local_wwadmin.php` — the words Funder and Cards
-- Pull request:
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/13
