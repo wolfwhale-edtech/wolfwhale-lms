@@ -52,4 +52,15 @@ class observer {
             coverage::store((int) $tag->outcomeid, $userid, $courseid, $cmid, 0);
         }
     }
+
+    /**
+     * A course reset can delete completion rows without an event for each activity.
+     *
+     * @param \core\event\base $event
+     */
+    public static function course_reset_ended(\core\event\base $event): void {
+        if ((int) $event->courseid > 0) {
+            coverage::reconcile_auto((int) $event->courseid);
+        }
+    }
 }

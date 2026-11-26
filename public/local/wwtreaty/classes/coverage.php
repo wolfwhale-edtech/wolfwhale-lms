@@ -48,8 +48,10 @@ class coverage {
      * @return array
      */
     public static function calculate(int $courseid, ?int $termid = null): array {
-        global $DB;
+        global $CFG, $DB;
 
+        require_once($CFG->libdir . '/completionlib.php');
+        self::reconcile_auto($courseid);
         $schoolid = school::school_for_course($courseid);
         [$start, $end, $usedterm] = self::window($schoolid, $termid);
         $students = self::students($courseid);
@@ -72,13 +74,32 @@ class coverage {
         if ($studentids) {
             [$insql, $params] = $DB->get_in_or_equal($studentids, SQL_PARAMS_NAMED);
             $params['courseid'] = $courseid;
-            $sql = "SELECT id, outcomeid, userid, timecreated
+            $params['complete'] = COMPLETION_COMPLETE;
+            $params['pass'] = COMPLETION_COMPLETE_PASS;
+            $finished = [];
+            $statesql = "SELECT cmc.id, cmc.coursemoduleid, cmc.userid
+                           FROM {course_modules_completion} cmc
+                           JOIN {course_modules} cm ON cm.id = cmc.coursemoduleid
+                          WHERE cm.course = :courseid
+                            AND cmc.completionstate IN (:complete, :pass)
+                            AND cmc.userid {$insql}";
+            foreach ($DB->get_records_sql($statesql, $params) as $state) {
+                $finished[(int) $state->coursemoduleid . ':' . (int) $state->userid] = true;
+            }
+            unset($params['complete'], $params['pass']);
+            $sql = "SELECT id, outcomeid, userid, timecreated, cmid, termid, usermodified
                       FROM {local_wwtreaty_evidence}
                      WHERE courseid = :courseid
                        AND userid {$insql}";
             foreach ($DB->get_records_sql($sql, $params) as $row) {
                 $when = (int) $row->timecreated;
-                if ($start && ($when < $start || $when > $end)) {
+                $automatic = (int) $row->usermodified === 0 && (int) $row->cmid > 0;
+                if ($automatic && empty($finished[(int) $row->cmid . ':' . (int) $row->userid])) {
+                    continue;
+                }
+                $inwindow = !$start || ($when >= $start && $when <= $end);
+                $forthisterm = $usedterm && (int) $row->cmid === 0 && (int) $row->termid === $usedterm;
+                if (!$inwindow && !$forthisterm) {
                     continue;
                 }
                 $met[(int) $row->outcomeid . ':' . (int) $row->userid] = true;
@@ -166,8 +187,9 @@ class coverage {
      * @param int $courseid
      * @param int $outcomeid
      * @param int $userid
+     * @param int $termid A later term can be recorded again. The earlier mark stays.
      */
-    public static function meet(int $courseid, int $outcomeid, int $userid): void {
+    public static function meet(int $courseid, int $outcomeid, int $userid, int $termid = 0): void {
         global $DB, $USER;
 
         school::require_tag($courseid);
@@ -187,7 +209,34 @@ class coverage {
         if (!$DB->record_exists('local_wwtreaty_tag', ['outcomeid' => $outcomeid, 'courseid' => $courseid])) {
             throw new \moodle_exception('invalidrecord', 'error');
         }
-        self::store($outcomeid, $userid, $courseid, 0, (int) $USER->id);
+        $start = 0;
+        $end = 0;
+        if ($termid > 0) {
+            $term = $DB->get_record('local_wwterms', ['id' => $termid, 'categoryid' => $schoolid]);
+            if (!$term) {
+                throw new \moodle_exception('invalidrecord', 'error');
+            }
+            $start = (int) $term->timestart;
+            $end = (int) $term->timeend;
+        } else {
+            $termid = 0;
+        }
+        $manual = $DB->get_records('local_wwtreaty_evidence', [
+            'outcomeid' => $outcomeid,
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'cmid' => 0,
+        ]);
+        foreach ($manual as $row) {
+            if ($termid > 0 && (int) $row->termid === $termid) {
+                return;
+            }
+            $when = (int) $row->timecreated;
+            if ($termid === 0 || ($when >= $start && $when <= $end)) {
+                return;
+            }
+        }
+        self::store($outcomeid, $userid, $courseid, 0, (int) $USER->id, $termid);
     }
 
     /**
@@ -201,8 +250,16 @@ class coverage {
      * @param int $courseid
      * @param int $cmid
      * @param int $editor
+     * @param int $termid
      */
-    public static function store(int $outcomeid, int $userid, int $courseid, int $cmid, int $editor): void {
+    public static function store(
+        int $outcomeid,
+        int $userid,
+        int $courseid,
+        int $cmid,
+        int $editor,
+        int $termid = 0
+    ): void {
         global $DB;
 
         if ($outcomeid <= 0 || $userid <= 0 || $courseid <= 0 || $cmid < 0) {
@@ -213,6 +270,7 @@ class coverage {
             'userid' => $userid,
             'courseid' => $courseid,
             'cmid' => $cmid,
+            'termid' => $termid,
         ]);
         if ($existing) {
             return;
@@ -222,9 +280,39 @@ class coverage {
             'userid' => $userid,
             'courseid' => $courseid,
             'cmid' => $cmid,
+            'termid' => $termid,
             'usermodified' => $editor,
             'timecreated' => time(),
         ]);
+    }
+
+    /**
+     * Drop automatic evidence whose activity is no longer complete.
+     *
+     * A course reset deletes the completion rows without an event for each
+     * activity. A teacher's own mark is left alone.
+     *
+     * @param int $courseid
+     */
+    public static function reconcile_auto(int $courseid): void {
+        global $CFG, $DB;
+
+        require_once($CFG->libdir . '/completionlib.php');
+        $rows = $DB->get_records_select(
+            'local_wwtreaty_evidence',
+            'courseid = :courseid AND cmid > 0 AND usermodified = 0',
+            ['courseid' => $courseid]
+        );
+        foreach ($rows as $row) {
+            $state = $DB->get_field('course_modules_completion', 'completionstate', [
+                'coursemoduleid' => $row->cmid,
+                'userid' => $row->userid,
+            ]);
+            if ((int) $state === COMPLETION_COMPLETE || (int) $state === COMPLETION_COMPLETE_PASS) {
+                continue;
+            }
+            $DB->delete_records('local_wwtreaty_evidence', ['id' => $row->id]);
+        }
     }
 
     /**
@@ -259,6 +347,7 @@ class coverage {
         global $DB, $USER;
 
         $context = school::require_view($courseid);
+        $now = \core\di::get(\core\clock::class)->time();
         $users = $DB->get_records_sql(
             "SELECT DISTINCT u.id, u.firstname, u.lastname, u.firstnamephonetic,
                             u.lastnamephonetic, u.middlename, u.alternatename
@@ -274,6 +363,8 @@ class coverage {
                 AND u.deleted = 0
                 AND u.suspended = 0
                 AND ue.status = :active
+                AND ue.timestart < :now1
+                AND (ue.timeend = 0 OR ue.timeend > :now2)
                 AND e.status = :enabled
            ORDER BY u.lastname ASC, u.firstname ASC",
             [
@@ -282,6 +373,8 @@ class coverage {
                 'student' => 'student',
                 'active' => ENROL_USER_ACTIVE,
                 'enabled' => ENROL_INSTANCE_ENABLED,
+                'now1' => $now,
+                'now2' => $now,
             ]
         );
         $course = get_course($courseid);

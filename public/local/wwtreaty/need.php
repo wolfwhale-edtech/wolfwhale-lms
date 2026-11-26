@@ -34,7 +34,12 @@ $context = \local_wwtreaty\school::require_view($courseid);
 
 if (data_submitted() && optional_param('action', '', PARAM_ALPHA) === 'meet') {
     require_sesskey();
-    \local_wwtreaty\coverage::meet($courseid, $outcomeid, required_param('user', PARAM_INT));
+    \local_wwtreaty\coverage::meet(
+        $courseid,
+        $outcomeid,
+        required_param('user', PARAM_INT),
+        max(0, $term)
+    );
     redirect(new moodle_url('/local/wwtreaty/need.php', [
         'course' => $courseid,
         'outcome' => $outcomeid,

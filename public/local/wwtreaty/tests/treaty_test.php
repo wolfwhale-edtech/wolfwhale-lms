@@ -497,6 +497,123 @@ final class treaty_test extends \advanced_testcase {
     }
 
     /**
+     * Resetting completion deletes the rows without an event for each activity.
+     * Automatic evidence must not keep counting. A teacher's mark stays.
+     */
+    public function test_a_completion_reset_drops_automatic_evidence(): void {
+        global $CFG, $DB;
+
+        $this->resetAfterTest();
+        require_once($CFG->libdir . '/completionlib.php');
+        $north = $this->getDataGenerator()->create_category();
+        $course = $this->getDataGenerator()->create_course([
+            'category' => $north->id,
+            'enablecompletion' => 1,
+        ]);
+        $teacher = $this->getDataGenerator()->create_user();
+        $student = $this->getDataGenerator()->create_user();
+        $this->getDataGenerator()->enrol_user($teacher->id, $course->id, 'editingteacher');
+        $this->getDataGenerator()->enrol_user($student->id, $course->id, 'student');
+        $page = $this->getDataGenerator()->create_module('page', [
+            'course' => $course->id,
+            'completion' => COMPLETION_TRACKING_MANUAL,
+        ]);
+        $cm = get_coursemodule_from_instance('page', $page->id);
+
+        $this->setUser($teacher);
+        $id = outcome::save($north->id, $this->sample());
+        tag::set((int) $cm->id, $id, true);
+        $this->setUser($student);
+        $completion = new \completion_info($course);
+        $completion->update_state($cm, COMPLETION_COMPLETE, $student->id);
+        $this->setUser($teacher);
+        $this->assertSame('met', coverage::summary($course->id, 0)['outcomes'][0]['status']);
+
+        $completion->delete_all_completion_data();
+        $after = coverage::summary($course->id, 0);
+        $this->assertSame('gap', $after['outcomes'][0]['status']);
+        $this->assertSame([(int) $student->id], array_column($after['needs'], 'userid'));
+        $this->assertSame(0, $DB->count_records('local_wwtreaty_evidence', ['usermodified' => 0]));
+
+        coverage::meet($course->id, $id, $student->id);
+        $completion->delete_all_completion_data();
+        $this->assertSame('met', coverage::summary($course->id, 0)['outcomes'][0]['status']);
+    }
+
+    /**
+     * A future start or a past end is not a current enrolment.
+     */
+    public function test_enrolments_outside_their_dates_are_left_out(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $built = $this->two_schools();
+        $later = $this->getDataGenerator()->create_user(['firstname' => 'Bea', 'lastname' => 'Moss']);
+        $ended = $this->getDataGenerator()->create_user(['firstname' => 'Cam', 'lastname' => 'Moss']);
+        $this->getDataGenerator()->enrol_user($later->id, $built->northcourse->id, 'student');
+        $this->getDataGenerator()->enrol_user($ended->id, $built->northcourse->id, 'student');
+        $now = \core\di::get(\core\clock::class)->time();
+        $this->set_enrolment_dates($built->northcourse->id, $later->id, $now + DAYSECS, 0);
+        $this->set_enrolment_dates($built->northcourse->id, $ended->id, 0, $now - 10);
+
+        $this->setUser($built->teacher);
+        $id = outcome::save($built->north->id, $this->sample());
+        tag::set($built->northcm, $id, true);
+        $summary = coverage::summary($built->northcourse->id, 0);
+        $this->assertSame([(int) $built->student->id], array_column($summary['needs'], 'userid'));
+
+        try {
+            coverage::meet($built->northcourse->id, $id, $ended->id);
+            $this->fail('An ended enrolment must not be marked');
+        } catch (\moodle_exception $error) {
+            $this->assertSame('invalidrecord', $error->errorcode);
+        }
+        $this->assertSame(0, $DB->count_records('local_wwtreaty_evidence', ['userid' => $ended->id]));
+    }
+
+    /**
+     * A mark in an earlier term stays. The next term can be marked again.
+     */
+    public function test_a_later_term_can_be_marked_again(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $built = $this->two_schools();
+        $this->setAdminUser();
+        $firststart = strtotime('2026-01-01 00:00:00 UTC');
+        $firstend = strtotime('2026-03-31 23:59:59 UTC');
+        $secondstart = strtotime('2026-09-01 00:00:00 UTC');
+        $secondend = strtotime('2026-12-18 23:59:59 UTC');
+        $firstterm = \local_wwterms\term::create($built->north->id, 'First', $firststart, $firstend);
+        $secondterm = \local_wwterms\term::create($built->north->id, 'Second', $secondstart, $secondend);
+
+        $this->setUser($built->teacher);
+        $id = outcome::save($built->north->id, $this->sample());
+        tag::set($built->northcm, $id, true);
+        coverage::meet($built->northcourse->id, $id, $built->student->id, $firstterm);
+        $DB->set_field('local_wwtreaty_evidence', 'timecreated', $firststart + 10, [
+            'outcomeid' => $id,
+            'userid' => $built->student->id,
+            'termid' => $firstterm,
+        ]);
+
+        $before = coverage::summary($built->northcourse->id, $secondterm);
+        $this->assertSame('gap', $this->by_code($before['outcomes'])['TE-4.1']['status']);
+        $this->assertSame([(int) $built->student->id], array_column($before['needs'], 'userid'));
+
+        coverage::meet($built->northcourse->id, $id, $built->student->id, $secondterm);
+        $after = coverage::summary($built->northcourse->id, $secondterm);
+        $this->assertSame('met', $this->by_code($after['outcomes'])['TE-4.1']['status']);
+        $earlier = coverage::summary($built->northcourse->id, $firstterm);
+        $this->assertSame('met', $this->by_code($earlier['outcomes'])['TE-4.1']['status']);
+        $this->assertSame(2, $DB->count_records('local_wwtreaty_evidence', [
+            'outcomeid' => $id,
+            'userid' => $built->student->id,
+            'cmid' => 0,
+        ]));
+    }
+
+    /**
      * Two schools, a teacher and a student in the north course, and one page in each course.
      *
      * @return \stdClass
@@ -560,6 +677,30 @@ final class treaty_test extends \advanced_testcase {
     private function csv(array $row): string {
         return "code,grade,theme,title,description,active\n"
             . "{$row['code']},{$row['grade']},{$row['theme']},{$row['title']},{$row['description']},{$row['active']}\n";
+    }
+
+    /**
+     * @param int $courseid
+     * @param int $userid
+     * @param int $timestart
+     * @param int $timeend
+     */
+    private function set_enrolment_dates(int $courseid, int $userid, int $timestart, int $timeend): void {
+        global $DB;
+
+        $id = $DB->get_field_sql(
+            "SELECT ue.id
+               FROM {user_enrolments} ue
+               JOIN {enrol} e ON e.id = ue.enrolid
+              WHERE e.courseid = :courseid AND ue.userid = :userid",
+            ['courseid' => $courseid, 'userid' => $userid],
+            MUST_EXIST
+        );
+        $DB->update_record('user_enrolments', (object) [
+            'id' => $id,
+            'timestart' => $timestart,
+            'timeend' => $timeend,
+        ]);
     }
 
     /**

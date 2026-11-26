@@ -29,4 +29,8 @@ $observers = [
         'eventname' => '\core\event\course_module_completion_updated',
         'callback' => '\local_wwtreaty\observer::completion_updated',
     ],
+    [
+        'eventname' => '\core\event\course_reset_ended',
+        'callback' => '\local_wwtreaty\observer::course_reset_ended',
+    ],
 ];
