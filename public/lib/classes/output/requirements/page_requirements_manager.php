@@ -1589,6 +1589,7 @@ class page_requirements_manager {
         \core\di::get(\core\hook\manager::class)->dispatch($requirejshook);
 
         $output .= $this->get_requirejs_static_esm_map($requirejshook);
+        $output .= $this->get_amd_bundle_config($cachejs, (int) $jsrev);
 
         // First include must be to a module with no dependencies, this prevents multiple requests.
         $prefix = <<<EOF
@@ -1612,6 +1613,51 @@ EOF;
 
         $output .= html_writer::script($prefix . $prefetch . implode(";\n", $this->amdjscode) . $suffix);
         return $output;
+    }
+
+    /**
+     * One script for the modules this page starts, instead of every module on the site.
+     *
+     * @param bool $cachejs Production cache is on.
+     * @param int $rev JavaScript revision.
+     * @return string
+     */
+    protected function get_amd_bundle_config(bool $cachejs, int $rev): string {
+        if (!$cachejs || $rev < 1) {
+            return '';
+        }
+        $seeds = array_merge(
+            ['core/first', 'core/prefetch', 'core/menu_navigation'],
+            $this->amd_seed_names(),
+        );
+        $bundle = \core_requirejs::store_page_bundle($seeds, $rev);
+        if ($bundle === null) {
+            return '';
+        }
+        $config = ['bundles' => ['bundle/' . $bundle['hash'] => $bundle['modules']]];
+        $json = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
+        return html_writer::script('requirejs.config(' . $json . ');');
+    }
+
+    /**
+     * Module names passed to require() in the footer.
+     *
+     * @return string[]
+     */
+    protected function amd_seed_names(): array {
+        $code = implode("\n", $this->amdjscode);
+        preg_match_all('/require\s*\(\s*\[([^\]]*)\]/', $code, $matches);
+        $seeds = [];
+        foreach ($matches[1] as $list) {
+            preg_match_all('/[\'"]([^\'"]+)[\'"]/', $list, $names);
+            foreach ($names[1] as $name) {
+                if ($name === 'jquery' || $name === 'jqueryui' || $name === 'jqueryprivate') {
+                    continue;
+                }
+                $seeds[$name] = true;
+            }
+        }
+        return array_keys($seeds);
     }
 
     /**
