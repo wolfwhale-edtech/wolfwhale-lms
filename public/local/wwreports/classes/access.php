@@ -89,6 +89,9 @@ class access {
         if (!$context) {
             return false;
         }
+        if (!has_capability('local/wwreports:comment', $context, $viewer)) {
+            return false;
+        }
         return is_enrolled($context, $student, '', true);
     }
 

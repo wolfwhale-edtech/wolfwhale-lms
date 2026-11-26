@@ -232,6 +232,91 @@ final class report_test extends \advanced_testcase {
     }
 
     /**
+     * A visible calculation that copies a hidden mark is left off the card.
+     */
+    public function test_a_calculated_mark_cannot_repeat_a_hidden_mark(): void {
+        global $DB;
+
+        $world = $this->world();
+        $secret = null;
+        $items = \grade_item::fetch_all(['courseid' => $world['rivercourse']->id]);
+        foreach ($items as $item) {
+            if ($item->get_name(false, false) === 'Secret essay') {
+                $secret = $item;
+                break;
+            }
+        }
+        $this->assertNotNull($secret);
+        $secret->idnumber = 'secretmark';
+        $secret->update();
+
+        $mirror = new \grade_item();
+        $mirror->courseid = $world['rivercourse']->id;
+        $mirror->itemtype = 'manual';
+        $mirror->itemname = 'Mirror mark';
+        $mirror->gradetype = GRADE_TYPE_VALUE;
+        $mirror->grademax = 100;
+        $mirror->grademin = 0;
+        $mirror->insert();
+        $mirror->set_calculation('=[[secretmark]]');
+        grade_regrade_final_grades($world['rivercourse']->id);
+        $copied = \grade_grade::fetch(['itemid' => $mirror->id, 'userid' => $world['ada']->id]);
+        $this->assertNotFalse($copied);
+        $this->assertEquals(73.0, (float) $copied->finalgrade);
+        $copied->feedback = 'MIRRORHIDDEN';
+        $copied->feedbackformat = FORMAT_PLAIN;
+        $copied->usermodified = $world['lee']->id;
+        $copied->update();
+
+        $this->setUser($world['pat']);
+        $card = card::build((int) $world['pat']->id, (int) $world['ada']->id, $world['term']);
+        $river = $this->course_named($card, 'River room');
+        $text = json_encode($river) . card::html($card) . json_encode(card::csv_rows($card));
+        $this->assertStringNotContainsString('Mirror mark', $text);
+        $this->assertStringNotContainsString('MIRRORHIDDEN', $text);
+        $this->assertStringNotContainsString('73', (string) $river['mark']);
+        $this->assertStringNotContainsString('73', json_encode($river['items']));
+        $this->assertGreaterThan(0, $DB->count_records('grade_grades', ['itemid' => $mirror->id]));
+    }
+
+    /**
+     * Prohibiting the comment capability closes the save, even for the teacher.
+     */
+    public function test_a_prohibited_comment_capability_blocks_the_save(): void {
+        global $DB;
+
+        $world = $this->world();
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'editingteacher'], MUST_EXIST);
+        $context = \context_course::instance($world['rivercourse']->id);
+        assign_capability('local/wwreports:comment', CAP_PROHIBIT, $roleid, $context->id, true);
+        accesslib_clear_all_caches_for_unit_testing();
+
+        $this->setUser($world['lee']);
+        $this->assertFalse(access::can_comment(
+            (int) $world['lee']->id,
+            (int) $world['ada']->id,
+            (int) $world['rivercourse']->id
+        ));
+        $this->expectException(\moodle_exception::class);
+        comment::save(
+            (int) $world['lee']->id,
+            (int) $world['ada']->id,
+            (int) $world['rivercourse']->id,
+            $world['term']['id'],
+            'Should not save'
+        );
+    }
+
+    /**
+     * Both CSV downloads load the writer class, which is not autoloaded.
+     */
+    public function test_csv_downloads_load_the_writer(): void {
+        card::load_csv_library();
+        funder::load_csv_library();
+        $this->assertTrue(class_exists(\csv_export_writer::class, false));
+    }
+
+    /**
      * A division administrator cannot open the authority above them.
      */
     public function test_a_division_administrator_cannot_open_the_authority(): void {

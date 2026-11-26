@@ -304,12 +304,22 @@ class card {
      * @param array $data
      */
     public static function send_csv(array $data): void {
+        self::load_csv_library();
         $writer = new \csv_export_writer();
         $writer->set_filename('report-card');
         foreach (self::csv_rows($data) as $row) {
             $writer->add_data($row);
         }
         $writer->download_file();
+    }
+
+    /**
+     * Load the CSV writer. It is not registered for autoloading.
+     */
+    public static function load_csv_library(): void {
+        global $CFG;
+
+        require_once($CFG->libdir . '/csvlib.class.php');
     }
 
     /**
@@ -356,11 +366,19 @@ class card {
             $grade->grade_item = $item;
             $grades[$itemid] = $grade;
         }
-        $affected = ['altered' => []];
+        $affected = ['altered' => [], 'unknown' => [], 'unknowngrades' => []];
         try {
             $affected = \grade_grade::get_hiding_affected($grades, $items);
         } catch (\Throwable $e) {
-            $affected = ['altered' => []];
+            $affected = ['altered' => [], 'unknown' => [], 'unknowngrades' => []];
+        }
+        // A calculated mark that reads a hidden mark cannot be shown. The raw
+        // value is kept in unknowngrades, and unknown lists those same items.
+        $unsafe = [];
+        foreach (['unknown', 'unknowngrades'] as $key) {
+            foreach (array_keys($affected[$key] ?? []) as $itemid) {
+                $unsafe[(int) $itemid] = true;
+            }
         }
         $hiddengraded = false;
         $lines = [];
@@ -375,7 +393,7 @@ class card {
             if ($item->is_category_item()) {
                 continue;
             }
-            $hidden = $item->is_hidden() || $grade->is_hidden();
+            $hidden = $item->is_hidden() || $grade->is_hidden() || isset($unsafe[(int) $itemid]);
             if ($hidden) {
                 if ($grade->finalgrade !== null && !$grade->is_excluded()) {
                     $hiddengraded = true;

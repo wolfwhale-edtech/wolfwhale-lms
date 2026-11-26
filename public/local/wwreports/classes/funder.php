@@ -262,12 +262,22 @@ class funder {
      * @param array $data
      */
     public static function send_csv(array $data): void {
+        self::load_csv_library();
         $writer = new \csv_export_writer();
         $writer->set_filename('funder-report');
         foreach (self::csv_rows($data) as $row) {
             $writer->add_data($row);
         }
         $writer->download_file();
+    }
+
+    /**
+     * Load the CSV writer. It is not registered for autoloading.
+     */
+    public static function load_csv_library(): void {
+        global $CFG;
+
+        require_once($CFG->libdir . '/csvlib.class.php');
     }
 
     /**
