@@ -24,4 +24,6 @@ The sign-in pictures (`public/auth/wwpicture/classes/pictures.php` and `public/t
 
 The offline mark (`public/local/wwoffline/classes/hook_callbacks.php`) is an original drawing by WolfWhale EdTech: a circle with a slash through it. It is part of WolfWhale LMS and is licensed under GPL v3. No icon font or icon service is used.
 
+The library icons (`public/local/wwlibrary/templates/index.mustache`, the Library tile on the student, teacher, and admin homes, and `public/mod/wwlibrary/pix/monologo.svg`) are original drawings by WolfWhale EdTech: a shelf, a folded map, a block, and a cube. They are part of WolfWhale LMS and are licensed under GPL v3. No icon font or icon service is used. The 3D viewer in `public/local/wwlibrary/js/vendor/` is model-viewer 3.5.0 by Google, Apache 2.0, and includes three.js, BSD 3-Clause. See `public/local/wwlibrary/thirdpartylibs.xml`.
+
 The shield on the admin home and the Data Sovereignty screen (`public/local/wwadmin/templates/home.mustache` and `public/local/wwadmin/templates/sovereignty.mustache`) is an original drawing by WolfWhale EdTech. It is part of WolfWhale LMS and is licensed under GPL v3. No icon font or icon service is used.

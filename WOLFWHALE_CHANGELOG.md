@@ -466,6 +466,61 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
 
+## WW-LMS-012 — Digital resource library
+
+- Date: 2026-11-26
+- Summary: A school library holds maps, worlds, and models. A map is an https page, or an uploaded HTML package. A world is a .mcworld file, an https link, or both. A model is a .glb or .gltf file, or an uploaded HTML package. The files are stored with the file API. Nothing is filled in on install. An administrator or a teacher can add, edit, order, and remove resources, and put them in folders. Attaching a resource adds it to a course as an activity, so a student opens the map, the world, or the model inside that course. A student can also open the library from home. The tiles are large pictures, filtered by Maps, Worlds, and Models. A student sees only the schools they are enrolled in. A teacher sees only the schools they teach. A category administrator sees only that school. A non-editing teacher can change the library and cannot add the activity, the same rule as adding a lesson. An HTML package runs in a framed page that is not this site. Script and markup files are stored as plain text, so opening the file address does not run them here. A map on this site does not keep this site's origin. A world opens with Launch, which downloads the file or follows the https link. A script in an uploaded package can fetch another file in that package, and can import another script in that package. The framed page is still not this site. A new resource keeps the school it was opened for. The 3D viewer is model-viewer 3.5.0, stored with the plugin. No sample resource is shipped.
+- What was checked: PHPUnit on PHP 8.3.6 and PostgreSQL 17.12. The library tests are 9 tests and 87 assertions. Together with the student home, the teacher home, the admin home, and points, that is 61 tests and 452 assertions. A teacher cannot save a resource into another school. A student in the other school cannot open the file. An http link is refused. A package that contains a program file is refused, and so is a path that climbs out of the package. A wrapped zip still opens index.html. Attaching adds a real course activity. Removing the resource removes that activity and the stored file. A prohibited view capability closes the library. Deleting the author clears the name and leaves the resource. Jest for the package addresses is 4 tests, including a script that fetches a packaged file. The existing offline rules file still passes. A local site was opened in a browser with made-up names. Ada Moss saw Maps 2, Worlds 1, and Models 1, then Room map, Cube, Room, and Block room. Room map inside the course showed the https page. Cube drew the uploaded model. Room drew the uploaded HTML package. Lee Moss opened the edit screen and the attach screen. Pat Moss saw Library 4 on the admin home.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the library icons, and the model-viewer credit
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `jest.config.js` — the library browser tests are included
+  - `public/local/wwlibrary/` — new library plugin:
+    - `version.php`
+    - `lib.php` — file serving
+    - `index.php` — the tiles
+    - `view.php` — one resource
+    - `edit.php` — add or change
+    - `folder.php` — a folder
+    - `attach.php` — add the resource to a course
+    - `styles.css`
+    - `thirdpartylibs.xml` — model-viewer
+    - `db/install.xml` — one table for resources, one table for folders
+    - `db/access.php` — open the library, change the library
+    - `lang/en/local_wwlibrary.php`
+    - `classes/library.php`
+    - `classes/storage.php`
+    - `classes/privacy/provider.php`
+    - `templates/index.mustache`
+    - `templates/viewer.mustache`
+    - `templates/form.mustache`
+    - `js/viewer.js` — the framed HTML package
+    - `js/viewer.test.js`
+    - `js/vendor/model-viewer.min.js` and `js/vendor/LICENSE`
+    - `tests/library_test.php`
+  - `public/mod/wwlibrary/` — the course activity:
+    - `version.php`
+    - `lib.php`
+    - `mod_form.php`
+    - `view.php`
+    - `index.php`
+    - `db/install.xml`
+    - `db/access.php`
+    - `lang/en/wwlibrary.php`
+    - `pix/monologo.svg`
+    - `classes/event/course_module_viewed.php`
+    - `classes/privacy/provider.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600, and it now depends on the library
+  - `public/local/wolfwhale/classes/home.php` — the Library tile
+  - `public/local/wolfwhale/classes/teacher.php` — the Library tile, and Library on Post
+  - `public/local/wolfwhale/templates/home.mustache`
+  - `public/local/wolfwhale/templates/teacher.mustache`
+  - `public/local/wolfwhale/tests/teacher_test.php`
+  - `public/local/wwadmin/version.php` — version raised to 2026112600
+  - `public/local/wwadmin/classes/home.php` — the Library tile
+  - `public/local/wwadmin/templates/home.mustache`
+  - `public/local/wwadmin/lang/en/local_wwadmin.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/15
 ## WW-LMS-013 — Nation data separation and OCAP export
 
 - Date: 2026-11-26

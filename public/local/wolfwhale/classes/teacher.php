@@ -153,6 +153,7 @@ class teacher {
             self::points_tile(),
             self::goal_tile(),
             self::treaty_tile(),
+            self::library_tile(),
         ];
         return array_values(array_filter($tiles));
     }
@@ -228,6 +229,18 @@ class teacher {
                 'word' => get_string($stringkey, 'local_wolfwhale'),
                 'url' => (new \moodle_url('/course/modedit.php', [
                     'add' => $modname,
+                    'course' => $courseid,
+                    'section' => 0,
+                    'return' => 0,
+                ]))->out(false),
+            ];
+        }
+        if (isset($installed['wwlibrary'])) {
+            $actions[] = [
+                'mod' => 'wwlibrary',
+                'word' => get_string('library', 'local_wwlibrary'),
+                'url' => (new \moodle_url('/course/modedit.php', [
+                    'add' => 'wwlibrary',
                     'course' => $courseid,
                     'section' => 0,
                     'return' => 0,
@@ -1057,6 +1070,19 @@ class teacher {
     }
 
     /**
+     * How many library resources this teacher can open.
+     *
+     * @return array
+     */
+    private static function library_tile(): array {
+        $count = \local_wwlibrary\library::visible_count();
+        $word = get_string('library', 'local_wwlibrary');
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wolfwhale');
+        $url = (new \moodle_url('/local/wwlibrary/index.php'))->out(false);
+        return self::tile('library', $word, $fact, $count < 1, $url);
+    }
+
+    /**
      * One tile.
      *
      * @param string $id
@@ -1084,6 +1110,7 @@ class teacher {
             'ispoints' => $id === 'points',
             'isgoal' => $id === 'goal',
             'istreaty' => $id === 'treaty',
+            'islibrary' => $id === 'library',
         ];
     }
 

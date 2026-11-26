@@ -64,6 +64,7 @@ $string['firstname'] = 'First name';
 $string['home'] = 'Home';
 $string['invalidrole'] = 'That role is not allowed.';
 $string['lastname'] = 'Last name';
+$string['library'] = 'Library';
 $string['licences'] = 'Licences';
 $string['missing'] = 'Fill in every field.';
 $string['name'] = 'Name';
