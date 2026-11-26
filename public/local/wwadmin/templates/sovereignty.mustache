@@ -1,0 +1,73 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwadmin/sovereignty
+
+    One Nation: counts, isolation, export, and the export audit.
+
+    The shield is original WolfWhale artwork, GPL v3.
+}}
+<div class="ww-home ww-sovereignty">
+    {{#back}}
+    <a class="ww-action ww-back" href="{{back}}">{{backword}}</a>
+    {{/back}}
+    {{#nationsurl}}
+    <a class="ww-action ww-back" href="{{nationsurl}}">{{nationsword}}</a>
+    {{/nationsurl}}
+    <p class="ww-course-name">{{nation}}</p>
+    <div class="ww-home-tiles">
+        {{#counts}}
+        <article class="ww-tile ww-tile-sovereignty">
+            <span class="ww-tile-link">
+                <span class="ww-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 4l22 8v18c0 14-8 24-22 30C18 54 10 44 10 30V12z" fill="currentColor"/>
+                        <path d="M32 16v28" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M22 28h20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="ww-tile-word">{{word}}</span>
+                <span class="ww-tile-fact">{{fact}}</span>
+            </span>
+        </article>
+        {{/counts}}
+    </div>
+    <form method="post" action="{{action}}" class="ww-sovereignty-export">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="category" value="{{category}}">
+        <input type="hidden" name="export" value="1">
+        <button type="submit" class="ww-action">{{exportword}}</button>
+    </form>
+    {{#hasaudits}}
+    <div class="ww-list">
+        {{#audits}}
+        {{#url}}
+        <a class="ww-row" href="{{url}}">
+            <span class="ww-row-word">{{word}}</span>
+            <span class="ww-row-fact">{{fact}}</span>
+        </a>
+        {{/url}}
+        {{^url}}
+        <div class="ww-row">
+            <span class="ww-row-word">{{word}}</span>
+            <span class="ww-row-fact">{{fact}}</span>
+        </div>
+        {{/url}}
+        {{/audits}}
+    </div>
+    {{/hasaudits}}
+</div>

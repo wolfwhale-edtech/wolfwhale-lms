@@ -50,8 +50,11 @@ class goal {
      * @param int $timeend
      */
     public static function save_category(int $categoryid, string $name, int $target, int $timeend): void {
+        global $USER;
+
         $context = \context_coursecat::instance($categoryid);
         require_capability('local/wwpoints:setcategorygoal', $context);
+        \local_wwnation\nation::require_category((int) $USER->id, $categoryid);
         self::store(0, $categoryid, $name, $target, $timeend);
     }
 

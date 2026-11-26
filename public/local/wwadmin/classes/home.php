@@ -106,12 +106,29 @@ class home {
                 count($roots) < 1, new \moodle_url('/local/wwadmin/report.php')),
             self::tile('export', 'export', $ready > 0 ? (string) $ready : get_string('none', 'local_wwadmin'),
                 $ready < 1, new \moodle_url('/local/wwadmin/export.php')),
+            self::sovereignty_tile($roots),
             self::tile('licences', 'licences', seats::fact($licence['active'], $licence['seats']),
                 false, new \moodle_url('/local/wwadmin/licences.php')),
             self::goal_tile($roots),
             self::week_tile($roots),
+            self::treaty_tile($roots),
             self::library_tile(),
         ];
+    }
+
+    /**
+     * Data sovereignty for the schools this person administers.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function sovereignty_tile(array $roots): array {
+        $url = new \moodle_url('/local/wwadmin/sovereignty.php');
+        if (count($roots) === 1) {
+            return self::tile('sovereignty', 'sovereignty', sovereignty::isolation_fact((int) $roots[0]), false, $url);
+        }
+        $fact = count($roots) > 0 ? (string) count($roots) : get_string('none', 'local_wwadmin');
+        return self::tile('sovereignty', 'sovereignty', $fact, count($roots) < 1, $url);
     }
 
     /**
@@ -136,6 +153,27 @@ class home {
             $empty = !$names;
         }
         return self::tile('goal', 'goal', $fact, $empty, new \moodle_url('/local/wwpoints/schoolgoal.php'));
+    }
+
+    /**
+     * How many active Treaty Education outcomes these schools have loaded.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function treaty_tile(array $roots): array {
+        $count = class_exists(\local_wwtreaty\outcome::class) ? \local_wwtreaty\outcome::active_count($roots) : 0;
+        $word = get_string('treaty', 'local_wwtreaty');
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wwadmin');
+        return [
+            'id' => 'treaty',
+            'word' => $word,
+            'fact' => $fact,
+            'empty' => $count < 1,
+            'url' => (new \moodle_url('/local/wwtreaty/index.php'))->out(false),
+            'speech' => get_string('speech', 'local_wwadmin', (object) ['word' => $word, 'fact' => $fact]),
+            'istreaty' => true,
+        ];
     }
 
     /**

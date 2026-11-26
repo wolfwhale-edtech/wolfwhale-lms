@@ -97,12 +97,34 @@ if ($rev > 0 and $rev < (time() + 60 * 60)) {
     $lazysuffix = "-lazy.js";
     $lazyload = (strpos($module, $lazysuffix) !== false);
 
+    if ($component === 'bundle') {
+        $hash = preg_replace('/\.js$/', '', $module);
+        if (!is_string($hash) || !preg_match('/^[a-f0-9]{40}$/', $hash)) {
+            header('HTTP/1.0 404 not found');
+            die('Bundle was not found');
+        }
+        $candidate = core_requirejs::bundle_cache_file((int) $rev, $hash);
+        if (!is_readable($candidate) && !core_requirejs::rebuild_page_bundle((int) $rev, $hash)) {
+            header('HTTP/1.0 404 not found');
+            die('Bundle was not found');
+        }
+        $etag = sha1($rev . '/bundle/' . $hash);
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) || !empty($_SERVER['HTTP_IF_MODIFIED_SINCE'])) {
+            js_send_unmodified(filemtime($candidate), $etag);
+        }
+        js_send_cached($candidate, $etag, 'requirejs.php');
+        exit(0);
+    }
+
     if ($lazyload) {
         // We are lazy loading a single file - so include the component/filename pair in the etag.
         $etag = sha1($rev . '/' . $component . '/' . $module);
+        $jsfiles = [];
     } else {
-        // We loading all (non-lazy) files - so only the rev makes this request unique.
-        $etag = sha1($rev);
+        // The requested module and the modules it names. Not every module on the site.
+        $requested = $component . '/' . preg_replace('/(\.min)?\.js$/', '', $module);
+        $jsfiles = core_requirejs::collect_amd_tree([$requested]);
+        $etag = sha1($rev . '/' . implode(',', array_keys($jsfiles)));
     }
 
     $candidate = $CFG->localcachedir . '/requirejs/' . $etag;
@@ -117,34 +139,15 @@ if ($rev > 0 and $rev < (time() + 60 * 60)) {
         exit(0);
 
     } else {
-        $jsfiles = array();
         if ($lazyload) {
             $jsfiles = core_requirejs::find_one_amd_module($component, $module);
-        } else {
-            // Here we respond to the request by returning ALL amd modules. This saves
-            // round trips in production.
-
-            $jsfiles = core_requirejs::find_all_amd_modules();
+        }
+        if (!$jsfiles) {
+            header('HTTP/1.0 404 not found');
+            die('Module was not found');
         }
 
-        $content = '';
-        foreach ($jsfiles as $modulename => $jsfile) {
-            $js = file_get_contents($jsfile);
-            if ($js === false) {
-                error_log('Failed to load JavaScript file ' . $jsfile);
-                $js = "/* Failed to load JavaScript file {$jsfile}. */\n";
-                $content = $js . $content;
-                continue;
-            }
-            // Remove source map link.
-            $js = preg_replace('~//# sourceMappingURL.*$~s', '', $js);
-            $js = rtrim($js);
-            $js .= "\n";
-
-            $js = requirejs_fix_define($modulename, $js);
-
-            $content .= $js;
-        }
+        $content = core_requirejs::bundle_source($jsfiles);
 
         js_write_cache_file_content($candidate, $content);
         // Verify nothing failed in cache file creation.

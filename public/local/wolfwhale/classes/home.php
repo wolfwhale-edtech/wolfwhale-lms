@@ -224,12 +224,12 @@ class home {
      * @return array|null
      */
     private static function messages_tile(): ?array {
-        global $CFG;
+        global $CFG, $USER;
 
         if (empty($CFG->messaging)) {
             return null;
         }
-        $count = \core_message\api::count_unread_conversations();
+        $count = \local_wwnation\nation::unread_count((int) $USER->id);
         $word = get_string('messages', 'local_wolfwhale');
         $url = (new \moodle_url('/message/index.php'))->out(false);
         if ($count < 1) {
@@ -244,7 +244,17 @@ class home {
      * @return array
      */
     private static function courses_tile(): array {
-        $courses = enrol_get_my_courses(null, 'fullname ASC');
+        global $USER;
+
+        $courses = [];
+        foreach (enrol_get_my_courses(null, 'fullname ASC') as $course) {
+            if ((int) $course->id === (int) SITEID) {
+                continue;
+            }
+            if (\local_wwnation\nation::allows_course((int) $USER->id, (int) $course->id)) {
+                $courses[] = $course;
+            }
+        }
         $word = get_string('courses', 'local_wolfwhale');
         $count = count($courses);
         if ($count === 0) {

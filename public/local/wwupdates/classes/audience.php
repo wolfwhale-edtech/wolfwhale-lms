@@ -83,7 +83,13 @@ class audience {
                 AND u.suspended = 0",
             [$roleid, $context->id, $childid]
         );
-        return array_values(array_unique(array_map('intval', $ids)));
+        $kept = [];
+        foreach (array_unique(array_map('intval', $ids)) as $parentid) {
+            if (\local_wwnation\nation::shares_parent($parentid, $childid)) {
+                $kept[] = $parentid;
+            }
+        }
+        return $kept;
     }
 
     /**

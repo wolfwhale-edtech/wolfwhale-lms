@@ -152,6 +152,7 @@ class teacher {
             self::course_tile('marks', 'marks', $marks, new \moodle_url('/local/wolfwhale/marks.php'), false, true),
             self::points_tile(),
             self::goal_tile(),
+            self::treaty_tile(),
             self::library_tile(),
         ];
         return array_values(array_filter($tiles));
@@ -474,6 +475,8 @@ class teacher {
      * @return array[]
      */
     public static function message_rows(): array {
+        global $USER;
+
         if (!self::messaging_on()) {
             return [];
         }
@@ -492,6 +495,9 @@ class teacher {
         }
         $rows = [];
         foreach ($people as $id => $person) {
+            if (!\local_wwnation\nation::shares((int) $USER->id, (int) $id)) {
+                continue;
+            }
             sort($person['courses']);
             $rows[] = self::row(
                 self::plain(fullname($person['user'])),
@@ -518,7 +524,7 @@ class teacher {
         if (!self::messaging_on()) {
             return 0;
         }
-        return (int) \core_message\api::count_unread_conversations($USER);
+        return \local_wwnation\nation::unread_count((int) $USER->id);
     }
 
     /**
@@ -545,6 +551,9 @@ class teacher {
             // person is allowed to see hidden courses. Enrolment is not required:
             // a teacher role on the category is enough.
             if (empty($course->visible) && !has_capability('moodle/course:viewhiddencourses', $context)) {
+                continue;
+            }
+            if (!\local_wwnation\nation::allows_course((int) $USER->id, (int) $course->id)) {
                 continue;
             }
             $kept[] = $course;
@@ -1000,6 +1009,43 @@ class teacher {
     }
 
     /**
+     * Treaty Education coverage for the courses this teacher teaches.
+     *
+     * The fact is how many outcomes are still open or still missing a student.
+     * None means this school has not loaded an outcome list.
+     *
+     * @return array|null
+     */
+    private static function treaty_tile(): ?array {
+        if (!class_exists(\local_wwtreaty\coverage::class)) {
+            return null;
+        }
+        $courses = \local_wwtreaty\school::teaching_courses();
+        if (!$courses) {
+            return null;
+        }
+        $gaps = 0;
+        $any = false;
+        foreach ($courses as $course) {
+            $summary = \local_wwtreaty\coverage::calculate((int) $course->id, null);
+            if (!$summary['outcomes']) {
+                continue;
+            }
+            $any = true;
+            $gaps += (int) $summary['gaps'];
+        }
+        $word = get_string('treaty', 'local_wwtreaty');
+        $url = (new \moodle_url('/local/wwtreaty/coverage.php'))->out(false);
+        if (!$any) {
+            return self::tile('treaty', $word, get_string('none', 'local_wolfwhale'), true, $url);
+        }
+        if ($gaps < 1) {
+            return self::tile('treaty', $word, get_string('met', 'local_wwtreaty'), false, $url);
+        }
+        return self::tile('treaty', $word, (string) $gaps, false, $url);
+    }
+
+    /**
      * The class goal, or None when this teacher has not set one.
      *
      * @return array|null
@@ -1063,6 +1109,7 @@ class teacher {
             'ismarks' => $id === 'marks',
             'ispoints' => $id === 'points',
             'isgoal' => $id === 'goal',
+            'istreaty' => $id === 'treaty',
             'islibrary' => $id === 'library',
         ];
     }
