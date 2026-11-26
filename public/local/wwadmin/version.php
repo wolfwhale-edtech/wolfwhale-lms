@@ -24,10 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026111902;
+$plugin->version   = 2026112600;
 $plugin->requires  = 2026100200;
 $plugin->component = 'local_wwadmin';
 $plugin->dependencies = [
     'local_wwterms' => 2026111900,
     'local_wwpoints' => 2026111900,
+    'local_wwtreaty' => 2026112600,
 ];
