@@ -511,4 +511,4 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/version.php` — version raised to 2026112600, and it now depends on the outcomes plugin
   - `public/local/wwadmin/classes/home.php` — the Treaty tile
   - `public/local/wwadmin/templates/home.mustache` — the circle with a check
-- Pull request:
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/12
