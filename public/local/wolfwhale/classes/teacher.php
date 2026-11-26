@@ -152,6 +152,7 @@ class teacher {
             self::course_tile('marks', 'marks', $marks, new \moodle_url('/local/wolfwhale/marks.php'), false, true),
             self::points_tile(),
             self::goal_tile(),
+            self::treaty_tile(),
         ];
         return array_values(array_filter($tiles));
     }
@@ -987,6 +988,43 @@ class teacher {
     }
 
     /**
+     * Treaty Education coverage for the courses this teacher teaches.
+     *
+     * The fact is how many outcomes are still open or still missing a student.
+     * None means this school has not loaded an outcome list.
+     *
+     * @return array|null
+     */
+    private static function treaty_tile(): ?array {
+        if (!class_exists(\local_wwtreaty\coverage::class)) {
+            return null;
+        }
+        $courses = \local_wwtreaty\school::teaching_courses();
+        if (!$courses) {
+            return null;
+        }
+        $gaps = 0;
+        $any = false;
+        foreach ($courses as $course) {
+            $summary = \local_wwtreaty\coverage::calculate((int) $course->id, null);
+            if (!$summary['outcomes']) {
+                continue;
+            }
+            $any = true;
+            $gaps += (int) $summary['gaps'];
+        }
+        $word = get_string('treaty', 'local_wwtreaty');
+        $url = (new \moodle_url('/local/wwtreaty/coverage.php'))->out(false);
+        if (!$any) {
+            return self::tile('treaty', $word, get_string('none', 'local_wolfwhale'), true, $url);
+        }
+        if ($gaps < 1) {
+            return self::tile('treaty', $word, get_string('met', 'local_wwtreaty'), false, $url);
+        }
+        return self::tile('treaty', $word, (string) $gaps, false, $url);
+    }
+
+    /**
      * The class goal, or None when this teacher has not set one.
      *
      * @return array|null
@@ -1037,6 +1075,7 @@ class teacher {
             'ismarks' => $id === 'marks',
             'ispoints' => $id === 'points',
             'isgoal' => $id === 'goal',
+            'istreaty' => $id === 'treaty',
         ];
     }
 

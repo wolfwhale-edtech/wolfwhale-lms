@@ -465,3 +465,50 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/client.js`
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
+
+## WW-LMS-016 — Treaty Education outcomes
+
+- Date: 2026-11-26
+- Summary: A school can keep its own Treaty Education outcomes and see which ones a class has tagged and met. The outcome list starts empty. No outcome wording is stored with the code, and no Indigenous-language word was added. An administrator, or an editing teacher in that school, adds, edits, archives, and imports outcomes. A teacher tags activities in a course they teach. The teacher home shows how many outcomes are still open or still missing a student. The admin home shows how many active outcomes the school has loaded. A student cannot change any of it.
+- What is stored, for one school (a top-level course category):
+  - An outcome: code, grade, theme, title, description, and whether it is active. The same code on a later import updates that row. Archiving keeps the row and takes it out of coverage.
+  - A tag: one outcome on one activity. One activity can carry several outcomes. Tagging an activity that students have already finished records that finish as evidence.
+  - Evidence: one student, one outcome, one course. Finishing a tagged activity writes it. Clearing that finish removes it. A teacher can also record evidence. That record stays if the activity finish is cleared.
+- Import format: a CSV file with the header `code,grade,theme,title,description,active`, or a JSON list of objects with those keys. `code` and `title` are required. `active` is 1 or 0, and a missing active value means active. A bad row writes nothing. The CSV and JSON buttons download a blank file with those keys and no outcome text.
+- Coverage: for one course and one term, each active outcome is tagged or not, and each enrolled student has met it or not. Evidence is counted when it was recorded inside the term. A term from another school is refused. In separate groups, a teacher who cannot see every group only sees their own groups. The page shows the outcomes and the students who still need one.
+- What was checked: PHPUnit for permissions, import validation, lesson tagging, and coverage. A local site was opened in a browser with the sample code TE-4.1 and the title Grade 4 Sample Outcome. Those words are a fixture for the check. They are not loaded by the install.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the circle with a check
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwtreaty/` — new outcomes plugin:
+    - `version.php`
+    - `db/install.xml` — outcomes, tags, and evidence
+    - `db/access.php` — manage, tag, and view
+    - `db/events.php` — completion writes evidence
+    - `lang/en/local_wwtreaty.php`
+    - `styles.css`
+    - `index.php` — the outcome list
+    - `edit.php` — add, edit, archive, restore
+    - `import.php` — CSV or JSON
+    - `template.php` — the blank import file
+    - `tag.php` — tag activities
+    - `coverage.php` — tagged, met, and who still needs coverage
+    - `need.php` — one outcome
+    - `classes/school.php`
+    - `classes/outcome.php`
+    - `classes/tag.php`
+    - `classes/coverage.php`
+    - `classes/observer.php`
+    - `classes/page.php`
+    - `classes/privacy/provider.php`
+    - `templates/board.mustache`
+    - `templates/form.mustache`
+    - `tests/treaty_test.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600, and it now depends on the outcomes plugin
+  - `public/local/wolfwhale/classes/teacher.php` — the Treaty tile
+  - `public/local/wolfwhale/templates/teacher.mustache` — the circle with a check
+  - `public/local/wolfwhale/tests/teacher_test.php` — the new tile
+  - `public/local/wwadmin/version.php` — version raised to 2026112600, and it now depends on the outcomes plugin
+  - `public/local/wwadmin/classes/home.php` — the Treaty tile
+  - `public/local/wwadmin/templates/home.mustache` — the circle with a check
+- Pull request:

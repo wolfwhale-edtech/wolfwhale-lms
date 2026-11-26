@@ -110,6 +110,7 @@ class home {
                 false, new \moodle_url('/local/wwadmin/licences.php')),
             self::goal_tile($roots),
             self::week_tile($roots),
+            self::treaty_tile($roots),
         ];
     }
 
@@ -135,6 +136,27 @@ class home {
             $empty = !$names;
         }
         return self::tile('goal', 'goal', $fact, $empty, new \moodle_url('/local/wwpoints/schoolgoal.php'));
+    }
+
+    /**
+     * How many active Treaty Education outcomes these schools have loaded.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function treaty_tile(array $roots): array {
+        $count = class_exists(\local_wwtreaty\outcome::class) ? \local_wwtreaty\outcome::active_count($roots) : 0;
+        $word = get_string('treaty', 'local_wwtreaty');
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wwadmin');
+        return [
+            'id' => 'treaty',
+            'word' => $word,
+            'fact' => $fact,
+            'empty' => $count < 1,
+            'url' => (new \moodle_url('/local/wwtreaty/index.php'))->out(false),
+            'speech' => get_string('speech', 'local_wwadmin', (object) ['word' => $word, 'fact' => $fact]),
+            'istreaty' => true,
+        ];
     }
 
     /**
