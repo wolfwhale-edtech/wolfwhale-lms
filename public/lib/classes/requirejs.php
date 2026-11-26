@@ -176,15 +176,67 @@ class core_requirejs {
             return null;
         }
         $hash = sha1($rev . "\n" . implode("\n", array_keys($files)));
-        $path = $CFG->localcachedir . '/requirejs/bundle-' . $rev . '-' . $hash;
+        $path = self::bundle_cache_file($rev, $hash);
+        // The module list is shared first, so another node can rebuild the script
+        // if it does not have the file yet. $CFG->cachedir is shared by cluster nodes.
+        // $CFG->localcachedir is not.
+        $list = $path . '.list';
+        if (!is_readable($list)) {
+            self::write_cache_file($list, implode("\n", array_keys($files)) . "\n");
+        }
         if (!is_readable($path)) {
-            require_once($CFG->libdir . '/jslib.php');
-            js_write_cache_file_content($path, self::bundle_source($files));
+            self::write_cache_file($path, self::bundle_source($files));
         }
         return [
             'hash' => $hash,
             'modules' => array_keys($files),
         ];
+    }
+
+    /**
+     * Shared path for one page bundle. Cluster nodes all see this directory.
+     *
+     * @param int $rev JavaScript revision.
+     * @param string $hash Bundle id.
+     * @return string
+     */
+    public static function bundle_cache_file(int $rev, string $hash): string {
+        global $CFG;
+        return $CFG->cachedir . '/requirejs/bundle-' . $rev . '-' . $hash;
+    }
+
+    /**
+     * Rebuild a bundle from the shared module list when the script file is missing.
+     *
+     * @param int $rev JavaScript revision.
+     * @param string $hash Bundle id.
+     * @return bool
+     */
+    public static function rebuild_page_bundle(int $rev, string $hash): bool {
+        $path = self::bundle_cache_file($rev, $hash);
+        $list = $path . '.list';
+        if (!is_readable($list)) {
+            return false;
+        }
+        $modules = array_values(array_filter(explode("\n", (string) file_get_contents($list)), 'strlen'));
+        $files = self::collect_amd_tree($modules);
+        if (!$files) {
+            return false;
+        }
+        self::write_cache_file($path, self::bundle_source($files));
+        return is_readable($path);
+    }
+
+    /**
+     * Write a cache file, creating the directory when needed.
+     *
+     * @param string $path Destination.
+     * @param string $content File contents.
+     */
+    private static function write_cache_file(string $path, string $content): void {
+        global $CFG;
+        require_once($CFG->libdir . '/jslib.php');
+        js_write_cache_file_content($path, $content);
     }
 
     /**

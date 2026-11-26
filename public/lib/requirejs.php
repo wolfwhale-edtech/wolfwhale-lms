@@ -103,8 +103,8 @@ if ($rev > 0 and $rev < (time() + 60 * 60)) {
             header('HTTP/1.0 404 not found');
             die('Bundle was not found');
         }
-        $candidate = $CFG->localcachedir . '/requirejs/bundle-' . $rev . '-' . $hash;
-        if (!is_readable($candidate)) {
+        $candidate = core_requirejs::bundle_cache_file((int) $rev, $hash);
+        if (!is_readable($candidate) && !core_requirejs::rebuild_page_bundle((int) $rev, $hash)) {
             header('HTTP/1.0 404 not found');
             die('Bundle was not found');
         }

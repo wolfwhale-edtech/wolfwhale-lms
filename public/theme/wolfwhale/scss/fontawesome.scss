@@ -20,48 +20,60 @@
 @import "../../../../lib/bundles/fontawesome/scss/variables";
 
 $ww-icon-names: (
-    "address-card", "align-center", "align-justify", "align-left", "align-right", "anchor",
-    "angle-down", "angle-left", "angle-right", "angle-up",
-    "angles-down", "angles-left", "angles-right", "angles-up", "arrow-down", "arrow-down-long",
-    "arrow-down-short-wide", "arrow-down-wide-short", "arrow-left", "arrow-right",
-    "arrow-right-from-bracket", "arrow-right-to-bracket",
-    "arrow-rotate-left", "arrow-rotate-right", "arrow-up", "arrow-up-from-bracket", "arrow-up-long", "arrow-up-right-from-square",
-    "arrow-up-short-wide", "arrows-left-right", "arrows-left-right-to-line", "arrows-rotate", "arrows-to-circle", "arrows-up-down",
-    "arrows-up-down-left-right", "asterisk", "audio-description", "award", "ban", "bars",
-    "bell", "bold", "bolt", "book", "bookmark", "border-all",
-    "briefcase", "bullhorn", "calculator", "calendar", "calendar-check", "calendar-plus",
-    "caret-down", "caret-left", "caret-right", "caret-up", "chart-bar", "chart-column",
-    "chart-line", "check", "check-to-slot",
-    "chevron-down", "chevron-left", "chevron-right", "chevron-up", "circle", "circle-arrow-down",
-    "circle-check", "circle-exclamation", "circle-half-stroke", "circle-info", "circle-minus", "circle-plus",
-    "circle-question", "circle-user", "circle-xmark", "clipboard", "clipboard-check", "clipboard-user",
-    "clock", "clock-rotate-left", "clone", "cloud-upload", "code", "cog",
-    "comment", "comments", "credit-card", "crosshairs", "database", "delete-left",
-    "dollar-sign", "down-left-and-up-right-to-center", "download", "ear-listen", "ellipsis", "ellipsis-vertical",
-    "envelope", "eraser", "exclamation", "expand", "eye", "eye-dropper",
-    "eye-slash", "face-smile", "file", "file-circle-minus", "file-circle-plus", "file-invoice",
-    "file-pen", "file-text", "file-video", "film", "filter", "flag",
-    "floppy-disk", "folder", "folder-open", "folder-plus", "folder-tree", "font",
-    "futbol", "gauge", "gear", "globe", "graduation-cap", "hammer",
-    "hard-drive", "highlighter", "history", "hourglass", "house", "id-badge",
-    "image", "indent", "info", "italic", "language", "laptop-file",
-    "layer-group", "leaf", "life-ring", "lightbulb", "link", "link-slash",
-    "list", "list-check", "list-ol", "list-ul", "location-dot", "lock",
-    "lock-open", "low-vision", "magnifying-glass", "magnifying-glass-plus", "maximize", "message",
-    "microphone-slash", "minus", "moon", "network-wired", "newspaper", "outdent",
-    "pager", "paper-plane", "paste", "peace", "pen", "pen-clip",
-    "pen-to-square", "people-arrows", "person", "photo-film", "pizza-slice", "plane",
-    "play", "plus", "print", "question", "question-circle", "quote-left",
-    "quote-right", "rectangle-list", "right-left", "rotate-left", "rotate-right", "rss",
-    "ruler-horizontal", "scale-balanced", "scissors", "shapes", "share", "share-from-square",
-    "sort", "spell-check", "spinner", "square", "square-arrow-up-right", "square-check",
-    "square-plus", "square-root-variable", "star", "stop", "strikethrough", "subscript",
-    "suitcase-rolling", "sun", "superscript", "table", "table-list", "tags",
-    "thumbs-up", "trash-can", "trash-can-arrow-up", "triangle-exclamation", "turn-down", "turn-up",
-    "underline", "universal-access", "unlock", "unlock-keyhole", "up-right-and-down-left-from-center", "upload",
-    "user", "user-check", "user-group", "user-lock", "user-plus", "user-tag",
-    "user-tie", "user-xmark", "users", "users-line", "volume-high", "wand-magic-sparkles",
-    "warning", "wrench", "xmark"
+    "address-book", "address-card", "align-center", "align-justify", "align-left",
+    "align-right", "anchor", "angle-down", "angle-left", "angle-right",
+    "angle-up", "angles-down", "angles-left", "angles-right", "angles-up",
+    "area-chart", "arrow-down", "arrow-down-long", "arrow-down-short-wide", "arrow-down-wide-short",
+    "arrow-left", "arrow-right", "arrow-right-from-bracket", "arrow-right-to-bracket", "arrow-rotate-left",
+    "arrow-rotate-right", "arrow-up", "arrow-up-from-bracket", "arrow-up-long", "arrow-up-right-from-square",
+    "arrow-up-short-wide", "arrows-left-right", "arrows-left-right-to-line", "arrows-rotate", "arrows-to-circle",
+    "arrows-up-down", "arrows-up-down-left-right", "asterisk", "audio-description", "award",
+    "ban", "bars", "bell", "bold", "bolt",
+    "book", "book-bookmark", "bookmark", "border-all", "briefcase",
+    "bullhorn", "calculator", "calendar", "calendar-check", "calendar-plus",
+    "caret-down", "caret-left", "caret-right", "caret-up", "chart-bar",
+    "chart-column", "chart-line", "check", "check-circle", "check-to-slot",
+    "chevron-down", "chevron-left", "chevron-right", "chevron-up", "circle",
+    "circle-arrow-down", "circle-check", "circle-down", "circle-exclamation", "circle-half-stroke",
+    "circle-info", "circle-minus", "circle-notch", "circle-plus", "circle-question",
+    "circle-user", "circle-xmark", "clipboard", "clipboard-check", "clipboard-user",
+    "clock", "clock-rotate-left", "clone", "cloud", "cloud-upload",
+    "code", "cog", "comment", "comment-dots", "comments",
+    "credit-card", "crosshairs", "database", "delete-left", "diagram-project",
+    "dollar-sign", "down-left-and-up-right-to-center", "download", "ear-listen", "ellipsis",
+    "ellipsis-h", "ellipsis-v", "ellipsis-vertical", "envelope", "envelope-open",
+    "eraser", "exclamation", "exclamation-circle", "exclamation-triangle", "expand",
+    "external-link", "eye", "eye-dropper", "eye-slash", "face-meh",
+    "face-smile", "file", "file-circle-minus", "file-circle-plus", "file-invoice",
+    "file-pen", "file-text", "file-video", "film", "filter",
+    "flag", "floppy-disk", "folder", "folder-open", "folder-plus",
+    "folder-tree", "font", "futbol", "gauge", "gear",
+    "globe", "graduation-cap", "grip-vertical", "hammer", "hand-pointer",
+    "hard-drive", "highlighter", "history", "hourglass", "house",
+    "id-badge", "image", "indent", "infinity", "info",
+    "info-circle", "italic", "key", "language", "laptop-file",
+    "layer-group", "leaf", "life-ring", "lightbulb", "link",
+    "link-slash", "list", "list-check", "list-ol", "list-ul",
+    "location-dot", "lock", "lock-open", "low-vision", "magnifying-glass",
+    "magnifying-glass-plus", "maximize", "message", "microphone-slash", "minus",
+    "mobile-screen", "mobile-screen-button", "moon", "network-wired", "newspaper",
+    "outdent", "pager", "paper-plane", "paste", "peace",
+    "pen", "pen-clip", "pen-to-square", "people-arrows", "person",
+    "photo-film", "pizza-slice", "plane", "play", "plus",
+    "print", "question", "question-circle", "quote-left", "quote-right",
+    "rectangle-list", "remove", "right-left", "right-to-bracket", "rotate-left",
+    "rotate-right", "rss", "ruler-horizontal", "scale-balanced", "scissors",
+    "search", "search-plus", "shapes", "share", "share-from-square",
+    "sort", "sort-asc", "sort-desc", "spell-check", "spinner",
+    "square", "square-arrow-up-right", "square-check", "square-plus", "square-root-variable",
+    "star", "stop", "strikethrough", "subscript", "suitcase-rolling",
+    "sun", "superscript", "table", "table-cells", "table-list",
+    "tags", "thumbs-up", "thumbtack", "times", "trash-can",
+    "trash-can-arrow-up", "triangle-exclamation", "turn-down", "turn-up", "underline",
+    "universal-access", "unlock", "unlock-keyhole", "up-right-and-down-left-from-center", "upload",
+    "user", "user-check", "user-group", "user-lock", "user-plus",
+    "user-tag", "user-tie", "user-xmark", "users", "users-line",
+    "volume-high", "wand-magic-sparkles", "warning", "wrench", "xmark"
 );
 
 $ww-icons: ();
@@ -74,22 +86,21 @@ $ww-icons: ();
 
 $fa-icons: $ww-icons;
 
-@if map-has-key($fa-icons, "circle-info") {
-    $fa-icons: map-merge($fa-icons, ("info-circle": map-get($fa-icons, "circle-info")));
-}
+// Older class names still used on other screens.
+$ww-aliases: (
+    "arrow-circle-o-down": "circle-down",
+    "circle-o": "circle",
+    "circle-o-notch": "circle-notch",
+    "commenting-o": "comment-dots",
+    "meh-o": "face-meh",
+    "plus-square-o": "square-plus",
+    "trash-o": "trash-can"
+);
 
-@if map-has-key($fa-icons, "xmark") {
-    $fa-icons: map-merge(
-        $fa-icons,
-        (
-            "times": map-get($fa-icons, "xmark"),
-            "remove": map-get($fa-icons, "xmark")
-        )
-    );
-}
-
-@if map-has-key($fa-icons, "square-plus") {
-    $fa-icons: map-merge($fa-icons, ("plus-square-o": map-get($fa-icons, "square-plus")));
+@each $old, $new in $ww-aliases {
+    @if map-has-key($fa-icons, $new) and not map-has-key($fa-icons, $old) {
+        $fa-icons: map-merge($fa-icons, ($old: map-get($fa-icons, $new)));
+    }
 }
 
 @import "../../../../lib/bundles/fontawesome/scss/mixins";

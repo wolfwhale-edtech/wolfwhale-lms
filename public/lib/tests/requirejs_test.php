@@ -80,4 +80,32 @@ final class requirejs_test extends \advanced_testcase {
         $all = core_requirejs::find_all_amd_modules();
         $this->assertLessThan(count($all), count($notification));
     }
+
+    /**
+     * The page bundle lives in the shared cache, and another node can rebuild it from the list.
+     */
+    public function test_page_bundle_is_shared_and_rebuildable(): void {
+        global $CFG;
+
+        $bundle = core_requirejs::store_page_bundle(['core/first'], time());
+        $this->assertNotNull($bundle);
+        $path = core_requirejs::bundle_cache_file((int) time(), $bundle['hash']);
+        // store used the revision it was given, not time() again.
+        $stored = null;
+        foreach (glob($CFG->cachedir . '/requirejs/bundle-*-' . $bundle['hash']) as $candidate) {
+            $stored = $candidate;
+        }
+        $this->assertNotNull($stored);
+        $this->assertStringStartsWith($CFG->cachedir, $stored);
+        $this->assertFalse(str_starts_with($stored, $CFG->localcachedir));
+        $this->assertFileExists($stored . '.list');
+
+        unlink($stored);
+        $this->assertTrue(core_requirejs::rebuild_page_bundle(
+            (int) preg_replace('/^.*bundle-(\d+)-.*$/', '$1', $stored),
+            $bundle['hash'],
+        ));
+        $this->assertFileExists($stored);
+        $this->assertStringContainsString('core/first', file_get_contents($stored));
+    }
 }
