@@ -428,9 +428,17 @@
         });
     }
 
+    function workerController() {
+        if (!('serviceWorker' in navigator)) {
+            return null;
+        }
+        return navigator.serviceWorker.controller;
+    }
+
     function prefetch() {
         var node = document.getElementById('ww-offline-prefetch');
-        if (!node || !navigator.serviceWorker.controller) {
+        var controller = workerController();
+        if (!node || !controller) {
             return;
         }
         var urls = [];
@@ -442,7 +450,7 @@
         if (!urls.length) {
             return;
         }
-        navigator.serviceWorker.controller.postMessage({
+        controller.postMessage({
             type: 'prefetch',
             userId: userId,
             urls: urls,
@@ -507,8 +515,9 @@
         }).catch(function() {
             return null;
         });
-        if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({type: 'logout', userId: userId});
+        var controller = workerController();
+        if (controller) {
+            controller.postMessage({type: 'logout', userId: userId});
         }
     });
 

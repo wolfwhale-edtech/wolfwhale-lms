@@ -60,4 +60,24 @@ final class requirejs_test extends \advanced_testcase {
         }
 
     }
+
+    /**
+     * The page bundle follows imports. It does not include every module, or a lazy player.
+     */
+    public function test_collect_amd_tree_follows_imports_only(): void {
+        $first = core_requirejs::collect_amd_tree(['core/first']);
+        $this->assertArrayHasKey('core/first', $first);
+        $this->assertArrayNotHasKey('core/modal', $first);
+        $this->assertLessThan(5, count($first));
+
+        $notification = core_requirejs::collect_amd_tree(['core/notification']);
+        $this->assertArrayHasKey('core/notification', $notification);
+        $this->assertArrayHasKey('core/modal_events', $notification);
+        // A dialogue is loaded when it opens, not with the first script.
+        $this->assertArrayNotHasKey('core/modal', $notification);
+        $this->assertArrayNotHasKey('media_videojs/video-lazy', $notification);
+
+        $all = core_requirejs::find_all_amd_modules();
+        $this->assertLessThan(count($all), count($notification));
+    }
 }

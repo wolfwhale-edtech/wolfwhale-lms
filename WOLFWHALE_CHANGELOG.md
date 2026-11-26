@@ -465,3 +465,35 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/client.js`
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
+
+## WW-LMS-014 — Faster loading on a slow connection
+
+- Date: 2026-11-26
+- Summary: A cold open of the student home on a Slow 3G link (500 kbps, 400 ms delay, browser cache cleared, responses gzipped) was measured, then the bytes on that path were cut. The production script loader had been answering every module request with every module on the site, and the home downloaded that file twice (719,546 bytes compressed each time). A page now gets one script of the modules it actually starts. The theme keeps the icons the screens use and drops the rest of the icon font. The wordmark font keeps Latin letters. The student home does not load the old-browser polyfill. The sky glass tiles, the Fjalla One WOLFWHALE wordmark, and offline mode stay.
+- Measured on the same machine, before and after, for `/local/wolfwhale/index.php`:
+  - Load: 40.321 s, then 14.558 s
+  - DOMContentLoaded: 14.055 s, then 10.268 s
+  - First paint: 7.268 s, then 5.820 s
+  - First contentful paint: 7.316 s, then 5.864 s
+  - Largest contentful paint: 7.316 s, then 5.864 s
+  - Transferred: 2,373,698 bytes, then 716,921 bytes
+  - Stylesheet, compressed: 193,542 bytes, then 170,561 bytes
+  - Script, transferred: 1,842,547 bytes, then 427,895 bytes. The page bundle itself is 120,528 bytes compressed.
+  - Fonts, transferred: 305,344 bytes, then 98,508 bytes. The solid icon font is 19,304 bytes (it was 158,220). The regular icon font is 7,028 bytes (it was 25,472). The wordmark font is 35,120 bytes (it was 84,596).
+- The earlier note of about 28 seconds was a previous measurement of this page. These two columns are the pair taken for this change.
+- What was checked: Grunt (style lint, the stylesheet build, script lint, the script build, feature files, and the component library) left the tree clean. Jest for the offline rules, 21 tests. PHPUnit for the script loader, 2 tests and 1,647 assertions; the student home, 16 tests and 69 assertions; offline lessons and the theme strings, 8 tests and 43 assertions. A local site was opened in a browser. The student home still shows the glass tiles, the wordmark, and the offline mark. The same open on a plain http host no longer throws when the browser has no service worker.
+- What still waits on the wire: the shared page script still loads the old interface library (83,592 bytes compressed), and the first paint still waits on the stylesheet.
+- Files and folders changed, against upstream v5.3.1:
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/lib/classes/requirejs.php` — a page bundle is the modules that page starts, plus the modules those files name
+  - `public/lib/requirejs.php` — serves that bundle, and a single module request no longer returns every module
+  - `public/lib/classes/output/requirements/page_requirements_manager.php` — the footer points the loader at that one bundle
+  - `public/lib/tests/requirejs_test.php` — the bundle follows imports and leaves the lazy player out
+  - `public/theme/wolfwhale/version.php` — version raised to 2026112600
+  - `public/theme/wolfwhale/scss/fontawesome.scss` — the icons this theme paints
+  - `public/theme/wolfwhale/fonts/fontawesome/` — the subset icon fonts, with their license
+  - `public/theme/wolfwhale/fonts/fjallaone/fjallaone-regular.woff2` — Latin letters for the wordmark
+  - `public/theme/wolfwhale/thirdpartylibs.xml` — the subset icon font
+  - `public/theme/wolfwhale/classes/output/core_renderer.php` — the student home skips the old-browser polyfill
+  - `public/local/wwoffline/version.php` — version raised to 2026112600
+  - `public/local/wwoffline/js/client.js` — prefetch and sign-out do not touch a missing service worker

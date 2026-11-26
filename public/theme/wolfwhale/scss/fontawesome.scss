@@ -1,0 +1,129 @@
+// This file is part of WolfWhale LMS
+//
+// WolfWhale LMS is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// WolfWhale LMS is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with WolfWhale LMS.  If not, see <http://www.gnu.org/licenses/>.
+
+// Icons this theme paints. The full set stays available to other themes.
+// Older class names used by a few screens point at the same drawings.
+
+@import "../../../../lib/bundles/fontawesome/scss/functions";
+@import "../../../../lib/bundles/fontawesome/scss/variables";
+
+$ww-icon-names: (
+    "address-card", "align-center", "align-justify", "align-left", "align-right", "anchor",
+    "angles-down", "angles-left", "angles-right", "angles-up", "arrow-down", "arrow-down-long",
+    "arrow-down-short-wide", "arrow-down-wide-short", "arrow-left", "arrow-right",
+    "arrow-right-from-bracket", "arrow-right-to-bracket",
+    "arrow-rotate-left", "arrow-rotate-right", "arrow-up", "arrow-up-from-bracket", "arrow-up-long", "arrow-up-right-from-square",
+    "arrow-up-short-wide", "arrows-left-right", "arrows-left-right-to-line", "arrows-rotate", "arrows-to-circle", "arrows-up-down",
+    "arrows-up-down-left-right", "asterisk", "audio-description", "award", "ban", "bars",
+    "bell", "bold", "bolt", "book", "bookmark", "border-all",
+    "briefcase", "bullhorn", "calculator", "calendar", "calendar-check", "calendar-plus",
+    "caret-down", "chart-bar", "chart-column", "chart-line", "check", "check-to-slot",
+    "chevron-down", "chevron-left", "chevron-right", "chevron-up", "circle", "circle-arrow-down",
+    "circle-check", "circle-exclamation", "circle-half-stroke", "circle-info", "circle-minus", "circle-plus",
+    "circle-question", "circle-user", "circle-xmark", "clipboard", "clipboard-check", "clipboard-user",
+    "clock", "clock-rotate-left", "clone", "cloud-upload", "code", "cog",
+    "comment", "comments", "credit-card", "crosshairs", "database", "delete-left",
+    "dollar-sign", "down-left-and-up-right-to-center", "download", "ear-listen", "ellipsis", "ellipsis-vertical",
+    "envelope", "eraser", "exclamation", "expand", "eye", "eye-dropper",
+    "eye-slash", "face-smile", "file", "file-circle-minus", "file-circle-plus", "file-invoice",
+    "file-pen", "file-text", "file-video", "film", "filter", "flag",
+    "floppy-disk", "folder", "folder-open", "folder-plus", "folder-tree", "font",
+    "futbol", "gauge", "gear", "globe", "graduation-cap", "hammer",
+    "hard-drive", "highlighter", "history", "hourglass", "house", "id-badge",
+    "image", "indent", "info", "italic", "language", "laptop-file",
+    "layer-group", "leaf", "life-ring", "lightbulb", "link", "link-slash",
+    "list", "list-check", "list-ol", "list-ul", "location-dot", "lock",
+    "lock-open", "low-vision", "magnifying-glass", "magnifying-glass-plus", "maximize", "message",
+    "microphone-slash", "minus", "moon", "network-wired", "newspaper", "outdent",
+    "pager", "paper-plane", "paste", "peace", "pen", "pen-clip",
+    "pen-to-square", "people-arrows", "person", "photo-film", "pizza-slice", "plane",
+    "play", "plus", "print", "question", "question-circle", "quote-left",
+    "quote-right", "rectangle-list", "right-left", "rotate-left", "rotate-right", "rss",
+    "ruler-horizontal", "scale-balanced", "scissors", "shapes", "share", "share-from-square",
+    "sort", "spell-check", "spinner", "square", "square-arrow-up-right", "square-check",
+    "square-plus", "square-root-variable", "star", "stop", "strikethrough", "subscript",
+    "suitcase-rolling", "sun", "superscript", "table", "table-list", "tags",
+    "thumbs-up", "trash-can", "trash-can-arrow-up", "triangle-exclamation", "turn-down", "turn-up",
+    "underline", "universal-access", "unlock", "unlock-keyhole", "up-right-and-down-left-from-center", "upload",
+    "user", "user-check", "user-group", "user-lock", "user-plus", "user-tag",
+    "user-tie", "user-xmark", "users", "users-line", "volume-high", "wand-magic-sparkles",
+    "warning", "wrench", "xmark"
+);
+
+$ww-icons: ();
+
+@each $name in $ww-icon-names {
+    @if map-has-key($fa-icons, $name) {
+        $ww-icons: map-merge($ww-icons, ($name: map-get($fa-icons, $name)));
+    }
+}
+
+$fa-icons: $ww-icons;
+
+@if map-has-key($fa-icons, "circle-info") {
+    $fa-icons: map-merge($fa-icons, ("info-circle": map-get($fa-icons, "circle-info")));
+}
+
+@if map-has-key($fa-icons, "xmark") {
+    $fa-icons: map-merge(
+        $fa-icons,
+        (
+            "times": map-get($fa-icons, "xmark"),
+            "remove": map-get($fa-icons, "xmark")
+        )
+    );
+}
+
+@if map-has-key($fa-icons, "square-plus") {
+    $fa-icons: map-merge($fa-icons, ("plus-square-o": map-get($fa-icons, "square-plus")));
+}
+
+@import "../../../../lib/bundles/fontawesome/scss/mixins";
+@import "../../../../lib/bundles/fontawesome/scss/core";
+@import "../../../../lib/bundles/fontawesome/scss/sizing";
+@import "../../../../lib/bundles/fontawesome/scss/fixed-width";
+@import "../../../../lib/bundles/fontawesome/scss/list";
+@import "../../../../lib/bundles/fontawesome/scss/bordered-pulled";
+@import "../../../../lib/bundles/fontawesome/scss/animated";
+@import "../../../../lib/bundles/fontawesome/scss/rotated-flipped";
+@import "../../../../lib/bundles/fontawesome/scss/stacked";
+@import "../../../../lib/bundles/fontawesome/scss/icons";
+@import "../../../../lib/bundles/fontawesome/scss/screen-reader";
+
+@font-face {
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url("[[font:theme|fontawesome/fa-solid-900.woff2]]") format("woff2");
+}
+
+@font-face {
+    font-family: "Font Awesome 6 Free";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("[[font:theme|fontawesome/fa-regular-400.woff2]]") format("woff2");
+}
+
+.fas,
+.fa-solid {
+    font-weight: 900;
+}
+
+.far,
+.fa-regular {
+    font-weight: 400;
+}
