@@ -72,7 +72,8 @@ body[id^="page-local-wwreports-"] #region-main-box {
     display: flex;
     flex-direction: column;
     gap: .6rem;
-    width: min(100%, 36rem);
+    width: 100%;
+    max-width: 36rem;
     margin-top: .6rem;
 }
 
@@ -119,7 +120,7 @@ body[id^="page-local-wwreports-"] #region-main-box {
     .activity-navigation,
     .ww-children,
     .ww-terms {
-        display: none !important;
+        display: none;
     }
 
     body,
@@ -133,8 +134,9 @@ body[id^="page-local-wwreports-"] #region-main-box {
     .ww-funder .ww-report-row,
     .ww-report,
     .ww-report-row {
-        background: #fff !important;
-        box-shadow: none !important;
+        background: #fff;
+        background-image: none;
+        box-shadow: none;
     }
 
     .ww-card .ww-report-row,
@@ -148,6 +150,6 @@ body[id^="page-local-wwreports-"] #region-main-box {
     .ww-report-term,
     .ww-row-word,
     .ww-row-fact {
-        color: #16324a !important;
+        color: #16324a;
     }
 }
