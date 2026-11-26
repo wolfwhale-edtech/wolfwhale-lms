@@ -124,6 +124,7 @@ class home {
         }
         $tiles[] = self::courses_tile();
         $tiles[] = self::points_tile();
+        $tiles[] = self::library_tile();
         return $tiles;
     }
 
@@ -223,12 +224,12 @@ class home {
      * @return array|null
      */
     private static function messages_tile(): ?array {
-        global $CFG;
+        global $CFG, $USER;
 
         if (empty($CFG->messaging)) {
             return null;
         }
-        $count = \core_message\api::count_unread_conversations();
+        $count = \local_wwnation\nation::unread_count((int) $USER->id);
         $word = get_string('messages', 'local_wolfwhale');
         $url = (new \moodle_url('/message/index.php'))->out(false);
         if ($count < 1) {
@@ -243,7 +244,17 @@ class home {
      * @return array
      */
     private static function courses_tile(): array {
-        $courses = enrol_get_my_courses(null, 'fullname ASC');
+        global $USER;
+
+        $courses = [];
+        foreach (enrol_get_my_courses(null, 'fullname ASC') as $course) {
+            if ((int) $course->id === (int) SITEID) {
+                continue;
+            }
+            if (\local_wwnation\nation::allows_course((int) $USER->id, (int) $course->id)) {
+                $courses[] = $course;
+            }
+        }
         $word = get_string('courses', 'local_wolfwhale');
         $count = count($courses);
         if ($count === 0) {
@@ -283,6 +294,19 @@ class home {
     }
 
     /**
+     * How many library resources this student can open.
+     *
+     * @return array
+     */
+    private static function library_tile(): array {
+        $count = \local_wwlibrary\library::visible_count();
+        $word = get_string('library', 'local_wwlibrary');
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wolfwhale');
+        $url = (new \moodle_url('/local/wwlibrary/index.php'))->out(false);
+        return self::tile('library', $word, $fact, $count < 1, $url);
+    }
+
+    /**
      * One tile.
      *
      * @param string $id Tile id.
@@ -307,6 +331,7 @@ class home {
             'ismessages' => $id === 'messages',
             'iscourses' => $id === 'courses',
             'ispoints' => $id === 'points',
+            'islibrary' => $id === 'library',
         ];
     }
 

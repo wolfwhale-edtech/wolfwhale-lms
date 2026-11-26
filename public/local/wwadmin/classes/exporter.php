@@ -16,6 +16,8 @@
 
 namespace local_wwadmin;
 
+use local_wwnation\nation;
+
 /**
  * A downloadable archive of one school's own data.
  *
@@ -41,9 +43,10 @@ class exporter {
      * Ask for an export of one school and queue the background task.
      *
      * @param int $categoryid
+     * @param bool $queue False when the caller builds the archive in this request.
      * @return int Export record id.
      */
-    public static function request(int $categoryid): int {
+    public static function request(int $categoryid, bool $queue = true): int {
         global $DB, $USER;
 
         scope::require($categoryid, 'local/wwadmin:export');
@@ -55,11 +58,25 @@ class exporter {
             'timecreated' => time(),
             'timecompleted' => 0,
         ]);
-        $task = new \local_wwadmin\task\export_task();
-        $task->set_custom_data(['exportid' => (int) $id]);
-        $task->set_userid((int) $USER->id);
-        \core\task\manager::queue_adhoc_task($task);
+        if ($queue) {
+            $task = new \local_wwadmin\task\export_task();
+            $task->set_custom_data(['exportid' => (int) $id]);
+            $task->set_userid((int) $USER->id);
+            \core\task\manager::queue_adhoc_task($task);
+        }
         return (int) $id;
+    }
+
+    /**
+     * Build one Nation archive now and record it in the audit log.
+     *
+     * @param int $categoryid
+     * @return int Export record id.
+     */
+    public static function build(int $categoryid): int {
+        $id = self::request($categoryid, false);
+        self::run($id);
+        return $id;
     }
 
     /**
@@ -121,6 +138,11 @@ class exporter {
             self::mark($log, self::FAILED, 'nopermission');
             return;
         }
+        $nationid = nation::id_for_root((int) $log->categoryid);
+        if ($nationid && !is_siteadmin((int) $log->userid) && !nation::is_member((int) $log->userid, $nationid)) {
+            self::mark($log, self::FAILED, 'nopermission');
+            return;
+        }
         try {
             $sets = self::gather((int) $log->categoryid);
             self::store($log, $sets);
@@ -159,24 +181,262 @@ class exporter {
      * @return array<string, array<int, array<string, string|int|float|null>>>
      */
     public static function gather(int $categoryid): array {
+        $userids = nation::connected_ids($categoryid);
+        $nationid = nation::id_for_root($categoryid);
         $tree = scope::tree_ids($categoryid);
-        $users = scope::users($tree);
+        $users = self::member_users($userids);
         $userids = array_map('intval', array_keys($users));
         $courses = scope::courses($tree);
         $courseids = array_map('intval', array_keys($courses));
         $sets = [
+            'manifest' => [self::manifest_row($nationid, $categoryid, $userids, $courseids)],
+            'ocap' => [self::ocap_row()],
             'users' => self::user_rows($users),
+            'courses' => self::course_rows($courses),
             'enrolments' => self::enrolment_rows($courseids, $userids),
             'grades' => self::grade_rows($courseids, $userids),
             'attendance' => self::attendance_rows($courseids),
             'submissions' => self::submission_rows($courseids, $userids),
+            'badges' => self::badge_rows($courseids, $userids),
+            'preferences' => self::preference_rows($userids),
         ];
         if (class_exists(\local_wwpoints\points::class)) {
             $sets['points'] = \local_wwpoints\points::export_rows($courseids, $userids);
+            $sets['levels'] = self::level_rows($courseids, $userids);
             $sets['avatars'] = \local_wwpoints\avatar::export_rows($userids);
             $sets['goals'] = \local_wwpoints\goal::export_rows($courseids, $tree);
         }
-        return $sets;
+        $clean = [];
+        foreach ($sets as $name => $rows) {
+            $clean[$name] = self::scrub($rows);
+        }
+        return $clean;
+    }
+
+    /**
+     * Members, without secret columns.
+     *
+     * @param int[] $userids
+     * @return \stdClass[]
+     */
+    private static function member_users(array $userids): array {
+        global $DB;
+
+        $userids = array_values(array_filter(array_map('intval', $userids)));
+        if (!$userids) {
+            return [];
+        }
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $params['deleted'] = 0;
+        $params['guest'] = 'guest';
+        return $DB->get_records_select(
+            'user',
+            "id {$insql} AND deleted = :deleted AND username <> :guest",
+            $params,
+            'lastname ASC, firstname ASC, id ASC',
+            'id, username, firstname, lastname, email, idnumber, suspended, auth'
+        );
+    }
+
+    /**
+     * One manifest row. Counts are filled after the other sets are known to the caller.
+     *
+     * @param int $nationid
+     * @param int $categoryid
+     * @param int[] $userids
+     * @param int[] $courseids
+     * @return array
+     */
+    private static function manifest_row(int $nationid, int $categoryid, array $userids, array $courseids): array {
+        global $DB;
+
+        $name = $DB->get_field('local_wwnation', 'name', ['id' => $nationid]);
+        return [
+            'nationid' => $nationid,
+            'name' => nation::plain((string) $name),
+            'categoryid' => $categoryid,
+            'exported' => time(),
+            'users' => count($userids),
+            'courses' => count($courseids),
+        ];
+    }
+
+    /**
+     * OCAP principles for this archive. The Nation holds each one.
+     *
+     * @return array
+     */
+    private static function ocap_row(): array {
+        return [
+            'ownership' => 'nation',
+            'control' => 'nation',
+            'access' => 'nation',
+            'possession' => 'nation',
+            'statute' => 'LAFOIP',
+        ];
+    }
+
+    /**
+     * Courses in this Nation.
+     *
+     * @param \stdClass[] $courses
+     * @return array[]
+     */
+    private static function course_rows(array $courses): array {
+        $rows = [];
+        foreach ($courses as $course) {
+            $rows[] = [
+                'id' => (int) $course->id,
+                'fullname' => $course->fullname,
+                'shortname' => $course->shortname,
+                'categoryid' => (int) $course->category,
+                'visible' => (int) $course->visible,
+            ];
+        }
+        return $rows;
+    }
+
+    /**
+     * Badges issued to these people when the badge belongs to this Nation.
+     *
+     * @param int[] $courseids
+     * @param int[] $userids
+     * @return array[]
+     */
+    private static function badge_rows(array $courseids, array $userids): array {
+        global $DB;
+
+        if (!$userids || !$DB->get_manager()->table_exists('badge_issued')) {
+            return [];
+        }
+        [$usql, $uparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+        $params = $uparams;
+        $coursesql = '1 = 0';
+        if ($courseids) {
+            [$csql, $cparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
+            $params += $cparams;
+            $coursesql = "b.courseid {$csql}";
+        }
+        $sql = "SELECT bi.id, bi.userid, b.id AS badgeid, b.name, b.courseid, bi.dateissued, bi.visible
+                  FROM {badge_issued} bi
+                  JOIN {badge} b ON b.id = bi.badgeid
+                 WHERE bi.userid {$usql}
+                   AND (b.courseid IS NULL OR b.courseid = 0 OR {$coursesql})
+              ORDER BY bi.userid ASC, b.id ASC";
+        $rows = [];
+        $records = $DB->get_recordset_sql($sql, $params);
+        foreach ($records as $record) {
+            $rows[] = [
+                'userid' => (int) $record->userid,
+                'badgeid' => (int) $record->badgeid,
+                'name' => $record->name,
+                'courseid' => (int) $record->courseid,
+                'dateissued' => (int) $record->dateissued,
+                'visible' => (int) $record->visible,
+            ];
+        }
+        $records->close();
+        return $rows;
+    }
+
+    /**
+     * Level for each person from points earned in this Nation.
+     *
+     * @param int[] $courseids
+     * @param int[] $userids
+     * @return array[]
+     */
+    private static function level_rows(array $courseids, array $userids): array {
+        global $DB;
+
+        if (!$userids || !$DB->get_manager()->table_exists('local_wwpoints_ledger')) {
+            return [];
+        }
+        $rows = [];
+        foreach ($userids as $userid) {
+            $params = ['userid' => $userid];
+            $where = 'userid = :userid AND (courseid = 0';
+            if ($courseids) {
+                [$csql, $cparams] = $DB->get_in_or_equal($courseids, SQL_PARAMS_NAMED, 'c');
+                $params += $cparams;
+                $where .= " OR courseid {$csql}";
+            }
+            $where .= ')';
+            $total = (int) $DB->get_field_sql(
+                "SELECT COALESCE(SUM(amount), 0) FROM {local_wwpoints_ledger} WHERE {$where}",
+                $params
+            );
+            $rows[] = [
+                'userid' => $userid,
+                'points' => $total,
+                'level' => \local_wwpoints\levels::for_points($total),
+            ];
+        }
+        return $rows;
+    }
+
+    /**
+     * Parent update switches for parents in this Nation.
+     *
+     * Only the known switch names are read. Other preferences are left out.
+     *
+     * @param int[] $userids
+     * @return array[]
+     */
+    private static function preference_rows(array $userids): array {
+        global $DB;
+
+        if (!$userids || !class_exists(\local_wwupdates\preferences::class)) {
+            return [];
+        }
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'parent']);
+        if (!$roleid) {
+            return [];
+        }
+        [$usql, $uparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'u');
+        $uparams['roleid'] = $roleid;
+        $uparams['level'] = CONTEXT_USER;
+        $parents = $DB->get_fieldset_sql(
+            "SELECT DISTINCT ra.userid
+               FROM {role_assignments} ra
+               JOIN {context} ctx ON ctx.id = ra.contextid
+              WHERE ra.roleid = :roleid
+                AND ctx.contextlevel = :level
+                AND ra.userid {$usql}",
+            $uparams
+        );
+        $keys = array_merge(\local_wwupdates\preferences::CHANNELS, \local_wwupdates\preferences::TYPES);
+        $rows = [];
+        foreach ($parents as $parentid) {
+            $parentid = (int) $parentid;
+            $row = ['userid' => $parentid];
+            foreach ($keys as $key) {
+                $row[$key] = \local_wwupdates\preferences::on($parentid, $key) ? 1 : 0;
+            }
+            $row['phone'] = \local_wwupdates\preferences::phone($parentid);
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
+    /**
+     * Drop secret columns from every row.
+     *
+     * @param array[] $rows
+     * @return array[]
+     */
+    private static function scrub(array $rows): array {
+        $banned = ['password', 'secret', 'token', 'sesskey', 'passwordhash', 'privatekey', 'hash'];
+        $clean = [];
+        foreach ($rows as $row) {
+            foreach (array_keys($row) as $key) {
+                if (in_array(strtolower((string) $key), $banned, true)) {
+                    unset($row[$key]);
+                }
+            }
+            $clean[] = $row;
+        }
+        return $clean;
     }
 
     /**
@@ -426,11 +686,17 @@ class exporter {
             return array_keys($rows[0]);
         }
         $empty = [
+            'manifest' => ['nationid', 'name', 'categoryid', 'exported', 'users', 'courses'],
+            'ocap' => ['ownership', 'control', 'access', 'possession', 'statute'],
             'users' => ['id', 'username', 'firstname', 'lastname', 'email', 'idnumber', 'suspended', 'auth'],
+            'courses' => ['id', 'fullname', 'shortname', 'categoryid', 'visible'],
             'enrolments' => ['userid', 'courseid', 'coursename', 'enrol', 'status', 'timestart', 'timeend', 'roles'],
             'grades' => ['userid', 'courseid', 'itemname', 'itemtype', 'itemmodule', 'finalgrade', 'rawgrademax', 'timemodified'],
             'attendance' => ['userid', 'courseid', 'sessdate', 'takenby', 'status'],
             'submissions' => ['userid', 'courseid', 'assignment', 'name', 'status', 'attemptnumber', 'timecreated', 'timemodified', 'latest'],
+            'badges' => ['userid', 'badgeid', 'name', 'courseid', 'dateissued', 'visible'],
+            'levels' => ['userid', 'points', 'level'],
+            'preferences' => ['userid', 'app', 'email', 'text', 'mark', 'absent', 'due', 'badge', 'message', 'weekly', 'phone'],
             'points' => ['userid', 'courseid', 'amount', 'reason', 'eventname', 'sourcekey', 'awardedby', 'timecreated'],
             'avatars' => ['userid', 'face', 'skin', 'hair', 'eyes', 'clothing', 'accessory'],
             'goals' => ['courseid', 'categoryid', 'name', 'target', 'timeend', 'createdby'],

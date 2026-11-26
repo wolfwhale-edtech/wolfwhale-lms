@@ -248,7 +248,7 @@ final class teacher_test extends \advanced_testcase {
         $this->setUser($teacher);
         $actions = teacher::post_actions((int) $course->id);
         $mods = array_column($actions, 'mod');
-        $this->assertSame(['page', 'resource', 'assign'], $mods);
+        $this->assertSame(['page', 'resource', 'assign', 'wwlibrary'], $mods);
         $this->assertSame('Lesson', $actions[0]['word']);
         $this->assertSame('File', $actions[1]['word']);
         $this->assertSame('Assignment', $actions[2]['word']);
@@ -488,7 +488,7 @@ final class teacher_test extends \advanced_testcase {
         $this->assertSame('Quiet room', $tiles['marks']['fact']);
         $this->assertSame('Marking. None', $tiles['marking']['speech']);
         $this->assertSame(
-            ['post', 'marking', 'attendance', 'messages', 'stuck', 'marks', 'report', 'points', 'goal'],
+            ['post', 'marking', 'attendance', 'messages', 'stuck', 'marks', 'report', 'points', 'goal', 'treaty', 'library'],
             array_keys($tiles)
         );
     }

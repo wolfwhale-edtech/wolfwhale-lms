@@ -124,7 +124,10 @@ class scope {
         $direct = [];
         foreach ($cats as $cat) {
             $context = \context_coursecat::instance($cat->id);
-            if (has_capability('local/wwadmin:view', $context, $userid)) {
+            // A role on the whole site is not a school. The assignment has to
+            // sit on this category or one of its parent categories.
+            if (has_capability('local/wwadmin:view', $context, $userid)
+                    && self::assigned_on_category_path($userid, (int) $cat->id)) {
                 $direct[] = (int) $cat->id;
             }
         }
@@ -198,9 +201,55 @@ class scope {
      * @return \context_coursecat
      */
     public static function require(int $categoryid, string $capability = 'local/wwadmin:view'): \context_coursecat {
+        global $USER;
+
         $context = \context_coursecat::instance($categoryid);
         require_capability($capability, $context);
+        if (!is_siteadmin()) {
+            $root = \local_wwnation\nation::root_id($categoryid);
+            if (!self::assigned_on_category_path((int) $USER->id, $categoryid)) {
+                throw new \moodle_exception('denied', 'local_wwnation');
+            }
+            $nationid = \local_wwnation\nation::id_for_root($root);
+            if ($nationid && !\local_wwnation\nation::is_member((int) $USER->id, $nationid)) {
+                throw new \moodle_exception('denied', 'local_wwnation');
+            }
+        }
         return $context;
+    }
+
+    /**
+     * True when this person holds a role on this category or a parent category.
+     *
+     * A role on the system context does not count.
+     *
+     * @param int $userid
+     * @param int $categoryid
+     * @return bool
+     */
+    private static function assigned_on_category_path(int $userid, int $categoryid): bool {
+        global $DB;
+
+        $path = $DB->get_field('course_categories', 'path', ['id' => $categoryid]);
+        if (!$path) {
+            return false;
+        }
+        $ids = array_values(array_filter(array_map('intval', explode('/', (string) $path))));
+        if (!$ids) {
+            return false;
+        }
+        [$insql, $params] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+        $params['userid'] = $userid;
+        $params['level'] = CONTEXT_COURSECAT;
+        return $DB->record_exists_sql(
+            "SELECT 1
+               FROM {role_assignments} ra
+               JOIN {context} ctx ON ctx.id = ra.contextid
+              WHERE ra.userid = :userid
+                AND ctx.contextlevel = :level
+                AND ctx.instanceid {$insql}",
+            $params
+        );
     }
 
     /**
@@ -236,6 +285,20 @@ class scope {
 
         if (!$categoryids) {
             return [];
+        }
+        $allowed = [];
+        $roots = [];
+        foreach ($categoryids as $id) {
+            $root = \local_wwnation\nation::root_id((int) $id);
+            if ($root > 0) {
+                $roots[$root] = $root;
+            }
+        }
+        foreach ($roots as $root) {
+            $nationid = \local_wwnation\nation::sync_root($root);
+            foreach (\local_wwnation\nation::member_ids($nationid) as $userid) {
+                $allowed[$userid] = $userid;
+            }
         }
         [$csql, $cparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'c');
         [$asql, $aparams] = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED, 'a');
@@ -279,7 +342,15 @@ class scope {
                         )
                    )
               ORDER BY u.lastname ASC, u.firstname ASC, u.id ASC";
-        return $DB->get_records_sql($sql, $params);
+        $rows = $DB->get_records_sql($sql, $params);
+        if ($allowed) {
+            foreach ($rows as $id => $row) {
+                if (!isset($allowed[(int) $id])) {
+                    unset($rows[$id]);
+                }
+            }
+        }
+        return $rows;
     }
 
     /**

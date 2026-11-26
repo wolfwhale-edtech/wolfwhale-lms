@@ -60,8 +60,11 @@ class attendance {
      * @return \context_course
      */
     public static function require_take(int $courseid): \context_course {
+        global $USER;
+
         $context = \context_course::instance($courseid);
         require_capability('local/wwattendance:take', $context);
+        \local_wwnation\nation::require_course((int) $USER->id, $courseid);
         return $context;
     }
 
@@ -301,7 +304,7 @@ class attendance {
      * @return \stdClass[]
      */
     public static function records_for_user(int $userid, ?int $from = null, ?int $until = null): array {
-        global $DB;
+        global $DB, $USER;
 
         if (!self::can_view_user($userid)) {
             throw new \moodle_exception('cannotview', 'local_wwattendance');
@@ -316,7 +319,7 @@ class attendance {
             $where .= ' AND s.sessdate <= :untiltime';
             $params['untiltime'] = $until;
         }
-        return $DB->get_records_sql(
+        $records = $DB->get_records_sql(
             "SELECT l.id, l.status, s.sessdate, s.courseid, c.fullname
                FROM {local_wwattendance_log} l
                JOIN {local_wwattendance_session} s ON s.id = l.sessionid
@@ -325,6 +328,17 @@ class attendance {
            ORDER BY s.sessdate DESC, c.fullname ASC",
             $params
         );
+        $actor = (int) $USER->id;
+        if (is_siteadmin($actor)) {
+            return $records;
+        }
+        $kept = [];
+        foreach ($records as $id => $record) {
+            if (\local_wwnation\nation::allows_course($actor, (int) $record->courseid)) {
+                $kept[$id] = $record;
+            }
+        }
+        return $kept;
     }
 
     /**

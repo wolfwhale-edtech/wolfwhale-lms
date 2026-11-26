@@ -1,0 +1,64 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwlibrary/form
+
+    One library form. Each control is named by its field.
+}}
+<form method="post" action="{{action}}" class="ww-form"{{#hasfile}} enctype="multipart/form-data"{{/hasfile}}>
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+    {{#hidden}}
+    <input type="hidden" name="{{name}}" value="{{value}}">
+    {{/hidden}}
+    {{#haskinds}}
+    <div class="ww-kind-pick">
+        {{#kinds}}
+        <label class="ww-kind">
+            <input type="radio" name="kind" value="{{value}}"{{#checked}} checked{{/checked}}>
+            <span>{{label}}</span>
+        </label>
+        {{/kinds}}
+    </div>
+    {{/haskinds}}
+    {{#fields}}
+    <label class="ww-field">
+        <span class="ww-row-word">{{label}}</span>
+        {{#text}}<input type="text" name="{{name}}" value="{{value}}"{{#required}} required{{/required}}>{{/text}}
+        {{#isfile}}<input type="file" name="{{name}}"{{#accept}} accept="{{accept}}"{{/accept}}>{{/isfile}}
+        {{#select}}
+        <select name="{{name}}">
+            {{#options}}<option value="{{value}}"{{#selected}} selected{{/selected}}>{{label}}</option>{{/options}}
+        </select>
+        {{/select}}
+    </label>
+    {{/fields}}
+    <div class="ww-actions">
+        <button type="submit" class="ww-action" name="action" value="save">{{save}}</button>
+        {{#removeword}}
+        <button type="submit" class="ww-action ww-action-remove" name="action" value="remove">{{removeword}}</button>
+        {{/removeword}}
+        {{#earlier}}
+        <button type="submit" class="ww-action" name="action" value="earlier">{{earlier}}</button>
+        {{/earlier}}
+        {{#later}}
+        <button type="submit" class="ww-action" name="action" value="later">{{later}}</button>
+        {{/later}}
+        {{#attach}}
+        <a class="ww-action" href="{{attach}}">{{attachword}}</a>
+        {{/attach}}
+    </div>
+</form>

@@ -1,0 +1,60 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwtreaty/board
+
+    Tiles. Each tile is a word and a fact.
+}}
+<div class="ww-home">
+    <div class="ww-home-tiles">
+        {{#tiles}}
+        <article class="ww-tile{{#status}} ww-tile-{{status}}{{/status}}{{#empty}} is-empty{{/empty}}{{#on}} is-on{{/on}}">
+            {{#post}}
+            <form method="post" action="{{action}}" class="ww-tile-form">
+                <input type="hidden" name="sesskey" value="{{sesskey}}">
+                {{#hidden}}
+                <input type="hidden" name="{{name}}" value="{{value}}">
+                {{/hidden}}
+                <button type="submit" class="ww-tile-link">
+                    <span class="ww-tile-word">{{word}}</span>
+                    {{#fact}}<span class="ww-tile-fact">{{fact}}</span>{{/fact}}
+                    {{#bar}}<span class="ww-treaty-bar" style="--ww-treaty: {{percent}}"><span></span></span>{{/bar}}
+                </button>
+            </form>
+            {{/post}}
+            {{^post}}
+            {{#url}}
+            <a class="ww-tile-link" href="{{url}}">
+                <span class="ww-tile-word">{{word}}</span>
+                {{#fact}}<span class="ww-tile-fact">{{fact}}</span>{{/fact}}
+                {{#bar}}<span class="ww-treaty-bar" style="--ww-treaty: {{percent}}"><span></span></span>{{/bar}}
+            </a>
+            {{/url}}
+            {{^url}}
+            <div class="ww-tile-link">
+                <span class="ww-tile-word">{{word}}</span>
+                {{#fact}}<span class="ww-tile-fact">{{fact}}</span>{{/fact}}
+            </div>
+            {{/url}}
+            {{/post}}
+        </article>
+        {{/tiles}}
+    </div>
+    {{#form}}
+    {{> local_wwtreaty/form }}
+    {{/form}}
+</div>

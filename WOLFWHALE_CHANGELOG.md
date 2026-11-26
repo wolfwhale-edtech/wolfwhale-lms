@@ -466,6 +466,139 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
 
+## WW-LMS-012 — Digital resource library
+
+- Date: 2026-11-26
+- Summary: A school library holds maps, worlds, and models. A map is an https page, or an uploaded HTML package. A world is a .mcworld file, an https link, or both. A model is a .glb or .gltf file, or an uploaded HTML package. The files are stored with the file API. Nothing is filled in on install. An administrator or a teacher can add, edit, order, and remove resources, and put them in folders. Attaching a resource adds it to a course as an activity, so a student opens the map, the world, or the model inside that course. A student can also open the library from home. The tiles are large pictures, filtered by Maps, Worlds, and Models. A student sees only the schools they are enrolled in. A teacher sees only the schools they teach. A category administrator sees only that school. A non-editing teacher can change the library and cannot add the activity, the same rule as adding a lesson. An HTML package runs in a framed page that is not this site. Script and markup files are stored as plain text, so opening the file address does not run them here. A map on this site does not keep this site's origin. A world opens with Launch, which downloads the file or follows the https link. A script in an uploaded package can fetch another file in that package, and can import another script in that package. The framed page is still not this site. A new resource keeps the school it was opened for. The 3D viewer is model-viewer 3.5.0, stored with the plugin. No sample resource is shipped.
+- What was checked: PHPUnit on PHP 8.3.6 and PostgreSQL 17.12. The library tests are 9 tests and 87 assertions. Together with the student home, the teacher home, the admin home, and points, that is 61 tests and 452 assertions. A teacher cannot save a resource into another school. A student in the other school cannot open the file. An http link is refused. A package that contains a program file is refused, and so is a path that climbs out of the package. A wrapped zip still opens index.html. Attaching adds a real course activity. Removing the resource removes that activity and the stored file. A prohibited view capability closes the library. Deleting the author clears the name and leaves the resource. Jest for the package addresses is 4 tests, including a script that fetches a packaged file. The existing offline rules file still passes. A local site was opened in a browser with made-up names. Ada Moss saw Maps 2, Worlds 1, and Models 1, then Room map, Cube, Room, and Block room. Room map inside the course showed the https page. Cube drew the uploaded model. Room drew the uploaded HTML package. Lee Moss opened the edit screen and the attach screen. Pat Moss saw Library 4 on the admin home.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the library icons, and the model-viewer credit
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `jest.config.js` — the library browser tests are included
+  - `public/local/wwlibrary/` — new library plugin:
+    - `version.php`
+    - `lib.php` — file serving
+    - `index.php` — the tiles
+    - `view.php` — one resource
+    - `edit.php` — add or change
+    - `folder.php` — a folder
+    - `attach.php` — add the resource to a course
+    - `styles.css`
+    - `thirdpartylibs.xml` — model-viewer
+    - `db/install.xml` — one table for resources, one table for folders
+    - `db/access.php` — open the library, change the library
+    - `lang/en/local_wwlibrary.php`
+    - `classes/library.php`
+    - `classes/storage.php`
+    - `classes/privacy/provider.php`
+    - `templates/index.mustache`
+    - `templates/viewer.mustache`
+    - `templates/form.mustache`
+    - `js/viewer.js` — the framed HTML package
+    - `js/viewer.test.js`
+    - `js/vendor/model-viewer.min.js` and `js/vendor/LICENSE`
+    - `tests/library_test.php`
+  - `public/mod/wwlibrary/` — the course activity:
+    - `version.php`
+    - `lib.php`
+    - `mod_form.php`
+    - `view.php`
+    - `index.php`
+    - `db/install.xml`
+    - `db/access.php`
+    - `lang/en/wwlibrary.php`
+    - `pix/monologo.svg`
+    - `classes/event/course_module_viewed.php`
+    - `classes/privacy/provider.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600, and it now depends on the library
+  - `public/local/wolfwhale/classes/home.php` — the Library tile
+  - `public/local/wolfwhale/classes/teacher.php` — the Library tile, and Library on Post
+  - `public/local/wolfwhale/templates/home.mustache`
+  - `public/local/wolfwhale/templates/teacher.mustache`
+  - `public/local/wolfwhale/tests/teacher_test.php`
+  - `public/local/wwadmin/version.php` — version raised to 2026112600
+  - `public/local/wwadmin/classes/home.php` — the Library tile
+  - `public/local/wwadmin/templates/home.mustache`
+  - `public/local/wwadmin/lang/en/local_wwadmin.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/15
+## WW-LMS-013 — Nation data separation and OCAP export
+
+- Date: 2026-11-26
+- Summary: Each Nation is a stored row for one top-level course category, and each person who belongs to it is a stored membership row. A school administrator, teacher, student, or parent is refused when that row does not include them. A role on the whole site is not membership and cannot list, count, or export a Nation. An export of a child category contains that category only, not the parent or a sibling. Removing the last enrolment or parent link deletes the stored membership. A site administrator can create Nations and can open every Nation. Deleting a membership row closes that person's Nation pages even when the course role is still there. A teacher cannot link a parent into another Nation. A site administrator can link a parent to children in two Nations, and that parent is stored in both. A parent sees only the children they are linked to. One click on Data Sovereignty builds a zip of that Nation only: users, courses, enrolments, marks, attendance, badges, points, levels, avatars, goals, and parent update switches, plus a manifest and an OCAP record (ownership, control, access, possession, LAFOIP). Passwords, password hashes, secrets, and any other preference are left out. The screen shows live database counts, whether anyone in the Nation also belongs to another Nation, the export control, and the export audit. The screen is the yellow foundation. It has no tagline and no helper text.
+- What was checked: PHPUnit on PHP 8.3.6 and PostgreSQL 17.12, 84 tests and 677 assertions, covering the Nation boundary, the admin home, the student, teacher, and parent homes, attendance, points, terms, and parent updates. A teacher, a student, and a parent are refused the other Nation. A membership row that has been removed refuses attendance. A system manager cannot list a Nation. A child-category export does not contain the parent category or a sibling. Unenrolling a person, or removing their parent link, deletes the stored membership. The zip contains the Nation's badge, points, level, and parent switches, and it does not contain the other Nation or a password hash or a planted secret. The sovereignty counts use this Nation's rows, and a person enrolled in both Nations is no longer reported as isolated. Jest, 357 tests. Grunt completed with no compiled-file changes. A local site was opened in a browser. The North administrator saw North School counts (4 people, 1 course, 2 enrolments, 1 attendance mark, 1 point, 1 parent preference, Isolated), pressed Export, and downloaded a zip that contained northstudent and did not contain southstudent, South room, or a password or secret. Opening South was refused. The South administrator's screen showed South School only.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the shield
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwnation/` — new Nation store:
+    - `version.php`
+    - `db/install.xml` — the Nation and its members
+    - `db/events.php` — enrolments and roles refresh membership
+    - `lang/en/local_wwnation.php`
+    - `classes/nation.php`
+    - `classes/observer.php`
+    - `classes/privacy/provider.php`
+    - `tests/boundary_test.php`
+  - `public/local/wwadmin/version.php` — version raised to 2026112600
+  - `public/local/wwadmin/classes/scope.php` — a system role is not a school, and a missing membership row is refused
+  - `public/local/wwadmin/classes/exporter.php` — the full Nation archive
+  - `public/local/wwadmin/classes/home.php` — the Sovereignty tile
+  - `public/local/wwadmin/classes/sovereignty.php` — the live counts
+  - `public/local/wwadmin/sovereignty.php` — the Data Sovereignty screen
+  - `public/local/wwadmin/nations.php` — a site administrator creates a Nation
+  - `public/local/wwadmin/templates/sovereignty.mustache`
+  - `public/local/wwadmin/templates/home.mustache` — the shield
+  - `public/local/wwadmin/styles.css` — the yellow foundation
+  - `public/local/wwadmin/lang/en/local_wwadmin.php`
+  - `public/local/wwattendance/version.php` — version raised to 2026112600
+  - `public/local/wwattendance/classes/attendance.php` — the course and the register stay in the Nation
+  - `public/local/wwpoints/version.php` — version raised to 2026112600
+  - `public/local/wwpoints/classes/points.php`
+  - `public/local/wwpoints/classes/goal.php`
+  - `public/local/wwterms/version.php` — version raised to 2026112600
+  - `public/local/wwterms/classes/term.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600
+  - `public/local/wolfwhale/classes/home.php`
+  - `public/local/wolfwhale/classes/teacher.php`
+  - `public/local/wolfwhale/classes/parents.php`
+  - `public/local/wwupdates/version.php` — version raised to 2026112600
+  - `public/local/wwupdates/classes/audience.php`
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/14
+
+## WW-LMS-014 — Faster loading on a slow connection
+
+- Date: 2026-11-26
+- Summary: A cold open of the student home on a Slow 3G link (500 kbps, 400 ms delay, browser cache cleared, responses gzipped) was measured, then the bytes on that path were cut. The production script loader had been answering every module request with every module on the site, and the home downloaded that file twice (719,546 bytes compressed each time). A page now gets one script of the modules it actually starts. The theme keeps the icons the screens use and drops the rest of the icon font. The wordmark font keeps Latin letters. The student home does not load the old-browser polyfill. The sky glass tiles, the Fjalla One WOLFWHALE wordmark, and offline mode stay.
+- Measured on the same machine, before and after, for `/local/wolfwhale/index.php`:
+  - Load: 40.321 s, then 14.558 s
+  - DOMContentLoaded: 14.055 s, then 10.268 s
+  - First paint: 7.268 s, then 5.820 s
+  - First contentful paint: 7.316 s, then 5.864 s
+  - Largest contentful paint: 7.316 s, then 5.864 s
+  - Transferred: 2,373,698 bytes, then 716,921 bytes
+  - Stylesheet, compressed: 193,542 bytes, then 170,561 bytes
+  - Script, transferred: 1,842,547 bytes, then 427,895 bytes. The page bundle itself is 120,528 bytes compressed.
+  - Fonts, transferred: 305,344 bytes, then 98,508 bytes. The solid icon font is 19,304 bytes (it was 158,220). The regular icon font is 7,028 bytes (it was 25,472). The wordmark font is 35,120 bytes (it was 84,596).
+- The earlier note of about 28 seconds was a previous measurement of this page. These two columns are the pair taken for this change.
+- The user-menu chevron is drawn with the icon font. The theme now sets that font on menu carets, and the subset includes the down, up, left, and right chevrons, carets, and angles used in the bar, menus, and blocks. Older names such as fa-search, fa-angle-down, and fa-angle-up stay too.
+- The page script is stored in the shared cache directory, with the module list beside it, so another server in a cluster can read it or rebuild it. It is not stored in the per-server cache.
+- What was checked: Grunt (style lint, the stylesheet build, script lint, the script build, feature files, and the component library) left the tree clean. Jest for the offline rules, 21 tests. PHPUnit for the script loader, 2 tests and 1,647 assertions; the student home, 16 tests and 69 assertions; offline lessons and the theme strings, 8 tests and 43 assertions. A local site was opened in a browser. The student home still shows the glass tiles, the wordmark, and the offline mark. The same open on a plain http host no longer throws when the browser has no service worker.
+- What still waits on the wire: the shared page script still loads the old interface library (83,592 bytes compressed), and the first paint still waits on the stylesheet.
+- Files and folders changed, against upstream v5.3.1:
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/lib/classes/requirejs.php` — a page bundle is the modules that page starts, plus the modules those files name
+  - `public/lib/requirejs.php` — serves that bundle, and a single module request no longer returns every module
+  - `public/lib/classes/output/requirements/page_requirements_manager.php` — the footer points the loader at that one bundle
+  - `public/lib/tests/requirejs_test.php` — the bundle follows imports and leaves the lazy player out
+  - `public/theme/wolfwhale/version.php` — version raised to 2026112600
+  - `public/theme/wolfwhale/scss/fontawesome.scss` — the icons this theme paints
+  - `public/theme/wolfwhale/fonts/fontawesome/` — the subset icon fonts, with their license
+  - `public/theme/wolfwhale/fonts/fjallaone/fjallaone-regular.woff2` — Latin letters for the wordmark
+  - `public/theme/wolfwhale/thirdpartylibs.xml` — the subset icon font
+  - `public/theme/wolfwhale/classes/output/core_renderer.php` — the student home skips the old-browser polyfill
+  - `public/local/wwoffline/version.php` — version raised to 2026112600
+  - `public/local/wwoffline/js/client.js` — prefetch and sign-out do not touch a missing service worker
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/16
+
 ## WW-LMS-015 — Student report cards and funder reports
 
 - Date: 2026-11-26
@@ -502,3 +635,50 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/templates/home.mustache` — those icons
   - `public/local/wwadmin/lang/en/local_wwadmin.php` — the words Funder and Cards
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/13
+
+## WW-LMS-016 — Treaty Education outcomes
+
+- Date: 2026-11-26
+- Summary: A school can keep its own Treaty Education outcomes and see which ones a class has tagged and met. The outcome list starts empty. No outcome wording is stored with the code, and no Indigenous-language word was added. An administrator, or an editing teacher in that school, adds, edits, archives, and imports outcomes. A teacher tags activities in a course they teach. The teacher home shows how many outcomes are still open or still missing a student. The admin home shows how many active outcomes the school has loaded. A student cannot change any of it.
+- What is stored, for one school (a top-level course category):
+  - An outcome: code, grade, theme, title, description, and whether it is active. The same code on a later import updates that row. Archiving keeps the row and takes it out of coverage.
+  - A tag: one outcome on one activity. One activity can carry several outcomes. Tagging an activity that students have already finished records that finish as evidence.
+  - Evidence: one student, one outcome, one course. Finishing a tagged activity writes it. Clearing that finish removes it, including when a course reset deletes every completion row at once. A teacher can also record evidence. That record stays if the activity finish is cleared, and the same student can be marked again in a later term. A student whose enrolment has not started, or has already ended, is not in the count.
+- Import format: a CSV file with the header `code,grade,theme,title,description,active`, or a JSON list of objects with those keys. `code` and `title` are required. `active` is 1 or 0, and a missing active value means active. A bad row writes nothing. The CSV and JSON buttons download a blank file with those keys and no outcome text.
+- Coverage: for one course and one term, each active outcome is tagged or not, and each enrolled student has met it or not. Evidence is counted when it was recorded inside the term. A term from another school is refused. In separate groups, a teacher who cannot see every group only sees their own groups. The page shows the outcomes and the students who still need one.
+- What was checked: PHPUnit for permissions, import validation, lesson tagging, and coverage. A local site was opened in a browser with the sample code TE-4.1 and the title Grade 4 Sample Outcome. Those words are a fixture for the check. They are not loaded by the install.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the circle with a check
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwtreaty/` — new outcomes plugin:
+    - `version.php`
+    - `db/install.xml` — outcomes, tags, and evidence
+    - `db/access.php` — manage, tag, and view
+    - `db/events.php` — completion writes evidence
+    - `lang/en/local_wwtreaty.php`
+    - `styles.css`
+    - `index.php` — the outcome list
+    - `edit.php` — add, edit, archive, restore
+    - `import.php` — CSV or JSON
+    - `template.php` — the blank import file
+    - `tag.php` — tag activities
+    - `coverage.php` — tagged, met, and who still needs coverage
+    - `need.php` — one outcome
+    - `classes/school.php`
+    - `classes/outcome.php`
+    - `classes/tag.php`
+    - `classes/coverage.php`
+    - `classes/observer.php`
+    - `classes/page.php`
+    - `classes/privacy/provider.php`
+    - `templates/board.mustache`
+    - `templates/form.mustache`
+    - `tests/treaty_test.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600, and it now depends on the outcomes plugin
+  - `public/local/wolfwhale/classes/teacher.php` — the Treaty tile
+  - `public/local/wolfwhale/templates/teacher.mustache` — the circle with a check
+  - `public/local/wolfwhale/tests/teacher_test.php` — the new tile
+  - `public/local/wwadmin/version.php` — version raised to 2026112600, and it now depends on the outcomes plugin
+  - `public/local/wwadmin/classes/home.php` — the Treaty tile
+  - `public/local/wwadmin/templates/home.mustache` — the circle with a check
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/12

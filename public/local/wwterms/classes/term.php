@@ -48,8 +48,11 @@ class term {
      * @return \context_coursecat
      */
     public static function require_manage(int $categoryid): \context_coursecat {
+        global $USER;
+
         $context = \context_coursecat::instance($categoryid);
         require_capability('local/wwterms:manage', $context);
+        \local_wwnation\nation::require_category((int) $USER->id, $categoryid);
         return $context;
     }
 

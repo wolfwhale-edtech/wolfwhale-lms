@@ -787,7 +787,7 @@ class parents {
         if (!$DB->record_exists('user', ['id' => $childid, 'deleted' => 0])) {
             return false;
         }
-        if (is_siteadmin($userid) || has_capability('local/wolfwhale:linkparent', \context_system::instance(), $userid)) {
+        if (is_siteadmin($userid)) {
             return true;
         }
         $courses = get_user_capability_course('local/wolfwhale:linkparent', $userid, false, '', 'id');
@@ -804,7 +804,7 @@ class parents {
         $params['student'] = 'student';
         $params['active'] = ENROL_USER_ACTIVE;
         $params['enabled'] = ENROL_INSTANCE_ENABLED;
-        return $DB->record_exists_sql(
+        $enrolled = $DB->record_exists_sql(
             "SELECT 1
                FROM {role_assignments} ra
                JOIN {context} ctx ON ctx.id = ra.contextid
@@ -819,6 +819,12 @@ class parents {
                 AND e.status = :enabled",
             $params
         );
+        if (!$enrolled) {
+            return false;
+        }
+        \local_wwnation\nation::sync_user($childid);
+        \local_wwnation\nation::sync_user($userid);
+        return \local_wwnation\nation::shares($userid, $childid);
     }
 
     /**
@@ -829,7 +835,7 @@ class parents {
     public static function linkable_children(): array {
         global $DB, $USER;
 
-        if (is_siteadmin() || has_capability('local/wolfwhale:linkparent', \context_system::instance())) {
+        if (is_siteadmin()) {
             $courseids = $DB->get_fieldset_select('course', 'id', 'id <> ?', [SITEID]);
         } else {
             $courses = get_user_capability_course('local/wolfwhale:linkparent', (int) $USER->id, false, '', 'id');
@@ -849,7 +855,7 @@ class parents {
         $params['student'] = 'student';
         $params['active'] = ENROL_USER_ACTIVE;
         $params['enabled'] = ENROL_INSTANCE_ENABLED;
-        return $DB->get_records_sql(
+        $students = $DB->get_records_sql(
             "SELECT DISTINCT u.id, u.firstname, u.lastname, u.firstnamephonetic,
                             u.lastnamephonetic, u.middlename, u.alternatename
                FROM {user} u
@@ -867,6 +873,17 @@ class parents {
            ORDER BY u.lastname ASC, u.firstname ASC, u.id ASC",
             $params
         );
+        if (is_siteadmin()) {
+            return $students;
+        }
+        $kept = [];
+        foreach ($students as $id => $student) {
+            \local_wwnation\nation::sync_user((int) $student->id);
+            if (\local_wwnation\nation::shares((int) $USER->id, (int) $student->id)) {
+                $kept[$id] = $student;
+            }
+        }
+        return $kept;
     }
 
     /**
@@ -963,6 +980,7 @@ class parents {
         if (!$roleid) {
             throw new \moodle_exception('cannotview', 'local_wolfwhale');
         }
+        \local_wwnation\nation::assert_parent_link($parentid, $childid);
         role_assign($roleid, $parentid, \context_user::instance($childid)->id);
     }
 
@@ -1023,7 +1041,7 @@ class parents {
         if (!$roleid) {
             return [];
         }
-        return $DB->get_records_sql(
+        $children = $DB->get_records_sql(
             "SELECT u.id, u.firstname, u.lastname, u.firstnamephonetic,
                     u.lastnamephonetic, u.middlename, u.alternatename
                FROM {role_assignments} ra
@@ -1042,6 +1060,13 @@ class parents {
                 'self' => $userid,
             ]
         );
+        $kept = [];
+        foreach ($children as $id => $child) {
+            if (\local_wwnation\nation::shares_parent($userid, (int) $child->id)) {
+                $kept[$id] = $child;
+            }
+        }
+        return $kept;
     }
 
     /**

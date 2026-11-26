@@ -1,0 +1,153 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_wwlibrary/index
+
+    Library tiles. Maps, worlds, and models, then the resources.
+
+    The icons in this file are original WolfWhale artwork, GPL v3.
+}}
+<div class="ww-home ww-library">
+    <button type="button" class="ww-speak ww-read" data-ww-speech="{{screenspeech}}" hidden>
+        <svg class="ww-speak-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+            <path d="M8 24h12l14-12v40L20 40H8z" fill="currentColor"/>
+            <path d="M42 22a14 14 0 0 1 0 20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+            <path d="M48 14a24 24 0 0 1 0 36" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <span>{{read}}</span>
+    </button>
+    {{#manyschools}}
+    <div class="ww-library-schools">
+        {{#schools}}
+        <a class="ww-action{{#current}} is-current{{/current}}" href="{{url}}">{{name}}</a>
+        {{/schools}}
+    </div>
+    {{/manyschools}}
+    {{#upurl}}
+    <div class="ww-actions">
+        <a class="ww-action" href="{{upurl}}">{{library}}</a>
+    </div>
+    {{/upurl}}
+    {{#manage}}
+    <div class="ww-actions">
+        <a class="ww-action" href="{{addurl}}">{{add}}</a>
+        <a class="ww-action" href="{{folderurl}}">{{folderword}}</a>
+    </div>
+    {{/manage}}
+    <div class="ww-library-kinds">
+        {{#kinds}}
+        <article class="ww-tile ww-tile-{{#ismap}}map{{/ismap}}{{#isworld}}world{{/isworld}}{{#ismodel}}model{{/ismodel}}{{#empty}} is-empty{{/empty}}{{#selected}} is-selected{{/selected}}">
+            <a class="ww-tile-link" href="{{url}}">
+                <span class="ww-tile-icon" aria-hidden="true">
+                    {{#ismap}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M8 14l16-6 16 6 16-6v42l-16 6-16-6-16 6z" fill="currentColor"/>
+                        <path d="M24 8v42M40 14v42" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/ismap}}
+                    {{#isworld}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 6l22 12v20L32 50 10 38V18z" fill="currentColor"/>
+                        <path d="M32 6v44M10 18l22 12 22-12" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/isworld}}
+                    {{#ismodel}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 8l24 14v20L32 56 8 42V22z" fill="currentColor"/>
+                        <path d="M32 28l24-14M32 28v28M32 28L8 14" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/ismodel}}
+                </span>
+                <span class="ww-tile-word">{{word}}</span>
+                <span class="ww-tile-fact">{{fact}}</span>
+            </a>
+        </article>
+        {{/kinds}}
+    </div>
+    <div class="ww-library-grid">
+        {{#folders}}
+        <article class="ww-library-card ww-tile ww-tile-folder">
+            <a class="ww-tile-link" href="{{url}}">
+                <span class="ww-tile-icon" aria-hidden="true">
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M6 16h20l6 8h26v28H6z" fill="currentColor"/>
+                    </svg>
+                </span>
+                <span class="ww-tile-word">{{name}}</span>
+            </a>
+            {{#manage}}
+            <a class="ww-library-edit" href="{{editurl}}">{{edit}}</a>
+            {{/manage}}
+        </article>
+        {{/folders}}
+        {{#resources}}
+        <article class="ww-library-card ww-tile ww-tile-{{#ismap}}map{{/ismap}}{{#isworld}}world{{/isworld}}{{#ismodel}}model{{/ismodel}}">
+            <a class="ww-tile-link" href="{{url}}">
+                <span class="ww-tile-icon" aria-hidden="true">
+                    {{#ismap}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M8 14l16-6 16 6 16-6v42l-16 6-16-6-16 6z" fill="currentColor"/>
+                        <path d="M24 8v42M40 14v42" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/ismap}}
+                    {{#isworld}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 6l22 12v20L32 50 10 38V18z" fill="currentColor"/>
+                        <path d="M32 6v44M10 18l22 12 22-12" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/isworld}}
+                    {{#ismodel}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 8l24 14v20L32 56 8 42V22z" fill="currentColor"/>
+                        <path d="M32 28l24-14M32 28v28M32 28L8 14" fill="none" stroke="#fff" stroke-width="3"/>
+                    </svg>
+                    {{/ismodel}}
+                </span>
+                <span class="ww-tile-word">{{name}}</span>
+            </a>
+            {{#manage}}
+            <a class="ww-library-edit" href="{{editurl}}">{{edit}}</a>
+            {{/manage}}
+        </article>
+        {{/resources}}
+    </div>
+</div>
+{{#js}}
+(function() {
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function') {
+        return;
+    }
+    var buttons = document.querySelectorAll('.ww-library .ww-speak');
+    for (var i = 0; i < buttons.length; i++) {
+        (function(button) {
+            button.hidden = false;
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                var text = button.getAttribute('data-ww-speech') || '';
+                if (!text) {
+                    return;
+                }
+                window.speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = document.documentElement.lang || 'en';
+                window.speechSynthesis.speak(utterance);
+            });
+        })(buttons[i]);
+    }
+})();
+{{/js}}
