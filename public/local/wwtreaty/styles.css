@@ -1,0 +1,83 @@
+/* Treaty Education. Glass tiles on the theme's sky. */
+
+body[id^="page-local-wwtreaty-"] #page-header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+body[id^="page-local-wwtreaty-"] #region-main,
+body[id^="page-local-wwtreaty-"] #region-main-box {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.ww-tile-treaty,
+.ww-tile-met,
+.ww-tile.is-on {
+    border-top-color: #149a9a;
+}
+
+.ww-tile-treaty .ww-tile-icon {
+    color: #149a9a;
+}
+
+.ww-tile-gap {
+    border-top-color: #e6b325;
+}
+
+.ww-tile-open {
+    border-top-color: #8fd4f5;
+}
+
+.ww-tile-form {
+    margin: 0;
+}
+
+button.ww-tile-link {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+    color: #16324a;
+}
+
+.ww-treaty-bar {
+    display: block;
+    width: 70%;
+    height: 1.1rem;
+    margin-top: .45rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(20, 154, 154, .18);
+}
+
+.ww-treaty-bar > span {
+    display: block;
+    width: calc(var(--ww-treaty) * 1%);
+    height: 100%;
+    border-radius: inherit;
+    background: #149a9a;
+}
+
+.ww-tile-gap .ww-treaty-bar > span {
+    background: #e6b325;
+}
+
+body[id^="page-local-wwtreaty-"] .ww-field textarea {
+    min-height: 8rem;
+    padding: .6rem 1rem;
+    color: #16324a;
+    font-size: 1.25rem;
+    background: #fff;
+    border: 1px solid rgba(255, 255, 255, .95);
+    border-radius: 1rem;
+}
