@@ -520,4 +520,4 @@ Each later change gets its own entry with:
   - `public/local/wwadmin/classes/home.php` — the Library tile
   - `public/local/wwadmin/templates/home.mustache`
   - `public/local/wwadmin/lang/en/local_wwadmin.php`
-- Pull request: pending
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/15
