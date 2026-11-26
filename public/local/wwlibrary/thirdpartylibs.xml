@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>js/vendor</location>
+    <name>model-viewer</name>
+    <description>Interactive viewer for glTF and GLB models. The file also contains three.js.</description>
+    <version>3.5.0</version>
+    <license>Apache/BSD</license>
+    <licenseversion>2.0/3-Clause</licenseversion>
+    <repository>https://github.com/google/model-viewer</repository>
+    <copyrights>
+      <copyright>2017 Google LLC</copyright>
+      <copyright>three.js authors</copyright>
+    </copyrights>
+  </library>
+</libraries>

@@ -90,6 +90,13 @@
                         <path d="M20 8v10M44 8v10" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
                     </svg>
                     {{/isweek}}
+                    {{#islibrary}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M8 12h48v8H8z" fill="currentColor"/>
+                        <path d="M12 22h8v30h-8zM24 22h8v30h-8zM36 22h16v30H36z" fill="currentColor"/>
+                        <path d="M6 52h52v6H6z" fill="currentColor"/>
+                    </svg>
+                    {{/islibrary}}
                 </span>
                 <span class="ww-tile-word">{{word}}</span>
                 <span class="ww-tile-fact">{{fact}}</span>

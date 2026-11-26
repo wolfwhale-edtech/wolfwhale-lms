@@ -19,6 +19,7 @@ module.exports = {
     testMatch: [
         '**/esm/tests/**/*.test.{ts,tsx}',
         '**/local/wwoffline/js/**/*.test.js',
+        '**/local/wwlibrary/js/**/*.test.js',
     ],
     moduleNameMapper,
     transform: {

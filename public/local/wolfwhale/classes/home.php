@@ -124,6 +124,7 @@ class home {
         }
         $tiles[] = self::courses_tile();
         $tiles[] = self::points_tile();
+        $tiles[] = self::library_tile();
         return $tiles;
     }
 
@@ -283,6 +284,19 @@ class home {
     }
 
     /**
+     * How many library resources this student can open.
+     *
+     * @return array
+     */
+    private static function library_tile(): array {
+        $count = \local_wwlibrary\library::visible_count();
+        $word = get_string('library', 'local_wwlibrary');
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wolfwhale');
+        $url = (new \moodle_url('/local/wwlibrary/index.php'))->out(false);
+        return self::tile('library', $word, $fact, $count < 1, $url);
+    }
+
+    /**
      * One tile.
      *
      * @param string $id Tile id.
@@ -307,6 +321,7 @@ class home {
             'ismessages' => $id === 'messages',
             'iscourses' => $id === 'courses',
             'ispoints' => $id === 'points',
+            'islibrary' => $id === 'library',
         ];
     }
 

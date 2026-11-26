@@ -110,6 +110,7 @@ class home {
                 false, new \moodle_url('/local/wwadmin/licences.php')),
             self::goal_tile($roots),
             self::week_tile($roots),
+            self::library_tile(),
         ];
     }
 
@@ -152,6 +153,17 @@ class home {
             return self::tile('week', 'week', \local_wwupdates\schedule::label((int) $roots[0]), false, $url);
         }
         return self::tile('week', 'week', (string) count($roots), false, $url);
+    }
+
+    /**
+     * How many library resources are in the schools this person administers.
+     *
+     * @return array
+     */
+    private static function library_tile(): array {
+        $count = class_exists(\local_wwlibrary\library::class) ? \local_wwlibrary\library::visible_count() : 0;
+        $fact = $count > 0 ? (string) $count : get_string('none', 'local_wwadmin');
+        return self::tile('library', 'library', $fact, $count < 1, new \moodle_url('/local/wwlibrary/index.php'));
     }
 
     /**
