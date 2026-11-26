@@ -507,4 +507,4 @@ Each later change gets its own entry with:
   - `public/local/wolfwhale/classes/parents.php`
   - `public/local/wwupdates/version.php` — version raised to 2026112600
   - `public/local/wwupdates/classes/audience.php`
-- Pull request: pending
+- Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/14
