@@ -25,6 +25,34 @@ namespace theme_wolfwhale\output;
  */
 class core_renderer extends \theme_boost\output\core_renderer {
     /**
+     * The student home does not need the old-browser polyfill. It competes with the
+     * stylesheet on a slow link, and current Chromebooks already have these features.
+     *
+     * @return string
+     */
+    public function standard_top_of_body_html() {
+        $html = parent::standard_top_of_body_html();
+        if (!$this->is_student_home()) {
+            return $html;
+        }
+        return preg_replace(
+            '#<script[^>]*src="[^"]*polyfills/polyfill\.js[^"]*"[^>]*>\s*</script>#',
+            '',
+            $html,
+        );
+    }
+
+    /**
+     * The signed-in student home, after other roles have been sent away.
+     *
+     * @return bool
+     */
+    private function is_student_home(): bool {
+        $path = $this->page->url->get_path();
+        return str_ends_with($path, '/local/wolfwhale/index.php');
+    }
+
+    /**
      * Home link without the upstream product logo.
      *
      * @return string HTML fragment
