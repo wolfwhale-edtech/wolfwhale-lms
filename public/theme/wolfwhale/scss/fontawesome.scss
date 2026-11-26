@@ -21,6 +21,7 @@
 
 $ww-icon-names: (
     "address-card", "align-center", "align-justify", "align-left", "align-right", "anchor",
+    "angle-down", "angle-left", "angle-right", "angle-up",
     "angles-down", "angles-left", "angles-right", "angles-up", "arrow-down", "arrow-down-long",
     "arrow-down-short-wide", "arrow-down-wide-short", "arrow-left", "arrow-right",
     "arrow-right-from-bracket", "arrow-right-to-bracket",
@@ -29,7 +30,8 @@ $ww-icon-names: (
     "arrows-up-down-left-right", "asterisk", "audio-description", "award", "ban", "bars",
     "bell", "bold", "bolt", "book", "bookmark", "border-all",
     "briefcase", "bullhorn", "calculator", "calendar", "calendar-check", "calendar-plus",
-    "caret-down", "chart-bar", "chart-column", "chart-line", "check", "check-to-slot",
+    "caret-down", "caret-left", "caret-right", "caret-up", "chart-bar", "chart-column",
+    "chart-line", "check", "check-to-slot",
     "chevron-down", "chevron-left", "chevron-right", "chevron-up", "circle", "circle-arrow-down",
     "circle-check", "circle-exclamation", "circle-half-stroke", "circle-info", "circle-minus", "circle-plus",
     "circle-question", "circle-user", "circle-xmark", "clipboard", "clipboard-check", "clipboard-user",
@@ -101,6 +103,15 @@ $fa-icons: $ww-icons;
 @import "../../../../lib/bundles/fontawesome/scss/stacked";
 @import "../../../../lib/bundles/fontawesome/scss/icons";
 @import "../../../../lib/bundles/fontawesome/scss/screen-reader";
+
+// Menus set the caret with font: var(--fa-font-solid). Without these, the glyph
+// is drawn in the page font and shows as an empty box.
+:root,
+:host {
+    --fa-style-family-classic: "Font Awesome 6 Free";
+    --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+    --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+}
 
 @font-face {
     font-family: "Font Awesome 6 Free";

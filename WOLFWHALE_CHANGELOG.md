@@ -481,6 +481,7 @@ Each later change gets its own entry with:
   - Script, transferred: 1,842,547 bytes, then 427,895 bytes. The page bundle itself is 120,528 bytes compressed.
   - Fonts, transferred: 305,344 bytes, then 98,508 bytes. The solid icon font is 19,304 bytes (it was 158,220). The regular icon font is 7,028 bytes (it was 25,472). The wordmark font is 35,120 bytes (it was 84,596).
 - The earlier note of about 28 seconds was a previous measurement of this page. These two columns are the pair taken for this change.
+- The user-menu chevron is drawn with the icon font. The theme now sets that font on menu carets, and the subset includes the down, up, left, and right chevrons, carets, and angles used in the bar, menus, and blocks.
 - What was checked: Grunt (style lint, the stylesheet build, script lint, the script build, feature files, and the component library) left the tree clean. Jest for the offline rules, 21 tests. PHPUnit for the script loader, 2 tests and 1,647 assertions; the student home, 16 tests and 69 assertions; offline lessons and the theme strings, 8 tests and 43 assertions. A local site was opened in a browser. The student home still shows the glass tiles, the wordmark, and the offline mark. The same open on a plain http host no longer throws when the browser has no service worker.
 - What still waits on the wire: the shared page script still loads the old interface library (83,592 bytes compressed), and the first paint still waits on the stylesheet.
 - Files and folders changed, against upstream v5.3.1:
