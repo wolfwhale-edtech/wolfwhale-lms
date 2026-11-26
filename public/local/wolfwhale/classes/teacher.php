@@ -461,6 +461,8 @@ class teacher {
      * @return array[]
      */
     public static function message_rows(): array {
+        global $USER;
+
         if (!self::messaging_on()) {
             return [];
         }
@@ -479,6 +481,9 @@ class teacher {
         }
         $rows = [];
         foreach ($people as $id => $person) {
+            if (!\local_wwnation\nation::shares((int) $USER->id, (int) $id)) {
+                continue;
+            }
             sort($person['courses']);
             $rows[] = self::row(
                 self::plain(fullname($person['user'])),
@@ -505,7 +510,7 @@ class teacher {
         if (!self::messaging_on()) {
             return 0;
         }
-        return (int) \core_message\api::count_unread_conversations($USER);
+        return \local_wwnation\nation::unread_count((int) $USER->id);
     }
 
     /**
@@ -532,6 +537,9 @@ class teacher {
             // person is allowed to see hidden courses. Enrolment is not required:
             // a teacher role on the category is enough.
             if (empty($course->visible) && !has_capability('moodle/course:viewhiddencourses', $context)) {
+                continue;
+            }
+            if (!\local_wwnation\nation::allows_course((int) $USER->id, (int) $course->id)) {
                 continue;
             }
             $kept[] = $course;

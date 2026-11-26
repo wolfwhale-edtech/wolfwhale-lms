@@ -180,6 +180,7 @@ class points {
         if (!is_siteadmin() && !in_array($courseid, self::teaching_ids((int) $USER->id), true)) {
             throw new \moodle_exception('invalidaward', 'local_wwpoints');
         }
+        \local_wwnation\nation::require_course((int) $USER->id, $courseid);
         return $context;
     }
 

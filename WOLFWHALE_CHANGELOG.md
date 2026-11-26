@@ -465,3 +465,46 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/client.js`
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
+
+## WW-LMS-013 — Nation data separation and OCAP export
+
+- Date: 2026-11-26
+- Summary: Each Nation is a stored row for one top-level course category, and each person who belongs to it is a stored membership row. A school administrator, teacher, student, or parent is refused when that row does not include them. A role on the whole site is not membership and cannot list, count, or export a Nation. A site administrator can create Nations and can open every Nation. Deleting a membership row closes that person's Nation pages even when the course role is still there. A parent link into a second Nation is refused, and a parent role that was written anyway does not show the other child. One click on Data Sovereignty builds a zip of that Nation only: users, courses, enrolments, marks, attendance, badges, points, levels, avatars, goals, and parent update switches, plus a manifest and an OCAP record (ownership, control, access, possession, LAFOIP). Passwords, password hashes, secrets, and any other preference are left out. The screen shows live database counts, whether anyone in the Nation also belongs to another Nation, the export control, and the export audit. The screen is the yellow foundation. It has no tagline and no helper text.
+- What was checked: PHPUnit on PHP 8.3.6 and PostgreSQL 17.12, 82 tests and 663 assertions, covering the Nation boundary, the admin home, the student, teacher, and parent homes, attendance, points, terms, and parent updates. A teacher, a student, and a parent are refused the other Nation. A membership row that has been removed refuses attendance. A system manager cannot list a Nation. The zip contains the Nation's badge, points, level, and parent switches, and it does not contain the other Nation or a password hash or a planted secret. The sovereignty counts use this Nation's rows, and a person enrolled in both Nations is no longer reported as isolated. Jest, 357 tests. Grunt completed with no compiled-file changes. A local site was opened in a browser. The North administrator saw North School counts (4 people, 1 course, 2 enrolments, 1 attendance mark, 1 point, 1 parent preference, Isolated), pressed Export, and downloaded a zip that contained northstudent and did not contain southstudent, South room, or a password or secret. Opening South was refused. The South administrator's screen showed South School only.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the shield
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwnation/` — new Nation store:
+    - `version.php`
+    - `db/install.xml` — the Nation and its members
+    - `db/events.php` — enrolments and roles refresh membership
+    - `lang/en/local_wwnation.php`
+    - `classes/nation.php`
+    - `classes/observer.php`
+    - `classes/privacy/provider.php`
+    - `tests/boundary_test.php`
+  - `public/local/wwadmin/version.php` — version raised to 2026112600
+  - `public/local/wwadmin/classes/scope.php` — a system role is not a school, and a missing membership row is refused
+  - `public/local/wwadmin/classes/exporter.php` — the full Nation archive
+  - `public/local/wwadmin/classes/home.php` — the Sovereignty tile
+  - `public/local/wwadmin/classes/sovereignty.php` — the live counts
+  - `public/local/wwadmin/sovereignty.php` — the Data Sovereignty screen
+  - `public/local/wwadmin/nations.php` — a site administrator creates a Nation
+  - `public/local/wwadmin/templates/sovereignty.mustache`
+  - `public/local/wwadmin/templates/home.mustache` — the shield
+  - `public/local/wwadmin/styles.css` — the yellow foundation
+  - `public/local/wwadmin/lang/en/local_wwadmin.php`
+  - `public/local/wwattendance/version.php` — version raised to 2026112600
+  - `public/local/wwattendance/classes/attendance.php` — the course and the register stay in the Nation
+  - `public/local/wwpoints/version.php` — version raised to 2026112600
+  - `public/local/wwpoints/classes/points.php`
+  - `public/local/wwpoints/classes/goal.php`
+  - `public/local/wwterms/version.php` — version raised to 2026112600
+  - `public/local/wwterms/classes/term.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600
+  - `public/local/wolfwhale/classes/home.php`
+  - `public/local/wolfwhale/classes/teacher.php`
+  - `public/local/wolfwhale/classes/parents.php`
+  - `public/local/wwupdates/version.php` — version raised to 2026112600
+  - `public/local/wwupdates/classes/audience.php`
+- Pull request: pending

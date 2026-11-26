@@ -106,11 +106,27 @@ class home {
                 count($roots) < 1, new \moodle_url('/local/wwadmin/report.php')),
             self::tile('export', 'export', $ready > 0 ? (string) $ready : get_string('none', 'local_wwadmin'),
                 $ready < 1, new \moodle_url('/local/wwadmin/export.php')),
+            self::sovereignty_tile($roots),
             self::tile('licences', 'licences', seats::fact($licence['active'], $licence['seats']),
                 false, new \moodle_url('/local/wwadmin/licences.php')),
             self::goal_tile($roots),
             self::week_tile($roots),
         ];
+    }
+
+    /**
+     * Data sovereignty for the schools this person administers.
+     *
+     * @param int[] $roots
+     * @return array
+     */
+    private static function sovereignty_tile(array $roots): array {
+        $url = new \moodle_url('/local/wwadmin/sovereignty.php');
+        if (count($roots) === 1) {
+            return self::tile('sovereignty', 'sovereignty', sovereignty::isolation_fact((int) $roots[0]), false, $url);
+        }
+        $fact = count($roots) > 0 ? (string) count($roots) : get_string('none', 'local_wwadmin');
+        return self::tile('sovereignty', 'sovereignty', $fact, count($roots) < 1, $url);
     }
 
     /**
