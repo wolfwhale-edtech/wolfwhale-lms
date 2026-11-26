@@ -83,6 +83,21 @@
                         <path d="M20 10h30l-8 12 8 12H20z" fill="currentColor"/>
                     </svg>
                     {{/isgoal}}
+                    {{#isfunder}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M32 6l22 12v6H10v-6z" fill="currentColor"/>
+                        <path d="M14 28h8v22h-8zM28 28h8v22h-8zM42 28h8v22h-8z" fill="currentColor"/>
+                        <path d="M8 50h48v6H8z" fill="currentColor"/>
+                        <path d="M18 40h6M32 34h6M46 28h6" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    {{/isfunder}}
+                    {{#iscards}}
+                    <svg viewBox="0 0 64 64" focusable="false">
+                        <path d="M16 8h28l8 8v36H16z" fill="currentColor"/>
+                        <path d="M44 8v8h8" fill="#fff"/>
+                        <path d="M24 28h18M24 36h18M24 44h12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    {{/iscards}}
                     {{#isweek}}
                     <svg viewBox="0 0 64 64" focusable="false">
                         <rect x="8" y="12" width="48" height="44" rx="6" fill="currentColor"/>

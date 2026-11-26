@@ -23,3 +23,5 @@ The icons on the teacher home (`public/local/wolfwhale/templates/teacher.mustach
 The sign-in pictures (`public/auth/wwpicture/classes/pictures.php` and `public/theme/wolfwhale/templates/core/loginform.mustache`) are original drawings by WolfWhale EdTech: a sun, a tree, a fish, a star, a moon, a flower, a house, a bird, a cloud, a circle, a window, and a face. They are part of WolfWhale LMS and are licensed under GPL v3 with the rest of the project. No icon font or icon service is used.
 
 The offline mark (`public/local/wwoffline/classes/hook_callbacks.php`) is an original drawing by WolfWhale EdTech: a circle with a slash through it. It is part of WolfWhale LMS and is licensed under GPL v3. No icon font or icon service is used.
+
+The report tile on the teacher home (`public/local/wolfwhale/templates/teacher.mustache`) is an original drawing of a page. The funder and cards tiles on the admin home (`public/local/wwadmin/templates/home.mustache`) are original drawings of a school and a page. They are part of WolfWhale LMS and are licensed under GPL v3. No icon font or icon service is used.

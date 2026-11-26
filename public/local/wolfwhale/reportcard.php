@@ -32,6 +32,12 @@ $term = \local_wolfwhale\parents::term_by_id(optional_param('term', '', PARAM_AL
 if (!$term) {
     $term = \local_wolfwhale\parents::current_term(null, (int) $child->id);
 }
+if (class_exists(\local_wwreports\card::class)) {
+    redirect(new moodle_url('/local/wwreports/card.php', [
+        'student' => $child->id,
+        'term' => $term['id'],
+    ]));
+}
 $data = \local_wolfwhale\parents::report((int) $child->id, $term);
 \local_wolfwhale\parents::setup_page('report', new moodle_url('/local/wolfwhale/reportcard.php', [
     'child' => $child->id,

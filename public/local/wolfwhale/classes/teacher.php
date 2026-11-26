@@ -150,6 +150,7 @@ class teacher {
             self::messages_tile(),
             self::count_tile('stuck', 'stuck', count($stuck), new \moodle_url('/local/wolfwhale/stuck.php')),
             self::course_tile('marks', 'marks', $marks, new \moodle_url('/local/wolfwhale/marks.php'), false, true),
+            self::report_tile(),
             self::points_tile(),
             self::goal_tile(),
         ];
@@ -987,6 +988,31 @@ class teacher {
     }
 
     /**
+     * The report card for students in this teacher's courses.
+     *
+     * @return array|null
+     */
+    private static function report_tile(): ?array {
+        global $USER;
+
+        if (!class_exists(\local_wwreports\access::class)) {
+            return null;
+        }
+        $students = \local_wwreports\access::students_taught((int) $USER->id);
+        $url = (new \moodle_url('/local/wwreports/card.php'))->out(false);
+        $word = get_string('report', 'local_wolfwhale');
+        $count = count($students);
+        if ($count === 0) {
+            return self::tile('report', $word, get_string('none', 'local_wolfwhale'), true, $url);
+        }
+        if ($count === 1) {
+            $student = reset($students);
+            return self::tile('report', $word, self::plain(fullname($student)), false, $url);
+        }
+        return self::tile('report', $word, (string) $count, false, $url);
+    }
+
+    /**
      * The class goal, or None when this teacher has not set one.
      *
      * @return array|null
@@ -1035,6 +1061,7 @@ class teacher {
             'ismessages' => $id === 'messages',
             'isstuck' => $id === 'stuck',
             'ismarks' => $id === 'marks',
+            'isreport' => $id === 'report',
             'ispoints' => $id === 'points',
             'isgoal' => $id === 'goal',
         ];

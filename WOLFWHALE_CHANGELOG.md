@@ -465,3 +465,40 @@ Each later change gets its own entry with:
   - `public/local/wwoffline/js/client.js`
   - `public/local/wwoffline/js/sw.js`
 - Pull request: https://github.com/wolfwhale-edtech/wolfwhale-lms/pull/11
+
+## WW-LMS-015 — Student report cards and funder reports
+
+- Date: 2026-11-26
+- Summary: A parent, a teacher, and a school administrator can open a term report card. A parent sees only a linked child. A teacher sees a student in a course they teach, and only that course. An administrator sees a student enrolled in a school they administer, and only courses in that school. The card shows each course mark, the present, absent, and late counts from the attendance register, badges the student has not hidden, the points total and level from the points ledger, grade comments on marks that are visible, and a comment a teacher saved for that student, course, and term. A hidden mark is left off the card. A course total that still contains a hidden mark is not shown, including when the course is set to show the real total. The card can be printed, or downloaded as HTML or CSV. An administrator can also open a funder report for a school, a division, or an education authority. A top-level category that contains other categories is an authority. A category under that which contains schools is a division. A category with no children is a school. The report counts, for each class in the term, the active students, the attendance rate, the course completion rate, and the activity completion rate. The total row counts those same records again across the classes. It is not an average of the class rates. A class with no attendance, or no completion tracking, shows None. Another school's classes are not included. The report can be printed or downloaded as CSV. The parent home Report tile, the teacher home Report tile, and the admin home Funder and Cards tiles open these pages. No theme sheet was rebuilt. The new styles are in the plugin stylesheet.
+- What was checked: PHPUnit on PHP 8.3.6 and PostgreSQL 17.12. The new report tests were 9 tests and 202 assertions. With the teacher home, the parent home, and the admin home, the run was 45 tests and 557 assertions. A parent cannot open another family's child. A teacher cannot open a student from another course, and a course they do not teach is left off a shared student's card. A school administrator cannot total another school. A division administrator cannot open the authority above them. A hidden item name, its mark, the raw course total, and feedback stored on the hidden item are absent from the card, the CSV, and the HTML, for a parent, a teacher, and an administrator, including when the course is set to show the real total. A visible mark, a present count inside the term, a badge, the ledger total, the level, and a stored comment are on the card. A mark taken before the term is not in the attendance rate. The authority total is 3 students, 50% attendance, 50% course completion, and 50% activity completion, counted from the class rows. It is not 75%. A class with no marks shows None, not 0%. A local site was opened in a browser with made-up names. Pat North opened Ada North's card. Lee North opened the same card and the comment box held the saved comment. Ned North opened the North Nation funder report. Print preview hid the buttons and the site bar. Screenshots from that check are with the pull request.
+- Files and folders changed, against upstream v5.3.1:
+  - `NOTICE.md` — the report, funder, and cards drawings
+  - `WOLFWHALE_CHANGELOG.md` — this entry
+  - `public/local/wwreports/` — new reports plugin:
+    - `version.php`
+    - `db/install.xml` — one comment for one student, course, term, and teacher
+    - `db/access.php`
+    - `lang/en/local_wwreports.php`
+    - `styles.css` — the card, the funder report, and print rules
+    - `card.php` — the report card
+    - `funder.php` — the funder report
+    - `classes/access.php`
+    - `classes/terms.php`
+    - `classes/card.php`
+    - `classes/comment.php`
+    - `classes/funder.php`
+    - `classes/privacy/provider.php`
+    - `templates/card.mustache`
+    - `templates/funder.mustache`
+    - `tests/report_test.php`
+  - `public/local/wolfwhale/version.php` — version raised to 2026112600
+  - `public/local/wolfwhale/classes/parents.php` — the Report tile opens the new card
+  - `public/local/wolfwhale/reportcard.php` — the old address opens the new card
+  - `public/local/wolfwhale/classes/teacher.php` — the Report tile
+  - `public/local/wolfwhale/templates/teacher.mustache` — the report icon
+  - `public/local/wolfwhale/tests/teacher_test.php` — the new tile is in the row
+  - `public/local/wwadmin/version.php` — version raised to 2026112600
+  - `public/local/wwadmin/classes/home.php` — the Funder and Cards tiles
+  - `public/local/wwadmin/templates/home.mustache` — those icons
+  - `public/local/wwadmin/lang/en/local_wwadmin.php` — the words Funder and Cards
+- Pull request:

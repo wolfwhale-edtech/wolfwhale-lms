@@ -1405,10 +1405,17 @@ class parents {
     private static function report_tile(int $childid): array {
         self::require_linked($childid);
         $term = self::current_term(null, $childid);
-        $url = (new \moodle_url('/local/wolfwhale/reportcard.php', [
-            'child' => $childid,
-            'term' => $term['id'],
-        ]))->out(false);
+        if (class_exists(\local_wwreports\card::class)) {
+            $url = (new \moodle_url('/local/wwreports/card.php', [
+                'student' => $childid,
+                'term' => $term['id'],
+            ]))->out(false);
+        } else {
+            $url = (new \moodle_url('/local/wolfwhale/reportcard.php', [
+                'child' => $childid,
+                'term' => $term['id'],
+            ]))->out(false);
+        }
         return self::tile('report', get_string('report', 'local_wolfwhale'), $term['short'], false, $url);
     }
 
