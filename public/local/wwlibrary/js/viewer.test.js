@@ -49,4 +49,41 @@ describe('library package addresses', () => {
         const rewritten = viewer.rewrite(css, 'css/room.css', {'images/room.png': 'blob:png'});
         expect(rewritten).toBe('body{background:url("blob:png")}');
     });
+
+    it('lets a script fetch packaged data and import a packaged module', async () => {
+        const html = viewer.build([
+            {
+                path: 'index.html',
+                text: '<!doctype html><body><script src="app.js"></script><script type="module" src="mod.js"></script></body>',
+            },
+            {
+                path: 'app.js',
+                text: 'fetch("data.json").then(function(response){return response.text();}).then(function(text){document.body.setAttribute("data-got", text);});',
+            },
+            {path: 'data.json', text: '{"room":1}'},
+            {path: 'mod.js', text: 'import {value} from "./lib.js"; document.body.setAttribute("data-mod", String(value));'},
+            {path: 'lib.js', text: 'export const value = 7;'},
+        ], 'index.html');
+        expect(html.indexOf('<script>(function(){')).toBeLessThan(html.indexOf('src="data:text/javascript'));
+        expect(html).toContain('data.json');
+        expect(html).not.toContain('blob:');
+
+        const decoded = decodeURIComponent(html);
+        const imported = decoded.match(/import \{value\} from "(data:text\/javascript[^"]+)"/);
+        expect(imported).not.toBeNull();
+        const library = decodeURIComponent(imported[1].split(',').slice(1).join(','));
+        expect(library).toContain('export const value = 7');
+
+        const util = require('util');
+        global.TextEncoder = util.TextEncoder;
+        global.TextDecoder = util.TextDecoder;
+        const {JSDOM} = require('jsdom');
+        const dom = new JSDOM(html, {
+            runScripts: 'dangerously',
+            resources: 'usable',
+            url: 'https://school.example/index.html',
+        });
+        await new Promise((resolve) => setTimeout(resolve, 300));
+        expect(dom.window.document.body.getAttribute('data-got')).toBe('{"room":1}');
+    });
 });

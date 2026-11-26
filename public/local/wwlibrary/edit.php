@@ -55,10 +55,7 @@ if ($id) {
     $link = '';
 }
 
-$actionurl = new moodle_url('/local/wwlibrary/edit.php');
-if ($id) {
-    $actionurl->param('id', $id);
-}
+$actionurl = \local_wwlibrary\library::edit_action($id, $school, $folderid);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_sesskey();
@@ -130,6 +127,7 @@ echo $OUTPUT->header();
 echo $OUTPUT->render_from_template('local_wwlibrary/form', [
     'action' => $actionurl->out(false),
     'sesskey' => sesskey(),
+    'hidden' => !$id ? [['name' => 'school', 'value' => $school]] : [],
     'hasfile' => true,
     'haskinds' => true,
     'kinds' => $kindoptions,

@@ -21,6 +21,9 @@
 }}
 <form method="post" action="{{action}}" class="ww-form"{{#hasfile}} enctype="multipart/form-data"{{/hasfile}}>
     <input type="hidden" name="sesskey" value="{{sesskey}}">
+    {{#hidden}}
+    <input type="hidden" name="{{name}}" value="{{value}}">
+    {{/hidden}}
     {{#haskinds}}
     <div class="ww-kind-pick">
         {{#kinds}}

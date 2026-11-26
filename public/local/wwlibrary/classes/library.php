@@ -809,6 +809,30 @@ class library {
     }
 
     /**
+     * Address of the add or edit form.
+     *
+     * A new resource keeps the school in the address and in the submitted
+     * fields. An existing resource is found by its id.
+     *
+     * @param int $id
+     * @param int $schoolid
+     * @param int $folderid
+     * @return \moodle_url
+     */
+    public static function edit_action(int $id, int $schoolid, int $folderid): \moodle_url {
+        $url = new \moodle_url('/local/wwlibrary/edit.php');
+        if ($id > 0) {
+            $url->param('id', $id);
+            return $url;
+        }
+        $url->param('school', $schoolid);
+        if ($folderid > 0) {
+            $url->param('folder', $folderid);
+        }
+        return $url;
+    }
+
+    /**
      * Page setup for a library screen.
      *
      * @param string $title

@@ -377,6 +377,21 @@ final class library_test extends \advanced_testcase {
     }
 
     /**
+     * A new resource form keeps the school. An existing resource is addressed by id.
+     */
+    public function test_a_new_resource_keeps_its_school(): void {
+        $this->resetAfterTest();
+        $fresh = library::edit_action(0, 12, 4);
+        $this->assertStringContainsString('school=12', $fresh->out(false));
+        $this->assertStringContainsString('folder=4', $fresh->out(false));
+        $this->assertStringNotContainsString('id=', $fresh->out(false));
+
+        $existing = library::edit_action(9, 12, 0);
+        $this->assertStringContainsString('id=9', $existing->out(false));
+        $this->assertStringNotContainsString('school=', $existing->out(false));
+    }
+
+    /**
      * A non-editing teacher can change the library and cannot add an activity.
      */
     public function test_a_non_editing_teacher_can_change_the_library_but_not_attach(): void {
