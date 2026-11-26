@@ -36,11 +36,12 @@ class sovereignty {
      * @return string
      */
     public static function isolation_fact(int $categoryid): string {
-        $nationid = nation::sync_root($categoryid);
+        $people = nation::connected_ids($categoryid);
+        $nationid = nation::id_for_root($categoryid);
         if (!$nationid) {
             return get_string('none', 'local_wwadmin');
         }
-        return self::isolation_word($nationid);
+        return self::isolation_word(nation::shared_among($people, $nationid));
     }
 
     /**
@@ -53,11 +54,15 @@ class sovereignty {
         global $DB, $USER;
 
         scope::require($categoryid);
-        $nationid = nation::sync_root($categoryid);
-        $record = $DB->get_record('local_wwnation', ['id' => $nationid], '*', MUST_EXIST);
-        $tree = scope::tree_ids((int) $record->categoryid);
-        $counts = self::counts($nationid, $tree);
-        $shared = nation::shared_count($nationid);
+        $people = nation::connected_ids($categoryid);
+        $nationid = nation::id_for_root($categoryid);
+        if (!$nationid) {
+            throw new \moodle_exception('denied', 'local_wwnation');
+        }
+        $category = $DB->get_record('course_categories', ['id' => $categoryid], 'id, name', MUST_EXIST);
+        $tree = scope::tree_ids($categoryid);
+        $counts = self::counts($nationid, $tree, $people);
+        $shared = nation::shared_among($people, $nationid);
         $rows = [
             self::count_row('users', $counts['users']),
             self::count_row('courses', $counts['courses']),
@@ -69,11 +74,11 @@ class sovereignty {
             self::count_row('preferences', $counts['preferences']),
             [
                 'word' => get_string('isolation', 'local_wwadmin'),
-                'fact' => self::isolation_word($nationid),
+                'fact' => self::isolation_word($shared),
             ],
         ];
         $audits = [];
-        $exports = $DB->get_records('local_wwadmin_export', ['categoryid' => (int) $record->categoryid], 'timecreated DESC');
+        $exports = $DB->get_records('local_wwadmin_export', ['categoryid' => $categoryid], 'timecreated DESC');
         foreach ($exports as $export) {
             $who = $DB->get_record('user', ['id' => $export->userid], 'id, firstname, lastname, firstnamephonetic, lastnamephonetic, middlename, alternatename, deleted');
             $name = ($who && !(int) $who->deleted) ? nation::plain(fullname($who)) : (string) $export->userid;
@@ -92,12 +97,12 @@ class sovereignty {
             $audits[] = $row;
         }
         return [
-            'nation' => nation::plain($record->name),
+            'nation' => nation::plain($category->name),
             'counts' => $rows,
             'shared' => $shared,
             'exportword' => get_string('export', 'local_wwadmin'),
             'sesskey' => sesskey(),
-            'category' => (int) $record->categoryid,
+            'category' => $categoryid,
             'audits' => $audits,
             'hasaudits' => $audits !== [],
         ];
@@ -106,11 +111,10 @@ class sovereignty {
     /**
      * Isolated, or the number of people who also belong to another Nation.
      *
-     * @param int $nationid
+     * @param int $shared
      * @return string
      */
-    private static function isolation_word(int $nationid): string {
-        $shared = nation::shared_count($nationid);
+    private static function isolation_word(int $shared): string {
         if ($shared === 0) {
             return get_string('isolated', 'local_wwadmin');
         }
@@ -136,31 +140,36 @@ class sovereignty {
      *
      * @param int $nationid
      * @param int[] $tree
+     * @param int[] $userids People in this category, not the rest of the Nation.
      * @return array<string, int>
      */
-    private static function counts(int $nationid, array $tree): array {
+    private static function counts(int $nationid, array $tree, array $userids): array {
         global $DB;
 
         $empty = [
-            'users' => 0,
+            'users' => count($userids),
             'courses' => 0,
             'enrolments' => 0,
             'marks' => 0,
             'attendance' => 0,
             'badges' => 0,
             'points' => 0,
-            'preferences' => 0,
+            'preferences' => self::preference_count($userids),
         ];
         if (!$tree) {
-            $empty['users'] = count(nation::member_ids($nationid));
             return $empty;
         }
         [$insql, $treeparams] = $DB->get_in_or_equal($tree, SQL_PARAMS_NAMED, 'cat');
         $courseparams = $treeparams + ['siteid' => SITEID];
         $memberparams = $treeparams + ['nation' => $nationid, 'siteid' => SITEID];
         $markparams = $treeparams + ['nation' => $nationid];
-        $users = (int) $DB->count_records('local_wwnation_member', ['nationid' => $nationid]);
+        $users = count($userids);
         $courses = (int) $DB->count_records_select('course', "category {$insql} AND id <> :siteid", $courseparams);
+        $userfilter = '';
+        $userparams = [];
+        if ($userids) {
+            [$userfilter, $userparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'usr');
+        }
         $enrolments = (int) $DB->get_field_sql(
             "SELECT COUNT(ue.id)
                FROM {user_enrolments} ue
@@ -193,34 +202,38 @@ class sovereignty {
             );
         }
         $badges = 0;
-        if ($DB->get_manager()->table_exists('badge_issued')) {
+        if ($userids && $DB->get_manager()->table_exists('badge_issued')) {
             $badges = (int) $DB->get_field_sql(
                 "SELECT COUNT(bi.id)
                    FROM {badge_issued} bi
                    JOIN {badge} b ON b.id = bi.badgeid
-                   JOIN {local_wwnation_member} m ON m.userid = bi.userid AND m.nationid = :nation
-                  WHERE b.courseid IS NULL
-                     OR b.courseid = 0
-                     OR EXISTS (
-                         SELECT 1 FROM {course} c WHERE c.id = b.courseid AND c.category {$insql}
-                     )",
-                $markparams
+                  WHERE bi.userid {$userfilter}
+                    AND (
+                         b.courseid IS NULL
+                         OR b.courseid = 0
+                         OR EXISTS (
+                             SELECT 1 FROM {course} c WHERE c.id = b.courseid AND c.category {$insql}
+                         )
+                    )",
+                $treeparams + $userparams
             );
         }
         $points = 0;
-        if ($DB->get_manager()->table_exists('local_wwpoints_ledger')) {
+        if ($userids && $DB->get_manager()->table_exists('local_wwpoints_ledger')) {
             $points = (int) $DB->get_field_sql(
                 "SELECT COUNT(p.id)
                    FROM {local_wwpoints_ledger} p
-                   JOIN {local_wwnation_member} m ON m.userid = p.userid AND m.nationid = :nation
-                  WHERE p.courseid = 0
-                     OR EXISTS (
-                         SELECT 1 FROM {course} c WHERE c.id = p.courseid AND c.category {$insql}
-                     )",
-                $markparams
+                  WHERE p.userid {$userfilter}
+                    AND (
+                         p.courseid = 0
+                         OR EXISTS (
+                             SELECT 1 FROM {course} c WHERE c.id = p.courseid AND c.category {$insql}
+                         )
+                    )",
+                $treeparams + $userparams
             );
         }
-        $preferences = self::preference_count($nationid);
+        $preferences = self::preference_count($userids);
         return [
             'users' => $users,
             'courses' => $courses,
@@ -234,15 +247,16 @@ class sovereignty {
     }
 
     /**
-     * Parents in this Nation who have a stored update switch.
+     * Parents in this category who have a stored update switch.
      *
-     * @param int $nationid
+     * @param int[] $userids
      * @return int
      */
-    private static function preference_count(int $nationid): int {
+    private static function preference_count(array $userids): int {
         global $DB;
 
-        if (!class_exists(\local_wwupdates\preferences::class)) {
+        $userids = array_values(array_filter(array_map('intval', $userids)));
+        if (!$userids || !class_exists(\local_wwupdates\preferences::class)) {
             return 0;
         }
         $names = [];
@@ -250,18 +264,19 @@ class sovereignty {
             $names[] = \local_wwupdates\preferences::name($key);
         }
         [$nsql, $nparams] = $DB->get_in_or_equal($names, SQL_PARAMS_NAMED, 'p');
-        $nparams['nation'] = $nationid;
-        $nparams['role'] = 'parent';
-        $nparams['level'] = CONTEXT_USER;
+        [$usql, $uparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'pu');
+        $params = $nparams + $uparams + [
+            'role' => 'parent',
+            'level' => CONTEXT_USER,
+        ];
         return (int) $DB->get_field_sql(
-            "SELECT COUNT(DISTINCT m.userid)
-               FROM {local_wwnation_member} m
-               JOIN {role_assignments} ra ON ra.userid = m.userid
+            "SELECT COUNT(DISTINCT ra.userid)
+               FROM {role_assignments} ra
                JOIN {role} r ON r.id = ra.roleid AND r.shortname = :role
                JOIN {context} ctx ON ctx.id = ra.contextid AND ctx.contextlevel = :level
-               JOIN {user_preferences} up ON up.userid = m.userid AND up.name {$nsql}
-              WHERE m.nationid = :nation",
-            $nparams
+               JOIN {user_preferences} up ON up.userid = ra.userid AND up.name {$nsql}
+              WHERE ra.userid {$usql}",
+            $params
         );
     }
 }

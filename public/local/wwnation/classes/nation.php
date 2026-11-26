@@ -175,14 +175,90 @@ class nation {
     }
 
     /**
-     * Refresh every Nation this person is enrolled in or holds a school role in.
+     * Refresh every Nation this person is enrolled in, holds a school role in,
+     * or is still stored in.
+     *
+     * Stored Nations are included so removing the last enrolment or role deletes
+     * the old membership instead of leaving it behind.
      *
      * @param int $userid
      */
     public static function sync_user(int $userid): void {
+        global $DB;
+
+        $roots = [];
         foreach (self::roots_for_user($userid) as $root) {
+            $roots[$root] = $root;
+        }
+        foreach (self::nations_of($userid) as $nationid) {
+            $categoryid = $DB->get_field('local_wwnation', 'categoryid', ['id' => $nationid]);
+            $root = self::root_id((int) $categoryid);
+            if ($root > 0) {
+                $roots[$root] = $root;
+            }
+        }
+        foreach ($roots as $root) {
             self::sync_root($root);
         }
+    }
+
+    /**
+     * Stored members who belong to this category's own tree.
+     *
+     * A manager of a child category gets that category, not the rest of the Nation.
+     * Parents are included only when they are linked to one of those people.
+     *
+     * @param int $categoryid
+     * @return int[]
+     */
+    public static function connected_ids(int $categoryid): array {
+        $nationid = self::sync_root($categoryid);
+        $tree = self::tree_ids($categoryid);
+        if ($nationid <= 0 || !$tree) {
+            return [];
+        }
+        $ids = [];
+        foreach (self::enrolled_ids($tree) as $id) {
+            $ids[$id] = $id;
+        }
+        foreach (self::role_ids($tree) as $id) {
+            $ids[$id] = $id;
+        }
+        $members = array_fill_keys(self::member_ids($nationid), true);
+        $ids = array_intersect_key($ids, $members);
+        foreach (self::parent_ids_for(array_values($ids), $nationid) as $id) {
+            if (isset($members[$id])) {
+                $ids[$id] = $id;
+            }
+        }
+        return array_values($ids);
+    }
+
+    /**
+     * How many of these people are also stored in another Nation.
+     *
+     * @param int[] $userids
+     * @param int $nationid
+     * @return int
+     */
+    public static function shared_among(array $userids, int $nationid): int {
+        global $DB;
+
+        $userids = array_values(array_filter(array_map('intval', $userids)));
+        if (!$userids || $nationid <= 0) {
+            return 0;
+        }
+        [$insql, $params] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+        $params['nation'] = $nationid;
+        return (int) $DB->get_field_sql(
+            "SELECT COUNT(DISTINCT m.userid)
+               FROM {local_wwnation_member} m
+               JOIN {local_wwnation_member} o
+                 ON o.userid = m.userid AND o.nationid <> m.nationid
+              WHERE m.nationid = :nation
+                AND m.userid {$insql}",
+            $params
+        );
     }
 
     /**

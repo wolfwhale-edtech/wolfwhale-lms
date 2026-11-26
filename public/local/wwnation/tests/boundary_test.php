@@ -311,6 +311,79 @@ final class boundary_test extends \advanced_testcase {
     }
 
     /**
+     * A manager of one child category does not export the parent or a sibling.
+     */
+    public function test_a_child_category_export_stays_in_that_category(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $parent = $this->getDataGenerator()->create_category(['name' => 'Nation']);
+        $child = $this->getDataGenerator()->create_category(['name' => 'Village', 'parent' => $parent->id]);
+        $sibling = $this->getDataGenerator()->create_category(['name' => 'Other village', 'parent' => $parent->id]);
+        $parentcourse = $this->getDataGenerator()->create_course(['category' => $parent->id, 'fullname' => 'Nation room']);
+        $childcourse = $this->getDataGenerator()->create_course(['category' => $child->id, 'fullname' => 'Village room']);
+        $siblingcourse = $this->getDataGenerator()->create_course(['category' => $sibling->id, 'fullname' => 'Other room']);
+        $parentstudent = $this->getDataGenerator()->create_user(['username' => 'nationstudent', 'email' => 'nationstudent@example.com']);
+        $childstudent = $this->getDataGenerator()->create_user(['username' => 'villagestudent', 'email' => 'villagestudent@example.com']);
+        $siblingstudent = $this->getDataGenerator()->create_user(['username' => 'otherstudent', 'email' => 'otherstudent@example.com']);
+        $this->getDataGenerator()->enrol_user($parentstudent->id, $parentcourse->id, 'student');
+        $this->getDataGenerator()->enrol_user($childstudent->id, $childcourse->id, 'student');
+        $this->getDataGenerator()->enrol_user($siblingstudent->id, $siblingcourse->id, 'student');
+        $admin = $this->getDataGenerator()->create_user(['username' => 'villageadmin']);
+        $manager = $DB->get_field('role', 'id', ['shortname' => 'manager'], MUST_EXIST);
+        role_assign($manager, $admin->id, \context_coursecat::instance($child->id)->id);
+        accesslib_clear_all_caches_for_unit_testing();
+
+        $this->setUser($admin);
+        $sets = exporter::gather($child->id);
+        $blob = json_encode($sets);
+        $this->assertStringContainsString('villagestudent', $blob);
+        $this->assertStringContainsString('Village room', $blob);
+        $this->assertStringNotContainsString('nationstudent', $blob);
+        $this->assertStringNotContainsString('otherstudent', $blob);
+        $this->assertStringNotContainsString('nationstudent@example.com', $blob);
+        $this->assertStringNotContainsString('otherstudent@example.com', $blob);
+        $this->assertStringNotContainsString('Nation room', $blob);
+        $this->assertStringNotContainsString('Other room', $blob);
+
+        $view = sovereignty::export($child->id);
+        $facts = [];
+        foreach ($view['counts'] as $row) {
+            $facts[$row['word']] = $row['fact'];
+        }
+        $this->assertSame('1', $facts['Courses']);
+        $this->assertSame('Village', $view['nation']);
+    }
+
+    /**
+     * Leaving a Nation removes the stored membership.
+     */
+    public function test_leaving_a_nation_drops_the_membership(): void {
+        global $DB;
+
+        $this->resetAfterTest();
+        $schools = $this->schools();
+        $nationid = nation::sync_root($schools->north->id);
+        $this->assertTrue(nation::is_member($schools->northstudent->id, $nationid));
+
+        $this->setAdminUser();
+        $plugin = enrol_get_plugin('manual');
+        $instance = $DB->get_record('enrol', [
+            'courseid' => $schools->northcourse->id,
+            'enrol' => 'manual',
+        ], '*', MUST_EXIST);
+        $plugin->unenrol_user($instance, $schools->northstudent->id);
+        $this->assertFalse(nation::is_member($schools->northstudent->id, $nationid));
+
+        \local_wolfwhale\parents::install_role();
+        \local_wolfwhale\parents::link($schools->northparent->id, $schools->northteacher->id);
+        $this->assertTrue(nation::is_member($schools->northparent->id, $nationid));
+        $roleid = $DB->get_field('role', 'id', ['shortname' => 'parent'], MUST_EXIST);
+        role_unassign($roleid, $schools->northparent->id, \context_user::instance($schools->northteacher->id)->id);
+        $this->assertFalse(nation::is_member($schools->northparent->id, $nationid));
+    }
+
+    /**
      * Two Nations.
      *
      * @return \stdClass

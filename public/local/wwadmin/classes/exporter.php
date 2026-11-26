@@ -181,10 +181,10 @@ class exporter {
      * @return array<string, array<int, array<string, string|int|float|null>>>
      */
     public static function gather(int $categoryid): array {
-        $nationid = nation::sync_root($categoryid);
+        $userids = nation::connected_ids($categoryid);
+        $nationid = nation::id_for_root($categoryid);
         $tree = scope::tree_ids($categoryid);
-        $memberids = nation::member_ids($nationid);
-        $users = self::member_users($memberids);
+        $users = self::member_users($userids);
         $userids = array_map('intval', array_keys($users));
         $courses = scope::courses($tree);
         $courseids = array_map('intval', array_keys($courses));
