@@ -96,7 +96,7 @@ class home {
             $schoolempty = $rate === null;
         }
 
-        return [
+        $tiles = [
             self::tile('people', 'people', $people > 0 ? (string) $people : get_string('none', 'local_wwadmin'),
                 $people < 1, new \moodle_url('/local/wwadmin/people.php')),
             self::tile('classes', 'classes', $courses > 0 ? (string) $courses : get_string('none', 'local_wwadmin'),
@@ -114,6 +114,59 @@ class home {
             self::treaty_tile($roots),
             self::library_tile(),
         ];
+        $funder = self::funder_tile();
+        if ($funder) {
+            $tiles[] = $funder;
+        }
+        $cards = self::cards_tile();
+        if ($cards) {
+            $tiles[] = $cards;
+        }
+        return $tiles;
+    }
+
+    /**
+     * The funder report for the schools this person administers.
+     *
+     * @return array|null
+     */
+    private static function funder_tile(): ?array {
+        if (!class_exists(\local_wwreports\funder::class)) {
+            return null;
+        }
+        $scopes = \local_wwreports\funder::scopes();
+        $url = new \moodle_url('/local/wwreports/funder.php');
+        if (count($scopes) === 1) {
+            return self::tile('funder', 'funder', $scopes[0]['name'], false, $url);
+        }
+        if (!$scopes) {
+            return self::tile('funder', 'funder', get_string('none', 'local_wwadmin'), true, $url);
+        }
+        return self::tile('funder', 'funder', (string) count($scopes), false, $url);
+    }
+
+    /**
+     * Report cards for students in the schools this person administers.
+     *
+     * @return array|null
+     */
+    private static function cards_tile(): ?array {
+        global $USER;
+
+        if (!class_exists(\local_wwreports\access::class)) {
+            return null;
+        }
+        $students = \local_wwreports\access::students_administered((int) $USER->id);
+        $url = new \moodle_url('/local/wwreports/card.php');
+        $count = count($students);
+        if ($count === 0) {
+            return self::tile('cards', 'cards', get_string('none', 'local_wwadmin'), true, $url);
+        }
+        if ($count === 1) {
+            $student = reset($students);
+            return self::tile('cards', 'cards', \local_wwpoints\points::plain(fullname($student)), false, $url);
+        }
+        return self::tile('cards', 'cards', (string) $count, false, $url);
     }
 
     /**

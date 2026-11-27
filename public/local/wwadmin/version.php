@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026112600;
+$plugin->version   = 2026112601;
 $plugin->requires  = 2026100200;
 $plugin->component = 'local_wwadmin';
 $plugin->dependencies = [
